@@ -1,7 +1,7 @@
 import collections
 from python_linq.linq_exceptions import NoSuchElementError
 
-class Linq():
+class From():
 
     def __init__(self, iterable):
         """
@@ -58,7 +58,7 @@ class Linq():
         def shape(x):
             return {"value": x}
 
-        coolA = Linq(a).select(shape(x)).to_list()
+        coolA = From(a).select(shape(x)).to_list()
 
         coolA == [
             {
@@ -71,7 +71,7 @@ class Linq():
         ]
 
         """
-        return Linq(predicate(x) for x in self)
+        return From(predicate(x) for x in self)
 
     def select_many(self, predicate = lambda x: x):
 
@@ -80,13 +80,13 @@ class Linq():
 
         Example:
 
-        l = Linq([[1, 2], [3, 4]])  
+        l = From([[1, 2], [3, 4]])  
         result = l.select_many().to_list()
 
         result == [1, 2, 3, 4]
         """
 
-        return Linq(predicate(x) for y in self for x in y)
+        return From(predicate(x) for y in self for x in y)
 
     def where(self, predicate):
         """
@@ -94,12 +94,12 @@ class Linq():
 
         Example:
 
-        l = Linq([2, 3, 4])  
+        l = From([2, 3, 4])  
         result = l.where(lambda x: x % 2 == 0).to_list()
 
         result == [2, 4]
         """
-        return Linq(x for x in self if predicate(x))
+        return From(x for x in self if predicate(x))
 
     def first(self, predicate = lambda x: True):
         """
