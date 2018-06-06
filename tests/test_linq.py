@@ -1,4 +1,4 @@
-from python_linq.linq import Linq
+from python_linq import Linq
 from python_linq.linq_exceptions import *
 import unittest
 
