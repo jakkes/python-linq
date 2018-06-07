@@ -94,3 +94,66 @@ class TestBasicFunctions(unittest.TestCase):
         self.assertEqual(expected, result)
 
         self.assertIsNone(From(self.simple).first_or_none(lambda x: x > 5))
+
+    def test_distinct(self):
+        expected = [1,2,3,4]
+        subject = [1,1,1,1,1,1,1,1,2,3,3,3,3,3,4]
+
+        result = From(subject).distinct().to_list()
+
+        self.assertListEqual(expected, result)
+
+        subject = [
+            {
+                "value": 1
+            },
+            {
+                "value": 1
+            },
+            {
+                "value": 1
+            },
+            {
+                "value": 2
+            },
+            {
+                "value": 2
+            },
+            {
+                "value": 3
+            }
+        ]
+        expected = [1, 2, 3]
+
+        result = From(subject).distinct(lambda x: x["value"]).select(lambda x: x["value"]).to_list()
+
+        self.assertListEqual(expected,result)
+
+    def test_group_join(self):
+        expected = [
+            {
+                "a": 1,
+                "b": 4
+            },
+            {
+                "a": 4,
+                "b": 9
+            },
+            {
+                "a": 9,
+                "b": 16
+            }
+        ]
+        subjA = [1, 2, 3]
+        subjB = [1, 2, 3]
+
+        result = From(subjA).group_join(
+            subjB,
+            lambda x: x,
+            lambda x: x,
+            lambda inner, outer: {"a": inner * inner, "b": (outer + 1) * (outer + 1)}
+        ).to_list()
+
+        self.assertListEqual(expected, result)
+
+        

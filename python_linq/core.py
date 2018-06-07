@@ -12,6 +12,7 @@ class From():
             raise ValueError("Object is not iterable")
         
         self.iterable = iterable
+        self.extensions = []
 
     def __contains__(self, object):
         for obj in self:
@@ -28,6 +29,10 @@ class From():
     def __iter__(self):
         for obj in self.iterable:
             yield obj
+        
+        for extension in self.extensions:
+            for obj in extension:
+                yield obj
 
     def count(self, predicate=lambda x: True):
         """
@@ -161,14 +166,94 @@ class From():
         """
         raise NotImplementedError()
 
+    def concat(self, iterable):
+        """
+        Adds the supplied iterable to the sequence
+        """
+
+        if not isinstance(iterable, collections.Iterable):
+            raise ValueError("Object is not iterable")
+
+        self.extensions.append(iterable)
+
+    def distinct(self, predicate = lambda x: x):
+        """
+        Returns objects that are distinct in the given value
+        """
+        cache = set()
+
+        def sequence():
+            for x in self:
+                if predicate(x) in cache:
+                    continue
+                else:
+                    cache.add(predicate(x))
+                    yield x
+
+        return From(x for x in sequence())
+        
+    def element_at_or_none(self, i):
+        """
+        Returns the element at index i. If index is out of range, None is returned
+        """
+        n = 0
+        for o in self:
+            if n == i:
+                return o
+            n += 1
+        return None
+
+    def element_at(self, i):
+        """
+        Returns the element at index i. Raises IndexError if index is out of range
+        """
+        result = self.element_at_or_none(i)
+        if result is None:
+            raise IndexError()
+        else:
+            return result
+
+
+
     def to_list(self):
         """
         Returns the objects in a list format
         """
         return list(x for x in self)
 
-    def group_by(self, key, selector_func):
+    def group_by(self, key_func, selector_func = lambda x: x):
         """
         Groups a list of objects into lists of objects defined by selector_func grouped by key
         """
+        grp = dict()
+
+        for obj in self:
+            key = key_func(obj)
+            if key in grp:
+                grp[key].append(selector_func(obj))
+            else:
+                grp[key] = list(selector_func(obj))
+
+        
+
         raise NotImplementedError()
+
+    def group_join(self, extension, inner, outer, selector):
+        """
+        Joins two sequences based on equality of inner and outer and forms objects according to selector
+
+        Keyword arguments:
+        extension -- the other sequence  
+        inner -- the object to use from THIS sequence for comparison with the extension sequence  
+        outer -- the object to use from the EXTENSION sequence for comparison with this sequence  
+        selector -- the object to form based on the inner and outer objects joined. Note, the second argument in selector (outerObject) can be None if none is found 
+        """
+        def sequence():
+            for innerObj in self:
+                outerObj = From(extension).first_or_none(lambda x: inner(innerObj) == outer(x))
+                yield selector(innerObj, outerObj)
+
+        return From(x for x in sequence())
+
+    
+        
