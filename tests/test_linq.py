@@ -1,4 +1,5 @@
 from python_linq import From
+from python_linq.core import Grouping
 from python_linq.linq_exceptions import *
 import unittest
 
@@ -156,4 +157,134 @@ class TestBasicFunctions(unittest.TestCase):
 
         self.assertListEqual(expected, result)
 
+    def test_group_by(self):
         
+        subject = [
+            {
+                "id": 1,
+                "data": 1
+            },
+            {
+                "id": 1,
+                "data": 2
+            },
+            {
+                "id": 2,
+                "data": 3
+            },
+            {
+                "id": 2,
+                "data": 4
+            },
+            {
+                "id": 3,
+                "data": 5
+            },
+            {
+                "id": 4,
+                "data": 6
+            }
+        ]
+
+        result = (
+            From(subject)
+            .group_by(lambda x: x["id"], lambda x: x["data"])
+            .select(lambda x: x.values)
+            .to_list()
+        )
+        expected = [[1, 2], [3, 4], [5], [6]]
+        self.assertListEqual(result, expected)
+
+        result = (
+            From(subject)
+            .group_by(lambda x: x["id"], lambda x: x["data"])
+            .select(
+                lambda x: From(x.values).max()
+            )
+            .to_list()
+        )
+        expected = [2, 4, 5, 6]
+        self.assertListEqual(result, expected)
+        
+    def test_intersect(self):
+        subject1 = [1,2,3,4]
+        subject2 = [3,4,5,6]
+
+        result = From(subject1).intersect(subject2).to_list()
+        expected = [3,4]
+        self.assertListEqual(result,expected)
+
+    def test_join(self):
+        subject1 = [
+            {
+                "id": 1,
+                "A": 2
+            },
+            {
+                "id": 2,
+                "A": 3
+            },
+            {
+                "id": 3,
+                "A": 4
+            },
+            {
+                "id": 4,
+                "A": 5
+            },
+            {
+                "id": 5,
+                "A": 6
+            }
+        ]
+        subject2 = [
+            {
+                "id": 1,
+                "B": 11
+            },
+            {
+                "id": 2,
+                "B": 12
+            },
+            {
+                "id": 3,
+                "B": 13
+            },
+            {
+                "id": 4,
+                "B": 14
+            }
+        ]
+
+        result = (
+            From(subject1)
+            .join(
+                subject2,
+                lambda x: x["id"],
+                lambda x: x["id"],
+                lambda inner, outer: { "A": inner["A"], "B": outer["B"] }
+            )
+            .to_list()
+        )
+        expected = [
+            {
+                "A": 2,
+                "B": 11
+            },
+            {
+                "A": 3,
+                "B": 12
+            },
+            {
+                "A": 4,
+                "B": 13
+            },
+            {
+                "A": 5,
+                "B": 14
+            }
+        ]
+        self.assertListEqual(expected, result)
+
+if __name__ == '__main__':
+    unittest.main()

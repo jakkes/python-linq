@@ -106,6 +106,18 @@ class From():
         """
         return From(x for x in self if predicate(x))
 
+    def max(self, predicate = lambda x: x):
+        """
+        Returns the maximum value found
+        """
+        return max(predicate(x) for x in self)
+
+    def min(self, predicate = lambda x: x):
+        """
+        Returns the minimum value found
+        """
+        return min(predicate(x) for x in self)
+
     def first(self, predicate = lambda x: True):
         """
         Returns first element satisfying the condition.
@@ -213,7 +225,21 @@ class From():
         else:
             return result
 
+    def intersect(self, iterable):
+        
+        """
+        Returns the intersection of this sequence and another one. In other words, returns only the objects that have equal keys in both iterables.
+        """
 
+        if not isinstance(iterable, collections.Iterable):
+            raise ValueError("Object is not iterable")
+        
+        def sequence():
+            for x in self:
+                if From(iterable).any(lambda y: x == y):
+                    yield x
+
+        return From(x for x in sequence())
 
     def to_list(self):
         """
@@ -225,35 +251,96 @@ class From():
         """
         Groups a list of objects into lists of objects defined by selector_func grouped by key
         """
-        grp = dict()
+        def sequence():
 
-        for obj in self:
-            key = key_func(obj)
-            if key in grp:
-                grp[key].append(selector_func(obj))
-            else:
-                grp[key] = list(selector_func(obj))
+            ### TODO: Rewrite this using yield
 
+            groups = dict()
+            for x in self:
+                key = key_func(x)
+                if key in groups:
+                    groups[key].append(selector_func(x))
+                else:
+                    groups[key] = [selector_func(x)]
+
+            for key in groups:
+                yield Grouping(key, groups[key])
+
+        return From(x for x in sequence())
+
+    def group_join(self, extension, innerKey, outerKey, selector):
         
-
-        raise NotImplementedError()
-
-    def group_join(self, extension, inner, outer, selector):
+        ### TODO: Fix if outerObj is None
+        
         """
-        Joins two sequences based on equality of inner and outer and forms objects according to selector
+        Group joins two sequences based on equality of inner and outer and forms objects according to selector
 
         Keyword arguments:
         extension -- the other sequence  
-        inner -- the object to use from THIS sequence for comparison with the extension sequence  
-        outer -- the object to use from the EXTENSION sequence for comparison with this sequence  
+        innerKey -- the object to use from THIS sequence for comparison with the extension sequence  
+        outerKey -- the object to use from the EXTENSION sequence for comparison with this sequence  
         selector -- the object to form based on the inner and outer objects joined. Note, the second argument in selector (outerObject) can be None if none is found 
         """
         def sequence():
             for innerObj in self:
-                outerObj = From(extension).first_or_none(lambda x: inner(innerObj) == outer(x))
+                outerObj = From(extension).first_or_none(lambda x: innerKey(innerObj) == outerKey(x))
                 yield selector(innerObj, outerObj)
 
         return From(x for x in sequence())
 
+    def join(self, outer, innerKey, outerKey, result):
+
+        ### TODO: Fix if outerObj is None
+
+        """
+        Joins two sequences on the innerKey and outerKey functions and returns whatever specified in result(innerObj, outerObj)
+        """
+
+        if not isinstance(outer, collections.Iterable):
+            raise ValueError("Object is not iterable")
+
+        def sequence():
+            for x in self:
+                outerObj = From(outer).first_or_none(lambda y: innerKey(x) == outerKey(y))
+                yield result(x, outerObj)
+
+        return From(x for x in sequence())
+
+    def union(self, outer):
+
+        """
+        Returns the union of two sequences, that is all unique elements that exist in either of the two sequences
+        """
+
+        if not isinstance(outer, collections.Iterable):
+            raise ValueError("Object is not iterable")
+
+        cache = set()
+
+        def sequence():
+            for x in self:
+                if x in cache:
+                    continue
+                else:
+                    cache.add(x)
+                    yield x
+
+            for x in outer:
+                if x in cache:
+                    continue
+                else:
+                    cache.add(x)
+                    yield x
+
+        return From(x for x in sequence())
+
     
-        
+
+
+class Grouping:
+    def __init__(self, key, values):
+        self.values = values
+        self.key = key
+
+    def __iter__(self):
+        yield from self.values
