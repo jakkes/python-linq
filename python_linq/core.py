@@ -78,7 +78,7 @@ class From():
         """
         return From(predicate(x) for x in self)
 
-    def select_many(self, predicate = lambda x: x):
+    def selectMany(self, predicate = lambda x: x):
 
         """
         Combines elements from multiple lists.
@@ -86,7 +86,7 @@ class From():
         Example:
 
         l = From([[1, 2], [3, 4]])  
-        result = l.select_many().to_list()
+        result = l.selectMany().to_list()
 
         result == [1, 2, 3, 4]
         """
@@ -130,7 +130,7 @@ class From():
 
         raise NoSuchElementError()
 
-    def first_or_none(self, predicate = lambda x: True):
+    def firstOrNone(self, predicate = lambda x: True):
         """
         Returns first element satisfying the condition. If no element is found, None is returned.
         """
@@ -139,7 +139,7 @@ class From():
                 return x
         return None
 
-    def last_or_none(self, predicate = lambda x: True):
+    def lastOrNone(self, predicate = lambda x: True):
         """
         Returns the last element in the sequence that satifies the condition. If no element is found, None is returned
         """
@@ -153,7 +153,7 @@ class From():
         """
         Returns the last element in the sequence that satifies the condition. If no element is found, NoSuchElementError is raised
         """
-        last = self.last_or_none(predicate)
+        last = self.lastOrNone(predicate)
 
         if last is None:
             raise NoSuchElementError()
@@ -204,7 +204,7 @@ class From():
 
         return From(x for x in sequence())
         
-    def element_at_or_none(self, i):
+    def elementAtOrNone(self, i):
         """
         Returns the element at index i. If index is out of range, None is returned
         """
@@ -215,11 +215,11 @@ class From():
             n += 1
         return None
 
-    def element_at(self, i):
+    def elementAt(self, i):
         """
         Returns the element at index i. Raises IndexError if index is out of range
         """
-        result = self.element_at_or_none(i)
+        result = self.elementAtOrNone(i)
         if result is None:
             raise IndexError()
         else:
@@ -241,13 +241,13 @@ class From():
 
         return From(x for x in sequence())
 
-    def to_list(self):
+    def toList(self):
         """
         Returns the objects in a list format
         """
         return list(x for x in self)
 
-    def group_by(self, key_func, selector_func = lambda x: x):
+    def groupBy(self, key_func, selector_func = lambda x: x):
         """
         Groups a list of objects into lists of objects defined by selector_func grouped by key
         """
@@ -268,7 +268,7 @@ class From():
 
         return From(x for x in sequence())
 
-    def group_join(self, extension, innerKey, outerKey, selector):
+    def groupJoin(self, extension, innerKey, outerKey, selector):
         
         ### TODO: Fix if outerObj is None
         
@@ -283,7 +283,7 @@ class From():
         """
         def sequence():
             for innerObj in self:
-                outerObj = From(extension).first_or_none(lambda x: innerKey(innerObj) == outerKey(x))
+                outerObj = From(extension).firstOrNone(lambda x: innerKey(innerObj) == outerKey(x))
                 yield selector(innerObj, outerObj)
 
         return From(x for x in sequence())
@@ -301,11 +301,51 @@ class From():
 
         def sequence():
             for x in self:
-                outerObj = From(outer).first_or_none(lambda y: innerKey(x) == outerKey(y))
+                outerObj = From(outer).firstOrNone(lambda y: innerKey(x) == outerKey(y))
                 if outerObj is None:
                     yield result(x, NoneDict())
                 else:
                     yield result(x, outerObj)
+
+        return From(x for x in sequence())
+
+    def take(self, i):
+        """
+        Returns i objects from the sequence
+        """
+        def sequence():
+            n = 0
+            for x in self:
+                
+                if n >= i:
+                    break
+                
+                yield x
+                n += 1
+
+        return From(x for x in sequence())
+
+    def takeWhile(self, predicate):
+        """
+        Returns objects as long as the condition is fulfilled
+        """
+
+        def sequence():
+            for x in self:
+                if predicate(x):
+                    yield x
+                else:
+                    break
+
+        return From(x for x in sequence())
+
+    def orderBy(self, key, descending = False):
+        """
+        Returns an order sequence with respect to the given key
+        """
+
+        def sequence():
+            yield from sorted(self, key, descending)
 
         return From(x for x in sequence())
 
@@ -336,9 +376,6 @@ class From():
                     yield x
 
         return From(x for x in sequence())
-
-    
-
 
 class Grouping:
     def __init__(self, key, values):

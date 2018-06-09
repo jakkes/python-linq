@@ -28,7 +28,7 @@ class TestBasicFunctions(unittest.TestCase):
     def test_to_list(self):
         self.assertListEqual(
             self.simple,
-            From(self.simple).to_list()
+            From(self.simple).toList()
         )
 
     def test_simple_combination(self):
@@ -41,7 +41,7 @@ class TestBasicFunctions(unittest.TestCase):
 
         obj = From(self.objects)
         
-        result = obj.select(lambda x: x["value"]).to_list()
+        result = obj.select(lambda x: x["value"]).toList()
 
         self.assertEqual(result, expected)
 
@@ -53,7 +53,7 @@ class TestBasicFunctions(unittest.TestCase):
         def shaper(x):
             return {"value": x}
 
-        result = obj.select(shaper).to_list()
+        result = obj.select(shaper).toList()
 
         self.assertListEqual(expected, result)
 
@@ -61,7 +61,7 @@ class TestBasicFunctions(unittest.TestCase):
         expected = [2, 4]
         obj = From(self.simple)
 
-        result = obj.where(lambda x: x % 2 == 0).to_list()
+        result = obj.where(lambda x: x % 2 == 0).toList()
 
         self.assertListEqual(expected, result)
 
@@ -69,7 +69,7 @@ class TestBasicFunctions(unittest.TestCase):
         expected = [1, 2, 3, 4]
         obj = From([[1, 2], [3, 4]])
 
-        result = obj.select_many().to_list()
+        result = obj.selectMany().toList()
 
         self.assertListEqual(expected, result)
 
@@ -94,13 +94,13 @@ class TestBasicFunctions(unittest.TestCase):
         result = From(self.simple).first(lambda x: x % 2 != 0)
         self.assertEqual(expected, result)
 
-        self.assertIsNone(From(self.simple).first_or_none(lambda x: x > 5))
+        self.assertIsNone(From(self.simple).firstOrNone(lambda x: x > 5))
 
     def test_distinct(self):
         expected = [1,2,3,4]
         subject = [1,1,1,1,1,1,1,1,2,3,3,3,3,3,4]
 
-        result = From(subject).distinct().to_list()
+        result = From(subject).distinct().toList()
 
         self.assertListEqual(expected, result)
 
@@ -126,7 +126,7 @@ class TestBasicFunctions(unittest.TestCase):
         ]
         expected = [1, 2, 3]
 
-        result = From(subject).distinct(lambda x: x["value"]).select(lambda x: x["value"]).to_list()
+        result = From(subject).distinct(lambda x: x["value"]).select(lambda x: x["value"]).toList()
 
         self.assertListEqual(expected,result)
 
@@ -148,12 +148,12 @@ class TestBasicFunctions(unittest.TestCase):
         subjA = [1, 2, 3]
         subjB = [1, 2, 3]
 
-        result = From(subjA).group_join(
+        result = From(subjA).groupJoin(
             subjB,
             lambda x: x,
             lambda x: x,
             lambda inner, outer: {"a": inner * inner, "b": (outer + 1) * (outer + 1)}
-        ).to_list()
+        ).toList()
 
         self.assertListEqual(expected, result)
 
@@ -188,20 +188,20 @@ class TestBasicFunctions(unittest.TestCase):
 
         result = (
             From(subject)
-            .group_by(lambda x: x["id"], lambda x: x["data"])
+            .groupBy(lambda x: x["id"], lambda x: x["data"])
             .select(lambda x: x.values)
-            .to_list()
+            .toList()
         )
         expected = [[1, 2], [3, 4], [5], [6]]
         self.assertListEqual(result, expected)
 
         result = (
             From(subject)
-            .group_by(lambda x: x["id"], lambda x: x["data"])
+            .groupBy(lambda x: x["id"], lambda x: x["data"])
             .select(
                 lambda x: From(x.values).max()
             )
-            .to_list()
+            .toList()
         )
         expected = [2, 4, 5, 6]
         self.assertListEqual(result, expected)
@@ -210,7 +210,7 @@ class TestBasicFunctions(unittest.TestCase):
         subject1 = [1,2,3,4]
         subject2 = [3,4,5,6]
 
-        result = From(subject1).intersect(subject2).to_list()
+        result = From(subject1).intersect(subject2).toList()
         expected = [3,4]
         self.assertListEqual(result,expected)
 
@@ -264,7 +264,7 @@ class TestBasicFunctions(unittest.TestCase):
                 lambda x: x["id"],
                 lambda inner, outer: { "A": inner["A"], "B": outer["B"] }
             )
-            .to_list()
+            .toList()
         )
         expected = [
             {
@@ -282,6 +282,10 @@ class TestBasicFunctions(unittest.TestCase):
             {
                 "A": 5,
                 "B": 14
+            },
+            {
+                "A": 6,
+                "B": None
             }
         ]
         self.assertListEqual(expected, result)
