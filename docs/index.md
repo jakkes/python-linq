@@ -16,4 +16,4 @@ totalSpending = From(data).sum(lambda x: x["spending"])
 averageSpending = From(data).avg(lambda x: x["spending"])
 ```
 
-[test link] (../functions/test)
+[test link](functions/test.md)
