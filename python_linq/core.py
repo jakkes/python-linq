@@ -302,11 +302,14 @@ class From():
         def sequence():
             for x in self:
                 outerObj = From(outer).first_or_none(lambda y: innerKey(x) == outerKey(y))
-                yield result(x, outerObj)
+                if outerObj is None:
+                    yield result(x, NoneDict())
+                else:
+                    yield result(x, outerObj)
 
         return From(x for x in sequence())
 
-    def union(self, outer):
+    def union(self, outer, key = lambda x: x):
 
         """
         Returns the union of two sequences, that is all unique elements that exist in either of the two sequences
@@ -319,17 +322,17 @@ class From():
 
         def sequence():
             for x in self:
-                if x in cache:
+                if key(x) in cache:
                     continue
                 else:
-                    cache.add(x)
+                    cache.add(key(x))
                     yield x
 
             for x in outer:
-                if x in cache:
+                if key(x) in cache:
                     continue
                 else:
-                    cache.add(x)
+                    cache.add(key(x))
                     yield x
 
         return From(x for x in sequence())
@@ -344,3 +347,52 @@ class Grouping:
 
     def __iter__(self):
         yield from self.values
+
+class NoneDict(dict):
+    def __setitem__(self, key, item):
+        pass
+
+    def __getitem__(self, key):
+        return None
+
+    def __repr__(self):
+        return None
+
+    def __len__(self):
+        return 0
+
+    def __delitem__(self, key):
+        pass
+
+    def clear(self):
+        pass
+
+    def copy(self):
+        return NoneDict()
+
+    def has_key(self, k):
+        return False
+
+    def update(self, *args, **kwargs):
+        return NoneDict()
+
+    def keys(self):
+        return []
+
+    def values(self):
+        return []
+
+    def items(self):
+        return []
+
+    def pop(self, *args):
+        return None
+
+    def __contains__(self, item):
+        return False
+
+    def __iter__(self):
+        yield None
+
+    def __str__(self):
+        return None
