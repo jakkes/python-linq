@@ -17,7 +17,7 @@ pip install python-linq
         - `>>> [4, 7, 12]`
 
 ## Examples
-Coming soon... Meanwhile, have a look at the tests.
+[>>>>> Examples <<<<<](https://jakkes.github.io/python-linq/examples.html)
 
 ## Documentation
-Coming soon...
+[>>>>> Documentation <<<<<](https://jakkes.github.io/python-linq/docs.html)
