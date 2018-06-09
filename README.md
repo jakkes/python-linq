@@ -6,7 +6,7 @@ Inspired by `py-linq` and `linq.py`.
 ## Install
 Install using pip
 ```
-pip install python-linq
+pip install --user python-linq
 ```
 
 ## Usage
@@ -16,8 +16,5 @@ pip install python-linq
     - `sq3 = From([1, 2, 3]).select(lambda x: x * x + 3).to_list()`
         - `>>> [4, 7, 12]`
 
-## Examples
-[>>>>> Examples <<<<<](https://jakkes.github.io/python-linq/examples.html)
-
-## Documentation
-[>>>>> Documentation <<<<<](https://jakkes.github.io/python-linq/docs.html)
+## Documentation & Examples
+[See this link](https://jakkes.github.io/python-linq/docs.html)

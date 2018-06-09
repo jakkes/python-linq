@@ -25,11 +25,7 @@ To install, simply run
 pip install --user python-linq
 ```
 
-Documentation
--------------
+Documentation & Examples
+------------------------
 
-[>>>>> Documentation <<<<<](docs.md)
-
-Examples
---------
-[>>>>> Examples <<<<<](examples.md)
+[See this link](docs.md)
