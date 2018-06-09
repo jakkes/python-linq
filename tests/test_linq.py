@@ -131,30 +131,16 @@ class TestBasicFunctions(unittest.TestCase):
         self.assertListEqual(expected,result)
 
     def test_group_join(self):
-        expected = [
-            {
-                "a": 1,
-                "b": 4
-            },
-            {
-                "a": 4,
-                "b": 9
-            },
-            {
-                "a": 9,
-                "b": 16
-            }
-        ]
+        
         subjA = [1, 2, 3]
-        subjB = [1, 2, 3]
+        subjB = [2, 2, 3, 4]
 
         result = From(subjA).groupJoin(
             subjB,
             lambda x: x,
-            lambda x: x,
-            lambda inner, outer: {"a": inner * inner, "b": (outer + 1) * (outer + 1)}
-        ).toList()
-
+            lambda x: x
+        ).select(lambda x: x.outer).toList()
+        expected = [[], [2, 2], [3]]
         self.assertListEqual(expected, result)
 
     def test_group_by(self):
@@ -282,10 +268,6 @@ class TestBasicFunctions(unittest.TestCase):
             {
                 "A": 5,
                 "B": 14
-            },
-            {
-                "A": 6,
-                "B": None
             }
         ]
         self.assertListEqual(expected, result)
