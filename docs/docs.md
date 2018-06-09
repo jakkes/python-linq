@@ -17,3 +17,4 @@ Functions
 | [any](docs/any.md) | Determines whether any element fulfills a specified condition |
 | [contains](docs/contains.md) | Checks whether an object is in the collection |
 | [count](docs/count.md) | Gives the amount of elements fulfilling a specific condition |
+| [select](docs/select.md) | Transforms the elements in the collection into a new collection |
