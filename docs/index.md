@@ -16,4 +16,20 @@ totalSpending = From(data).sum(lambda x: x["spending"])
 averageSpending = From(data).avg(lambda x: x["spending"])
 ```
 
-[test link](functions/test.md)
+Installation
+------------
+
+To install, simply run
+
+``` bash
+pip install --user python-linq
+```
+
+Documentation
+-------------
+
+[>>>>> Documentation <<<<<](docs.md)
+
+Examples
+--------
+[>>>>> Examples <<<<<](examples.md)
