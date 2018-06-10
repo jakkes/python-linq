@@ -1,5 +1,5 @@
 `From.all(condition)`
-=======================
+=====================
 
 Determines whether all elements fulfill a specified condition.
 
