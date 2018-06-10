@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="python-linq",
-    version="0.1.0",
+    version="0.1.1",
     author="Jakob Stigenberg",
     description="Brings LINQ to Python",
     long_description=long_description,
@@ -18,3 +18,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ),
 )
+
+### Publish
+### python3 setup.py sdist bdist_wheel
+### twine upload dist/*
