@@ -1,5 +1,5 @@
 # Python-linq
-Provides simple to use LINQ features to Python.
+Provides simple to use LINQ features to Python 3.x.
 
 Inspired by `py-linq` and `linq.py`.
 

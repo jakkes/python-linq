@@ -17,6 +17,7 @@ Functions
 | [any](docs/any.md) | Determines whether any element fulfills a specified condition |
 | [contains](docs/contains.md) | Checks whether an object is in the collection |
 | [count](docs/count.md) | Gives the amount of elements fulfilling a specific condition |
+| [first](docs/first.md) | Returns the first element satisfying a specific condition |
 | [max](docs/max.md) | Finds the maximum value |
 | [min](docs/min.md) | Finds the minimum value |
 | [select](docs/select.md) | Transforms the elements in the collection into a new collection |
