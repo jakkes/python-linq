@@ -12,8 +12,10 @@ Python-LINQ aims to bring the useful LINQ features from C# to Python. LINQ makes
 stored in a variable `data`. We can now use LINQ to query this data, much like SQL. For example
 
 ``` python
-totalSpending = From(data).sum(lambda x: x["spending"])
-averageSpending = From(data).avg(lambda x: x["spending"])
+>>> From(data).sum(lambda x: x["spending"])
+45
+>>> From(data).avg(lambda x: x["spending"])
+15
 ```
 
 Installation
