@@ -200,6 +200,28 @@ class TestBasicFunctions(unittest.TestCase):
         expected = [3,4]
         self.assertListEqual(result,expected)
 
+        subjectA = [
+            {
+                "id": 1,
+                "value": 3
+            }, {
+                "id": 2,
+                "value": 4
+            }
+        ]
+        subjectB = [
+            {
+                "id": 2,
+                "value": 4
+            }, {
+                "id": 3,
+                "value": 5
+            }
+        ]
+        result = From(subjectA).intersect(subjectB, key=lambda x: x["id"]).select(lambda x: x["value"]).toList()
+        expected = [4]
+        self.assertListEqual(expected, result)
+
     def test_join(self):
         subject1 = [
             {
@@ -271,6 +293,21 @@ class TestBasicFunctions(unittest.TestCase):
             }
         ]
         self.assertListEqual(expected, result)
+
+    def test_concat(self):
+        subjectA = [
+            { "value": 1},
+            { "value": 2}
+        ]
+        subjectB = [
+            { "value": 3 },
+            { "value": 4 }
+        ]
+        result = From(subjectA).select(lambda x: x["value"]).concat(
+            From(subjectB).select(lambda x: x["value"])
+        ).toList()
+        expected = [1, 2, 3, 4]
+        self.assertListEqual(result, expected)
 
 if __name__ == '__main__':
     unittest.main()
