@@ -63,7 +63,7 @@ Examples
 >>>         "name": "Jakob"
 >>>     }, {
 >>>         "id": 2,
->>>         "name": "Johan
+>>>         "name": "Johan"
 >>>     }
 >>> ]
 >>> 
