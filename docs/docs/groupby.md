@@ -35,10 +35,16 @@ Examples
 >>> ]
 >>> 
 >>> # Keys
->>> From(subject).groupBy(lambda x: x["age"]).select(lambda x: x.key).toList()
+>>> From(subject).groupBy(
+>>>     lambda x: x["age"], 
+>>>     transform = lambda x: x["name"]
+>>> ).select(lambda x: x.key).toList()
 [10, 11]
 
 >>> # Names
->>> From(subject).groupBy(lambda x: x["age"]).select(lambda x: x.values).toList()
+>>> From(subject).groupBy(
+>>>     lambda x: x["age"],
+>>>     transform=lambda x: x["name"]
+>>> ).select(lambda x: x.values).toList()
 [ ["Steven", "Johan" ], [ "Lars" ] ]
 ```
