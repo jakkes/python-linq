@@ -379,6 +379,14 @@ class From():
 
         return From(x for x in sequence())
 
+    def forEach(self, func):
+        
+        """Executes a function for each element.
+        """
+
+        for x in self:
+            func(x)
+
     def groupJoin(self, extension, innerKey, outerKey, innerTransform = lambda x: x, outerTransform = lambda x: x):
         
         """Joins the sequence with objects from another sequence.

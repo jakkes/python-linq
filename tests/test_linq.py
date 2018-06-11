@@ -143,6 +143,58 @@ class TestBasicFunctions(unittest.TestCase):
         expected = [[], [2, 2], [3]]
         self.assertListEqual(expected, result)
 
+        grades = [
+            {
+                "userid": 1,
+                "grade": "A"
+            }, {
+                "userid": 1,
+                "grade": "B"
+            }, {
+                "userid": 2,
+                "grade": "B"
+            }, {
+                "userid": 2,
+                "grade": "B"
+            }
+        ]
+        students = [
+            {
+                "id": 1,
+                "name": "Jakob"
+            }, {
+                "id": 2,
+                "name": "Johan"
+            }
+        ]
+        names = From(students).groupJoin(
+            grades,
+            innerKey = lambda x: x["id"],
+            outerKey = lambda x: x["userid"],
+            innerTransform = lambda x: x["name"],
+            outerTransform = lambda x: x["grade"]
+        ).select(lambda x: x.inner).toList()
+
+        expected = ["Jakob", "Johan"]
+        self.assertListEqual(
+            names,
+            expected
+        )
+
+        grades = From(students).groupJoin(
+            grades,
+            innerKey = lambda x: x["id"],
+            outerKey = lambda x: x["userid"],
+            innerTransform = lambda x: x["name"],
+            outerTransform = lambda x: x["grade"]
+        ).select(lambda x: x.outer).toList()
+
+        expected = [["A","B"], ["B","B"]]
+        self.assertListEqual(
+            grades,
+            expected
+        )
+
     def test_group_by(self):
         
         subject = [

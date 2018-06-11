@@ -16,7 +16,14 @@ Parameters
 Returns
 -------
 
-`From` object wrapping a collection of `Grouping` objects. See [Grouping](docs/grouping.md).
+`From` object wrapping a collection of `Grouping` objects.
+
+### Grouping object ###
+Every `Grouping` object has two attributes, key and values.
+- `Grouping.key`
+    - The `key` value associated to the group.
+- `Grouping.values`
+    - The collection of elements associated to the key.
 
 Examples
 --------

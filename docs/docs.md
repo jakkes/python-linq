@@ -24,8 +24,11 @@ Functions
 | [elementAtOrNone](docs/elementatornone.md) | Returns the element at a specific index or `None` if none is found |
 | [first](docs/first.md) | Returns the first element |
 | [firstOrNone](docs/firstornone.md) | Returns the first element satisfying a given condition. If none is found, `None` is returned |
+| [forEach](docs/foreach.md) | Executes a function for each element |
 | [groupBy](docs/groupby.md) | Groups the elements by a specific key |
+| [groupJoin](docs/groupjoin.md) | Joins the collection with objects from another collection |
 | [intersect](docs/intersect.md) | Given another collection, filters the elements such that the remaining ones exist it both the given and the underlying collection |
+| [join](docs/join.md) | Joins the collection with objects from another collection |
 | [last](docs/lastornone.md) | Returns the last element |
 | [lastOrNone](docs/lastornone.md) | Returns the last element satisfying a given condition. If no element is found, `None` is returned |
 | [max](docs/max.md) | Finds the maximum value |
