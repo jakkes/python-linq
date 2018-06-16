@@ -16,6 +16,256 @@ class TestBasicFunctions(unittest.TestCase):
             }
         ]
 
+    def test_all(self):
+        self.assertFalse(From([1, 2, 3, 4, 5, 6]).all(lambda x: x == 4))
+
+        self.assertTrue(From([1, 2, 3, 4, 5, 6]).all(lambda x: x < 7))
+
+        subject = [
+            {
+                "id": 1,
+                "value": 2
+            },{
+                "id": 2,
+                "value": 3
+            }
+        ]
+        self.assertTrue(
+            From(subject).any(
+                lambda x: x["value"] == 2 or x["value"] == 3
+            )
+        )
+
+    def test_any(self):
+        self.assertTrue(From([1, 2, 3, 4, 5, 6]).any(lambda x: x == 4))
+
+        self.assertFalse(From([1, 2, 3, 4, 5, 6]).any(lambda x: x > 6))
+
+        subject = [
+            {
+                "id": 1,
+                "value": 2
+            },{
+                "id": 2,
+                "value": 3
+            }
+        ]
+        self.assertTrue(From(subject).any(lambda x: x["value"] == 2))
+
+    def test_average(self):
+        subject = [1, 2, 3, 4, 5]
+        self.assertEqual(
+            From(subject).average(),
+            3
+        )
+
+        self.assertEqual(
+            From(subject).average(lambda x: x*x),
+            11
+        )
+
+        subject = [
+            { "value": 1 },
+            { "value": 2 },
+            { "value": 3 }
+        ]
+        self.assertEqual(
+            From(subject).average(lambda x: x["value"]),
+            2
+        )
+
+    def test_concat(self):
+        
+        subjectA = [1, 2, 3]
+        subjectB = [4, 5, 6]
+        
+        self.assertListEqual(
+            From(subjectA).concat(subjectB).toList(),
+            [1, 2, 3, 4, 5, 6]
+        )
+
+        subjectA = [
+            { "value": 1},
+            { "value": 2}
+        ]
+        subjectB = [
+            { "value": 3 },
+            { "value": 4 }
+        ]
+        self.assertListEqual(
+            From(subjectA).select(lambda x: x["value"]).concat(
+                From(subjectB).select(lambda x: x["value"])
+            ).toList(),
+            [1, 2, 3, 4]
+        )
+
+    def test_contains(self):
+        self.assertTrue(From([1, 2, 3, 4]).contains(2))
+
+        self.assertFalse(From([1, 2, 3, 4]).contains(5))
+
+    def test_count(self):
+        self.assertEqual(
+            From([1, 2, 3, 4, 5, 6]).count(),
+            6
+        )
+
+        self.assertEqual(
+            From([1, 2, 3, 4, 5, 6]).count(lambda x: x > 3),
+            3
+        )
+
+        subject = [
+            {
+                "id": 1,
+                "value": 2
+            },{
+                "id": 2,
+                "value": 3
+            }
+        ]
+        self.assertEqual(
+            From(subject).count(lambda x: x["value"] > 2),
+            1
+        )
+
+    def test_distinct(self):
+        subject = [1, 1, 2, 3, 3, 3]
+        self.assertListEqual(
+            From(subject).distinct().toList(),
+            [1, 2, 3]
+        )
+
+        subject = [
+            {
+                "id": 1,
+                "value": 3
+            }, {
+                "id": 1,
+                "value": 3
+            }, {
+                "id": 2,
+                "value": 4
+            }, {
+                "id": 2,
+                "value": 4
+            }
+        ]
+        self.assertListEqual(
+            From(subject).distinct(lambda x: x["id"]).select(lambda x: x["value"]).toList(),
+            [3, 4]
+        )
+
+        expected = [1,2,3,4]
+        subject = [1,1,1,1,1,1,1,1,2,3,3,3,3,3,4]
+
+        result = From(subject).distinct().toList()
+
+        self.assertListEqual(expected, result)
+
+        subject = [
+            {
+                "value": 1
+            },
+            {
+                "value": 1
+            },
+            {
+                "value": 1
+            },
+            {
+                "value": 2
+            },
+            {
+                "value": 2
+            },
+            {
+                "value": 3
+            }
+        ]
+        expected = [1, 2, 3]
+
+        result = From(subject).distinct(lambda x: x["value"]).select(lambda x: x["value"]).toList()
+
+        self.assertListEqual(expected,result)
+
+    def test_elementat(self):
+        subject = [1, 2, 3, 4]
+        self.assertEqual(
+            From(subject).elementAt(2),
+            3
+        )
+
+        with self.assertRaises(IndexError):
+            From(subject).elementAt(4)
+
+        subject = [
+            { "value": 1 },
+            { "value": 2 }
+        ]
+        self.assertDictEqual(
+            From(subject).elementAt(0),
+            { "value": 1 }
+        )
+
+    def test_elementatornone(self):
+        
+        subject = [1, 2, 3, 4]
+        self.assertEqual(
+            From(subject).elementAtOrNone(2),
+            3
+        )
+
+        self.assertIsNone(From(subject).elementAtOrNone(4))
+
+        subject = [
+            { "value": 1 },
+            { "value": 2 }
+        ]
+        self.assertDictEqual(
+            From(subject).elementAtOrNone(0),
+            { "value": 1 }
+        )
+
+    def test_first(self):
+        subject = [1, 2, 3, 4]
+        self.assertEqual(
+            From(subject).first(lambda x: x % 2 == 0),
+            2
+        )
+
+        self.assertEqual(
+            From(subject).first(),
+            1
+        )
+
+        with self.assertRaises(NoSuchElementError):
+            From(subject).first(lambda x: x > 4)
+
+        subject = [
+            { "value": 1 },
+            { "value": 2 }
+        ]
+        self.assertDictEqual(
+            From(subject).first(lambda x: x["value"] == 2),
+            { "value": 2 }
+        )
+
+        expected = 2
+        result = From(self.simple).first()
+        self.assertEqual(expected, result)
+
+        expected = 3
+        result = From(self.simple).first(lambda x: x % 2 != 0)
+        self.assertEqual(expected, result)
+
+        with self.assertRaises(NoSuchElementError):
+            From(self.simple).first(lambda x: x > 5)
+
+
+
+
+
     def test_wrapper(self):
         with self.assertRaises(ValueError):
             From(1)
@@ -73,18 +323,6 @@ class TestBasicFunctions(unittest.TestCase):
 
         self.assertListEqual(expected, result)
 
-    def test_first(self):
-        expected = 2
-        result = From(self.simple).first()
-        self.assertEqual(expected, result)
-
-        expected = 3
-        result = From(self.simple).first(lambda x: x % 2 != 0)
-        self.assertEqual(expected, result)
-
-        with self.assertRaises(NoSuchElementError):
-            From(self.simple).first(lambda x: x > 5)
-
     def test_first_or_none(self):
         expected = 2
         result = From(self.simple).first()
@@ -95,40 +333,6 @@ class TestBasicFunctions(unittest.TestCase):
         self.assertEqual(expected, result)
 
         self.assertIsNone(From(self.simple).firstOrNone(lambda x: x > 5))
-
-    def test_distinct(self):
-        expected = [1,2,3,4]
-        subject = [1,1,1,1,1,1,1,1,2,3,3,3,3,3,4]
-
-        result = From(subject).distinct().toList()
-
-        self.assertListEqual(expected, result)
-
-        subject = [
-            {
-                "value": 1
-            },
-            {
-                "value": 1
-            },
-            {
-                "value": 1
-            },
-            {
-                "value": 2
-            },
-            {
-                "value": 2
-            },
-            {
-                "value": 3
-            }
-        ]
-        expected = [1, 2, 3]
-
-        result = From(subject).distinct(lambda x: x["value"]).select(lambda x: x["value"]).toList()
-
-        self.assertListEqual(expected,result)
 
     def test_group_join(self):
         
@@ -345,21 +549,6 @@ class TestBasicFunctions(unittest.TestCase):
             }
         ]
         self.assertListEqual(expected, result)
-
-    def test_concat(self):
-        subjectA = [
-            { "value": 1},
-            { "value": 2}
-        ]
-        subjectB = [
-            { "value": 3 },
-            { "value": 4 }
-        ]
-        result = From(subjectA).select(lambda x: x["value"]).concat(
-            From(subjectB).select(lambda x: x["value"])
-        ).toList()
-        expected = [1, 2, 3, 4]
-        self.assertListEqual(result, expected)
 
 if __name__ == '__main__':
     unittest.main()
