@@ -446,7 +446,7 @@ class From():
 
         def sequence():
             for x in self:
-                outerObjs = From(extension).where(lambda y: innerKey(x) == outerKey(y)).toList()
+                outerObjs = From(extension).where(lambda y: innerKey(x) == outerKey(y))
                 for outerObj in outerObjs:
                     yield transform(x, outerObj)
 
