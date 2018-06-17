@@ -33,8 +33,11 @@ Functions
 | [lastOrNone](docs/lastornone.md) | Returns the last element satisfying a given condition. If no element is found, `None` is returned |
 | [max](docs/max.md) | Finds the maximum value |
 | [min](docs/min.md) | Finds the minimum value |
+| [order](docs/order.md) | Orders the collection |
 | [select](docs/select.md) | Transforms the elements in the collection into a new collection |
 | [selectMany](doct/selectMany.md) | Selects elements from all sub-collections |
 | [sum](docs/sum.md) | Returns the sum of all elements |
+| [take](docs/take.md) | Takes a given number of elements |
+| [takeWhile](docs/takewhile.md) | Takes elements as long as a specified condition is `True` |
 | [toList](docs/tolist.md) | Returns the iterable as a list |
 | [where](docs/where.md) | Filters the elements based on a condition |

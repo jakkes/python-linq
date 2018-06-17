@@ -584,6 +584,16 @@ class TestBasicFunctions(unittest.TestCase):
             [1, 2, 3, 4]
         )
 
+    def test_foreach(self):
+        res = []
+
+        subject = [1, 2, 3]
+        From(subject).forEach(lambda x: res.append(x))
+        self.assertListEqual(
+            res,
+            subject
+        )
+
     def test_where(self):
         expected = [2, 4]
         obj = From(self.simple)
@@ -607,44 +617,58 @@ class TestBasicFunctions(unittest.TestCase):
             [3]
         )
 
-
-
-    def test_wrapper(self):
-        with self.assertRaises(ValueError):
-            From(1)
-
-        From("a")
-        From([1,2,3])
-
-        self.assertTrue(True)
-
-    def test_simple_combination(self):
-        obj = From(self.simple)
-        self.assertTrue(3 in obj)
-        self.assertTrue(2 in obj)
-
-    def test_simple_select(self):
-        expected = [2,3,4]
-
-        obj = From(self.objects)
+    def test_groupjoin(self):
+        grades = [
+            {
+                "userid": 1,
+                "grade": "A"
+            }, {
+                "userid": 1,
+                "grade": "B"
+            }, {
+                "userid": 2,
+                "grade": "B"
+            }, {
+                "userid": 2,
+                "grade": "B"
+            }
+        ]
+        students = [
+            {
+                "id": 1,
+                "name": "Jakob"
+            }, {
+                "id": 2,
+                "name": "Johan"
+            }
+        ]
         
-        result = obj.select(lambda x: x["value"]).toList()
+        self.assertListEqual(
+            
+            From(students).groupJoin(
+                grades,
+                innerKey = lambda x: x["id"],
+                outerKey = lambda x: x["userid"],
+                innerTransform = lambda x: x["name"],
+                outerTransform = lambda x: x["grade"]
+            ).select(lambda x: x.inner).toList(),
+            
+            ['Jakob', 'Johan']
+        )
 
-        self.assertEqual(result, expected)
+        self.assertListEqual(
 
-    def test_first_or_none(self):
-        expected = 2
-        result = From(self.simple).first()
-        self.assertEqual(expected, result)
+            From(students).groupJoin(
+                grades,
+                innerKey = lambda x: x["id"],
+                outerKey = lambda x: x["userid"],
+                innerTransform = lambda x: x["name"],
+                outerTransform = lambda x: x["grade"]
+            ).select(lambda x: x.outer).toList(),
 
-        expected = 3
-        result = From(self.simple).first(lambda x: x % 2 != 0)
-        self.assertEqual(expected, result)
+            [ ['A', 'B'], ['B', 'B'] ]
+        )
 
-        self.assertIsNone(From(self.simple).firstOrNone(lambda x: x > 5))
-
-    def test_group_join(self):
-        
         subjA = [1, 2, 3]
         subjB = [2, 2, 3, 4]
 
@@ -707,8 +731,26 @@ class TestBasicFunctions(unittest.TestCase):
             grades,
             expected
         )
-        
+
     def test_join(self):
+        subjA = [1, 2, 3, 4, 5]
+        subjB = [2, 3, 4, 5, 6]
+        self.assertListEqual(
+            
+            From(subjA).join(
+                subjB,
+                lambda x: x,
+                lambda x: x+1,
+                lambda x, y: {"inner": x, "outer": y}
+            ).toList(),
+
+            [
+                { "inner": 3, "outer": 2},
+                { "inner": 4, "outer": 3},
+                { "inner": 5, "outer": 4}
+            ]
+        )
+
         subject1 = [
             {
                 "id": 1,
@@ -779,6 +821,43 @@ class TestBasicFunctions(unittest.TestCase):
             }
         ]
         self.assertListEqual(expected, result)
+
+    def test_take(self):
+        self.assertListEqual(
+            From([1, 2, 3]).take(2).toList(),
+            [1, 2]
+        )
+
+    def test_takewhile(self):
+        self.assertListEqual(
+            From([1, 2, 3, 4, 5, 6]).takeWhile(lambda x: x % 3 != 0).toList(),
+            [1, 2]
+        )
+
+    def test_order(self):
+        self.assertListEqual(
+            From([1, 2, 4, 3, 7, 6, 5]).order(descending=True).toList(),
+            [7, 6, 5, 4, 3, 2, 1]
+        )
+
+        self.assertListEqual(
+            From([1, 2, 4, 3, 7, 6, 5]).order().toList(),
+            [1, 2, 3, 4, 5, 6, 7]
+        )
+
+        self.assertListEqual(
+            From([1, 2, 4, 3, 7, 6, 5]).order(key=lambda x: x % 3).toList(),
+            [3, 6, 1, 4, 7, 2, 5]
+        )
+
+    def test_wrapper(self):
+        with self.assertRaises(ValueError):
+            From(1)
+
+        From("a")
+        From([1,2,3])
+
+        self.assertTrue(True)
 
 if __name__ == '__main__':
     unittest.main()
