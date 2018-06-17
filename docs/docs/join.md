@@ -42,7 +42,7 @@ Examples
 >>> From(subjA).join(
 >>>     subjB,
 >>>     lambda x: x,
->>>     lambda x: x-1,
+>>>     lambda x: x+1,
 >>>     lambda x, y: {"inner": x, "outer": y}
 >>> ).toList()
 [
