@@ -13,7 +13,7 @@ Parameters
         - Return type must be `Hashable`.
     - __Default__: Uses the elements as is.
         - `key = lambda x: x`
-    - __Note__: If two objects' keys are equal but the objects are not equal, the first object in the sequence is used. Thus, __specifying a key should only be done when certain that two equal keys imply two equal objects__.
+    - __Note__: If two objects' keys are equal but the objects are not equal, the first object in the sequence is used. Thus, __specifying a key should only be done when certain that two equal keys imply two equal objects__. If this is not the case, use with caution.
 
 Raises
 ------
