@@ -24,7 +24,7 @@ Installation
 To install, simply run
 
 ``` bash
-pip install --user python-linq
+pip install python-linq
 ```
 
 Documentation & Examples
