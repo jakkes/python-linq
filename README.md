@@ -6,7 +6,7 @@ Inspired by `py-linq` and `linq.py`.
 ## Install
 Install using pip
 ```
-pip install --user python-linq
+pip install python-linq
 ```
 
 ## Usage
