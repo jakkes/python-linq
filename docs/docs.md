@@ -40,4 +40,5 @@ Functions
 | [take](docs/take.md) | Takes a given number of elements |
 | [takeWhile](docs/takewhile.md) | Takes elements as long as a specified condition is `True` |
 | [toList](docs/tolist.md) | Returns the iterable as a list |
+| [union](docs/union.md) | Combines two collections into a collection containing all elements that are found in at least one of the collections |
 | [where](docs/where.md) | Filters the elements based on a condition |

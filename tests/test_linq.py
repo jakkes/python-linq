@@ -850,6 +850,22 @@ class TestBasicFunctions(unittest.TestCase):
             [3, 6, 1, 4, 7, 2, 5]
         )
 
+    def test_union(self):
+        self.assertListEqual(
+            From([1, 2, 3]).union([3, 4, 5]).toList(),
+            [1, 2, 3, 4, 5]
+        )
+
+        self.assertListEqual(
+            From([1, 2, 3]).union([3, 4, 5], key = lambda x: x % 4).toList(),
+            [1, 2, 3, 4] # Note 5 == 2 in modulo 4
+        )
+
+        self.assertListEqual(
+            From([1, 2, 3]).union([3, 4, 5], transform = lambda x: x + 1).toList(),
+            [2, 3, 4, 5, 6]
+        )
+
     def test_wrapper(self):
         with self.assertRaises(ValueError):
             From(1)
