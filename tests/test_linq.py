@@ -875,5 +875,22 @@ class TestBasicFunctions(unittest.TestCase):
 
         self.assertTrue(True)
 
+    def test_skip(self):
+        self.assertListEqual(
+            From([1,2,3,4,5,6,7]).skip(3).toList(),
+            [4,5,6,7]
+        )
+
+    def test_skipWhile(self):
+        self.assertListEqual(
+            From([1,2,3,4,5,6,7]).skipWhile(lambda x: x < 3).toList(),
+            [3,4,5,6,7]
+        )
+
+        self.assertListEqual(
+            From([1,2,3,4,5,6,7]).skipWhile(lambda x: x % 3 != 0).toList(),
+            [3,4,5,6,7]
+        )
+
 if __name__ == '__main__':
     unittest.main()
