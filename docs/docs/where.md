@@ -25,5 +25,5 @@ Examples
 >>>     { "value": 3 }
 >>> ]
 >>> From(subject).where(lambda x: x["value"] == 3).select(lambda x: x["value"]).toList()
-[2, 3]
+[3]
 ```

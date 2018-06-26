@@ -446,7 +446,7 @@ class From():
 
         def sequence():
             for x in self:
-                outerObjs = From(extension).where(lambda y: innerKey(x) == outerKey(y)).toList()
+                outerObjs = From(extension).where(lambda y: innerKey(x) == outerKey(y))
                 for outerObj in outerObjs:
                     yield transform(x, outerObj)
 
@@ -494,7 +494,7 @@ class From():
 
         return From(x for x in sequence())
 
-    def orderBy(self, key = lambda x: x, descending = False):
+    def order(self, key = lambda x: x, descending = False):
         """Orders the sequence with respect to the given key
         
         Keyword Arguments:
@@ -506,7 +506,7 @@ class From():
         """
 
         def sequence():
-            yield from sorted(self, key, descending)
+            yield from sorted(self, key=key, reverse=descending)
 
         return From(x for x in sequence())
 

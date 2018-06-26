@@ -21,7 +21,7 @@ Examples
 >>> From([1, 2, 3, 4, 5, 6]).all(lambda x: x == 4)
 False
 
->>> From([1, 2, 3, 4, 5, 6]).count(lambda x: x < 7)
+>>> From([1, 2, 3, 4, 5, 6]).all(lambda x: x < 7)
 True
 
 >>> subject = [

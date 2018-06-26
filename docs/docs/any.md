@@ -21,7 +21,7 @@ Examples
 >>> From([1, 2, 3, 4, 5, 6]).any(lambda x: x == 4)
 True
 
->>> From([1, 2, 3, 4, 5, 6]).count(lambda x: x > 6)
+>>> From([1, 2, 3, 4, 5, 6]).any(lambda x: x > 6)
 False
 
 >>> subject = [
