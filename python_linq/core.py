@@ -510,6 +510,31 @@ class From():
 
         return From(x for x in sequence())
 
+    def skip(self, count):
+        def sequence():
+            i = 0
+            for obj in self:
+                if i < count:
+                    i += 1
+                    continue
+
+                yield obj
+
+        return From(x for x in sequence())
+
+    def skipWhile(self, condition):
+        def sequence():
+            skipping = True
+            for obj in self:
+                if skipping:
+                    if condition(obj):
+                        continue
+                    else:
+                        skipping = False
+                yield obj
+        
+        return From(x for x in sequence())
+
     def union(self, outer, key = lambda x: x, transform = lambda x: x):
         """Find the union of two sequences, i.e. all objects that are within either one the two sequences.
         Only unique objects (with respect to the key) are returned.
