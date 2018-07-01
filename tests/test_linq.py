@@ -892,5 +892,26 @@ class TestBasicFunctions(unittest.TestCase):
             [3,4,5,6,7]
         )
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_toDict(self):
+        self.assertDictEqual(
+            From([1,2,3,4]).toDict(lambda x: str(x*x)),
+            {
+                '1': 1,
+                '4': 2,
+                '9': 3,
+                '16': 4
+            }
+        )
+
+        self.assertDictEqual(
+            From([1,2,3,4]).toDict(lambda x: str(x), transform = lambda x: x*x),
+            {
+                '1': 1,
+                '2': 4,
+                '3': 9,
+                '4': 16
+            }
+        )
+
+        with self.assertRaises(KeyError):
+            From([1,2,3,4]).toDict(lambda x: str(x % 3))

@@ -511,6 +511,15 @@ class From():
         return From(x for x in sequence())
 
     def skip(self, count):
+        """Skips the first elements in the sequence
+
+        Arguments:
+            count {int} -- The number of elements to skip
+
+        Returns:
+            Iterable {From} -- The remaining elements wrapped in a From object.
+        """
+
         def sequence():
             i = 0
             for obj in self:
@@ -523,6 +532,14 @@ class From():
         return From(x for x in sequence())
 
     def skipWhile(self, condition):
+        """Skips the first elements in the sequence while the condition evaluates `True`
+
+        Arguments:
+            condition -- The number of elements to skip
+
+        Returns:
+            Iterable {From} -- The remaining elements wrapped in a From object.
+        """
         def sequence():
             skipping = True
             for obj in self:
@@ -534,6 +551,32 @@ class From():
                 yield obj
         
         return From(x for x in sequence())
+
+    def toDict(self, key, transform = lambda x: x):
+        
+        """Returns the sequence as a dictionary where the key is given by `key`.
+
+        Arguments:
+            key -- Expression determining the key for each element. Much evaluate to a unique value for each element.
+
+        Keyword Arguments:
+            transform -- Expression describing the transform of the elements before added to the dictionary
+
+        Returns:
+            {Dictionary} -- A dictionary where the keys are giving by `key` and elements by `transform`.
+
+        """
+        
+        re = {}
+        keys = set()
+        for el in self:
+            k_ey = key(el)
+            if k_ey in keys:
+                raise KeyError("Key already exists.")
+            keys.add(k_ey)
+            re[k_ey] = transform(el)
+        
+        return re
 
     def union(self, outer, key = lambda x: x, transform = lambda x: x):
         """Find the union of two sequences, i.e. all objects that are within either one the two sequences.
