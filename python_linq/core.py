@@ -128,6 +128,23 @@ class From():
 
         return max(key(x) for x in self)
 
+    def argmax(self, key):
+        """Return the object that maximizes the value given by key. NOTE: does not return the index of the object, e.g. if a list is supplied
+        
+        Arguments:
+            key -- Expression determining which value to use
+        
+        Returns:
+            object -- Returns the object which maximizes the value
+        """
+        m = None
+        for x in self:
+            if m is None or key(x) > key(m):
+                m = x
+        if m is None:
+            raise ValueError("Cannot find maximum in an empty sequence")
+        return m
+
     def min(self, key = lambda x: x):
         """Returns the minimum value found
         
@@ -139,6 +156,23 @@ class From():
         """
 
         return min(key(x) for x in self)
+
+    def argmin(self, key):
+        """Return the object that minimizes the value given by key. NOTE: does not return the index of the object, e.g. if a list is supplied
+        
+        Arguments:
+            key -- Expression determining which value to use
+        
+        Returns:
+            object -- Returns the object which minimizes the value
+        """
+        m = None
+        for x in self:
+            if m is None or key(x) < key(m):
+                m = x
+        if m is None:
+            raise ValueError("Cannot find maximum in an empty sequence")
+        return m
 
     def first(self, condition = lambda x: True):
         """Returns the first element found to satisfy the given condition
@@ -363,9 +397,6 @@ class From():
         """
 
         def sequence():
-
-            ### TODO: Rewrite this using yield
-
             groups = dict()
             for x in self:
                 k = key(x)

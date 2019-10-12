@@ -474,6 +474,11 @@ class TestBasicFunctions(unittest.TestCase):
             4
         )
 
+        self.assertEqual(
+            From(subject).argmax(lambda x: x),
+            4
+        )
+
         subject = [
             { "value" : 1 },
             { "value" : 2 }
@@ -483,10 +488,19 @@ class TestBasicFunctions(unittest.TestCase):
             2
         )
 
+        self.assertEqual(
+            From(subject).argmax(lambda x: x["value"]),
+            { "value": 2 }
+        )
+
     def test_min(self):
         subject = [1, 2, 3, 4]
         self.assertEqual(
             From(subject).min(),
+            1
+        )
+        self.assertEqual(
+            From(subject).argmin(lambda x: x),
             1
         )
 
@@ -497,6 +511,10 @@ class TestBasicFunctions(unittest.TestCase):
         self.assertEqual(
             From(subject).min(lambda x: x["value"]),
             1
+        )
+        self.assertEqual(
+            From(subject).argmin(lambda x: x["value"]),
+            { "value": 1 }
         )
 
     def test_select(self):
