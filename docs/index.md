@@ -18,13 +18,15 @@ stored in a variable `data`. We can now use LINQ to query this data, much like S
 15
 ```
 
+Moreover, by the use of generator functions, the queries require no intermediate lists which significantly increases the performance.
+
 Installation
 ------------
 
 To install, simply run
 
 ``` bash
-pip install python-linq
+pip3 install python-linq
 ```
 
 Documentation & Examples

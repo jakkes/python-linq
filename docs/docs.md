@@ -15,6 +15,8 @@ Functions
 | -: | :- |
 | [all](docs/all.md) | Determines whether all elements fulfill a specified condition |
 | [any](docs/any.md) | Determines whether any element fulfills a specified condition |
+| [argmax](docs/argmax.md) | Finds the object maximizing a given value |
+| [argmin](docs/argmin.md) | Finds the object minimizing a given value |
 | [average](docs/average.md) | Returns the average value |
 | [concat](docs/concat.md) | Adds a collection to the sequence |
 | [contains](docs/contains.md) | Checks whether an object is in the collection |
