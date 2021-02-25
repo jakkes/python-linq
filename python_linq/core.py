@@ -1,7 +1,7 @@
 import collections
 from python_linq.linq_exceptions import NoSuchElementError
 
-class From():
+class From:
 
     def __init__(self, iterable):
         """Wraps an iterable object
@@ -16,8 +16,8 @@ class From():
             raise ValueError("Object is not iterable")
 
         
-        self.iterable = iterable
-        self.extensions = []
+        self._iterable = iterable
+        self._extensions = []
 
     def __contains__(self, obj):
         for o in self:
@@ -37,10 +37,10 @@ class From():
         return obj in self
     
     def __iter__(self):
-        for obj in self.iterable:
+        for obj in self._iterable:
             yield obj
         
-        for extension in self.extensions:
+        for extension in self._extensions:
             for obj in extension:
                 yield obj
 
@@ -284,7 +284,7 @@ class From():
         if not isinstance(iterable, collections.Iterable):
             raise ValueError("Object is not iterable")
 
-        self.extensions.append(iterable)
+        self._extensions.append(iterable)
         return self
 
     def distinct(self, key = lambda x: x):
