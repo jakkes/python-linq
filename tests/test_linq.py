@@ -60,7 +60,7 @@ class TestBasicFunctions(unittest.TestCase):
         )
 
         self.assertEqual(
-            From(subject).average(lambda x: x*x),
+            From(subject).select(lambda x: x*x).average(),
             11
         )
 
@@ -70,7 +70,7 @@ class TestBasicFunctions(unittest.TestCase):
             { "value": 3 }
         ]
         self.assertEqual(
-            From(subject).average(lambda x: x["value"]),
+            From(subject).select(lambda x: x["value"]).average(),
             2
         )
 
@@ -495,7 +495,7 @@ class TestBasicFunctions(unittest.TestCase):
             { "value" : 2 }
         ]
         self.assertEqual(
-            From(subject).max(lambda x: x["value"]),
+            From(subject).select(lambda x: x["value"]).max(),
             2
         )
 
@@ -527,7 +527,7 @@ class TestBasicFunctions(unittest.TestCase):
             { "value" : 2 }
         ]
         self.assertEqual(
-            From(subject).min(lambda x: x["value"]),
+            From(subject).select(lambda x: x["value"]).min(),
             1
         )
 
@@ -591,7 +591,7 @@ class TestBasicFunctions(unittest.TestCase):
         )
 
         self.assertEqual(
-            From(subject).sum(lambda x: x*x),
+            From(subject).select(lambda x: x*x).sum(),
             55
         )
 
@@ -601,7 +601,7 @@ class TestBasicFunctions(unittest.TestCase):
             { "value": 3 }
         ]
         self.assertEqual(
-            From(subject).sum(lambda x: x["value"]),
+            From(subject).select(lambda x: x["value"]).sum(),
             6
         )
 
@@ -683,7 +683,8 @@ class TestBasicFunctions(unittest.TestCase):
                 outerKey = lambda x: x["userid"],
                 innerTransform = lambda x: x["name"],
                 outerTransform = lambda x: x["grade"]
-            ).select(lambda x: x.inner).toList(),
+            )
+            .select(lambda x: x.inner).toList(),
             
             ['Jakob', 'Johan']
         )
@@ -706,6 +707,8 @@ class TestBasicFunctions(unittest.TestCase):
 
         result = From(subjA).groupJoin(
             subjB,
+            lambda x: x,
+            lambda x: x,
             lambda x: x,
             lambda x: x
         ).select(lambda x: x.outer).toList()
@@ -894,7 +897,7 @@ class TestBasicFunctions(unittest.TestCase):
         )
 
         self.assertListEqual(
-            From([1, 2, 3]).union([3, 4, 5], transform = lambda x: x + 1).toList(),
+            From([1, 2, 3]).union([3, 4, 5]).select(lambda x: x+1).toList(),
             [2, 3, 4, 5, 6]
         )
 
