@@ -13,15 +13,15 @@ VT = TypeVar("VT")
 
 
 class From(Iterable[T]):
+    """Query builder."""
 
     def __init__(self, iterable: Iterable[T]):
-        """Wraps an iterable object
-
+        """
         Arguments:
-            iterable {Iterable} -- An iterable collection of objects
+            iterable (Iterable): An iterable collection of objects of type T
 
         Raises:
-            ValueError -- If iterable is not an iterable collection
+            ValueError: If `iterable` is not an iterable collection
         """
         if not isinstance(iterable, collections.Iterable):
             raise ValueError("Object is not iterable")
@@ -36,13 +36,13 @@ class From(Iterable[T]):
         return False
 
     def contains(self, obj: T) -> bool:
-        """Determines if sequence contains the given object
+        """Determines if the sequence contains the given object
 
         Arguments:
-            obj -- The object to look for
+            obj (T): The object to look for
 
         Returns:
-            bool -- `True` if the object is found, otherwise `False`.
+            bool: True if the object is found, otherwise `False`.
         """
         return obj in self
 
@@ -58,22 +58,22 @@ class From(Iterable[T]):
         """Counts the objects satisfying the condition
 
         Keyword Arguments:
-            condition {[type]} -- Expression returning `True` or `False`. (default: counts all objects)
+            condition (Callable[[T], bool]): Expression returning True or False. (default: counts all objects)
 
         Returns:
-            int -- The number of objects found satisfying the condition
+            int: The number of objects found satisfying the condition
         """
 
         return sum(1 for x in self if condition(x))
 
     def any(self, condition: Callable[[T], bool]) -> bool:
-        """Checks whether any object fulfilling the condition is found
+        """Checks whether the sequence contains any object fulfilling the condition
 
         Arguments:
-            condition -- Expression returning `True` or `False`. Could be any lambda expression or function with a single input argument.
+            condition (Callable[[T], bool]): Expression returning True or False.
 
         Returns:
-            bool -- `True` if any satisfactory object is found, otherwise `False`
+            bool: True if any satisfactory object is found, otherwise False
         """
 
         return any(condition(x) for x in self)
@@ -82,10 +82,10 @@ class From(Iterable[T]):
         """Checks whether all objects satisfy a given condition
 
         Arguments:
-            condition -- Expression returning `True` or `False`. Could be any lambda expression or function with a single input argument.
+            condition (Callable[[T], bool]): Expression returning True or False.
 
         Returns:
-            bool -- `True` if all objects are found to satisfy the condition, otherwise `False`
+            bool: True if all objects are found to satisfy the condition, otherwise False
         """
 
         return all(condition(x) for x in self)
@@ -94,22 +94,22 @@ class From(Iterable[T]):
         """Transforms each object in the sequence.
 
         Arguments:
-            transform -- Function describing the transformation
+            transform (Callable[[T], S]): Function describing the transformation
 
         Returns:
-            Iterable {From} -- Returns a `From` object wrapping the new objects for further use
+            From: Returns a new query builder based on the transformed object.
         """
         return From(transform(x) for x in self)
 
     def selectMany(self, transform: Callable[[T], S] = lambda x: x) -> From[S]:
-        """Selects objects, with the possibility of transforming them, for all the underlying lists into
-        one sequence. Useful when the collection is composed of multiple subcollections containing objects. 
+        """Selects objects, with the possibility of transforming them, from all underlying lists into
+        one sequence. Useful when the collection is composed of multiple subcollections. 
 
         Keyword Arguments:
-            transform -- Expression describing the transformation. (default: no transform is applied and the underlying objects are selected as is)
+            transform: Expression describing the transformation. (default: no transform is applied and the underlying objects are selected as is)
 
         Returns:
-            Iterable {From} -- Returns a `From` object wrapping the new objects for further use.
+            From: Returns a new query builder based on the transformed object.
         """
 
         return From(transform(x) for y in self for x in y)
@@ -118,10 +118,10 @@ class From(Iterable[T]):
         """Filters the sequence for the given condition
 
         Arguments:
-            condition -- Expression returning `True` or `False` with a single input.
+            condition (Callable[[T], bool]): Expression returning True or False with a single input.
 
         Returns:
-            Iterable {From} -- Returns a `From` object wrapping all objects for which the condition is True.
+            From: Returns a new query builder based on the filtered objects.
         """
 
         return From(x for x in self if condition(x))
@@ -130,45 +130,47 @@ class From(Iterable[T]):
         """Returns the maximum value found
 
         Returns:
-            object -- Returns the maximum value
+            T: Returns the maximum value
         """
-
         return max(self)
 
     def argmax(self, key: Callable[[T], Any]) -> T:
-        """Return the object that maximizes the value given by key. NOTE: does not return the index of the object, e.g. if a list is supplied
+        """Return the object that maximizes the value given by key. NOTE: does not return the index of the object.
 
         Arguments:
-            key -- Expression determining which value to use
+            key (Callable[[T], Any]): Expression determining which value to use
 
         Returns:
-            object -- Returns the object which maximizes the value
+            T: Returns the object which maximizes the value
         """
         m = None
+        vm = None
         for x in self:
-            if m is None or key(x) > key(m):
+            vx = key(x)
+            if m is None or vx > vm:
                 m = x
+                vm = vx
         if m is None:
-            raise ValueError("Cannot find maximum in an empty sequence")
+            raise ValueError("Cannot find maximum of an empty sequence")
         return m
 
     def min(self) -> T:
         """Returns the minimum value found
 
         Returns:
-            object -- Returns the maximum value
+            T: Returns the maximum value
         """
 
         return min(self)
 
     def argmin(self, key: Callable[[T], Any]) -> T:
-        """Return the object that minimizes the value given by key. NOTE: does not return the index of the object, e.g. if a list is supplied
+        """Return the object that minimizes the value given by key.
 
         Arguments:
-            key -- Expression determining which value to use
+            key (Callable[[T], Any]): Expression determining which value to use
 
         Returns:
-            object -- Returns the object which minimizes the value
+            T: Returns the object which minimizes the value
         """
         m = None
         for x in self:
@@ -182,13 +184,13 @@ class From(Iterable[T]):
         """Returns the first element found to satisfy the given condition
 
         Keyword Arguments:
-            condition -- Expression returning `True` or `False` (default: Returns the first element in the sequence)
+            condition (Callable[[T], bool]): Expression returning True or False (default: Returns the first element in the sequence)
 
         Raises:
-            NoSuchElementError -- If no element is found to satisfy the condition
+            NoSuchElementError: If no element is found to satisfy the condition
 
         Returns:
-            object -- The first element found to satisfy the given condition
+            T: The first element found to satisfy the given condition
         """
 
         for x in self:
@@ -201,10 +203,10 @@ class From(Iterable[T]):
         """Returns the first element found to satisfy the given condition
 
         Keyword Arguments:
-            condition -- Expression returning `True` or `False` (default: {lambdax:True})
+            condition (Callable[[T], bool]): Expression returning True or False (default: (lambda x: True))
 
         Returns:
-            object -- The first element found to satisfy the given condition. If no element is found, None is returned.
+            Optional[T]: The first element found to satisfy the given condition. If no element is found, None is returned.
         """
 
         for x in self:
@@ -216,10 +218,10 @@ class From(Iterable[T]):
         """Returns the last element found to satisfy the given condition
 
         Keyword Arguments:
-            condition -- Expression returning `True` or `False` (default: {lambdax:True})
+            condition (Callable[[T], bool]): Expression returning True or False (default: (lambdax:True))
 
         Returns:
-            object -- The last element found to satisfy the given condition. If no element is found, None is returned.
+            Optional[T]: The last element found to satisfy the given condition. If no element is found, None is returned.
         """
         last = None
         for x in self:
@@ -231,13 +233,13 @@ class From(Iterable[T]):
         """Returns the last element found to satisfy the given condition
 
         Keyword Arguments:
-            condition -- Expression returning `True` or `False` (default: Returns the first element in the sequence)
+            condition (Callable[[T], bool]): Expression returning True or False (default: Returns the first element in the sequence)
 
         Raises:
-            NoSuchElementError -- If no element is found to satisfy the condition
+            NoSuchElementError: If no element is found to satisfy the condition
 
         Returns:
-            object -- The last element found to satisfy the given condition
+            T: The last element found to satisfy the given condition
         """
 
         last = self.lastOrNone(condition)
@@ -251,35 +253,34 @@ class From(Iterable[T]):
         """Returns the sum over all elements
 
         Returns:
-            object -- The sum over all elements
+            T: The sum over all elements
         """
-
         return sum(self)
 
     def average(self) -> T:
         """Returns the average of all elements
 
         Returns:
-            object -- The average of all elements
+            T: The average of all elements
         """
         s = 0
         n = 0
         for x in self:
             s += x
             n += 1
-        return s * 1.0 / n
+        return s / n
 
     def concat(self, iterable: Iterable[T]) -> From[T]:
         """Adds an iterable to the sequence
 
         Arguments:
-            iterable {Iterable} -- The collection to add
+            iterable (Iterable): The collection to add
 
         Raises:
-            ValueError -- If the supplied object is not iterable
+            ValueError: If the supplied object is not iterable
 
         Returns:
-            Iterable {From} -- Returns a `From` object that wraps the new collection of objects
+            From: Query builder with the extension concatenated.
         """
 
         if not isinstance(iterable, collections.Iterable):
@@ -289,13 +290,13 @@ class From(Iterable[T]):
         return self
 
     def distinct(self, key: Callable[[T], Any] = lambda x: x) -> From[T]:
-        """Gives all objects that are distinct in the given key, i.e. having unique return values in key.
+        """Filters all objects that are unique in the given key function, i.e. having unique return values.
 
         Keyword Arguments:
-            key -- Expression determining which key to use. The key must be Hashable (default: Uses the elements as is)
+            key (Callable[[T], Any]): Expression determining which key to use. The key must be hashable (default: Uses the elements as is)
 
         Returns:
-            [type] -- [description]
+            From: Query builder with only distinct elements.
         """
 
         cache = set()
@@ -314,10 +315,10 @@ class From(Iterable[T]):
         """Returns the element at the given position. If there is no element at the given position, `None` is returned.
 
         Arguments:
-            i {int} -- The position at which to retrieve the element from
+            i (int): The position at which to retrieve the element from
 
         Returns:
-            object -- The object at the given position. `None` if there is none.
+            Optional[T]: The object at the given position. `None` if there is none.
         """
 
         n = 0
@@ -331,13 +332,13 @@ class From(Iterable[T]):
         """Returns the element at the given position.
 
         Arguments:
-            i {int} -- The position at which to retrieve the element from
+            i (int): The position at which to retrieve the element from
 
         Raises:
-            IndexError -- If there is no object at the given position
+            IndexError: If there is no object at the given position
 
         Returns:
-            object -- The element at the given position
+            T: The element at the given position
         """
 
         result = self.elementAtOrNone(i)
@@ -350,16 +351,16 @@ class From(Iterable[T]):
         """Returns all elements found in both sequences.
 
         Arguments:
-            iterable {Iterable} -- The other iterable to compare to.
+            iterable (Iterable): The other iterable to compare to.
 
         Keyword Arguments:
-            key -- Expression determining which key to use. Key must be hashable. (default: The elements are used as is)
+            key (Callable[[T], Any]): Expression determining which key to use. Key must be hashable. (default: The elements are used as is)
 
         Raises:
-            ValueError -- If the given iterable is not Iterable
+            ValueError: If the given iterable is not Iterable
 
         Returns:
-            Iterable {From} -- Returns a `From` object wrapping the new sequence of elements.
+            From: Query builder on the intersection of self and the given iterable.
         """
 
         if not isinstance(iterable, collections.Iterable):
@@ -367,7 +368,8 @@ class From(Iterable[T]):
 
         def sequence():
             for x in self:
-                if From(iterable).any(lambda y: x == y):
+                kx = key(x)
+                if From(iterable).any(lambda y: kx == key(y)):
                     yield x
 
         return From(sequence())
@@ -376,24 +378,23 @@ class From(Iterable[T]):
         """Returns the sequence as a list.
 
         Returns:
-            List -- A list containing all elements in the sequence.
+            List: A list containing all elements in the sequence.
         """
-
         return list(self)
 
-    def groupBy(self, key: Callable[[T], KT], transform: Callable[[T], VT] = lambda x: x) -> Grouping[KT, VT]:
+    def groupBy(self, key: Callable[[T], KT], transform: Callable[[T], VT] = lambda x: x) -> From[Grouping[KT, VT]]:
         """Groups all elements based on the given key.
 
         Arguments:
-            key -- Expression determining which key to use
+            key (Callable[[T], KT]): Expression determining which key to use
 
         Keyword Arguments:
-            transform -- Expression describing the transform the objects when creating the groups.
+            transform (Callable[[T], VT]): Expression describing the transform the objects when creating the groups.
             Can be any lambda expression or function with a single input argument (default: Use the elements as is)
 
         Returns:
-            Iterable {From} -- A `From` object wrapping a collection of `Grouping` objects.
-            Every `Grouping` object has two attributes, `key` and `values` which contains the
+            From[Grouping[KT, VT]]: Query builder object wrapping a sequence of `Grouping` objects.
+            Every `Grouping` object has two attributes, `key`, and `values` which contains the
             transformed objects.
         """
 
@@ -411,7 +412,7 @@ class From(Iterable[T]):
 
         return From(sequence())
 
-    def forEach(self, func: Callable[[T]]) -> NoReturn:
+    def forEach(self, func: Callable[[T], NoReturn]) -> NoReturn:
         """Executes a function for each element.
         """
 
@@ -422,16 +423,16 @@ class From(Iterable[T]):
         """Joins the sequence with objects from another sequence.
 
         Arguments:
-            extension {Iterable} -- The other sequence
-            innerKey -- Expression determining what key to use from the inner objects
-            outerKey -- Expression determining what key to use from the outer objects
-            innerTransform -- The transform to apply to the inner objects
-            outerTransform -- The transform to apply to the outer objects
+            extension (Iterable[S]): The other sequence
+            innerKey (Callable[[T], Any]): Expression determining what key to use from the inner objects
+            outerKey (Callable[[S], Any]): Expression determining what key to use from the outer objects
+            innerTransform (Callable[[T], U]): The transform to apply to the inner objects
+            outerTransform (Callable[[S], V]): The transform to apply to the outer objects
 
         Returns:
-            Iterable {From} -- Returns a `From` object wrapping a collection of `Joining` objects. Each `Joining` object contains
-            the properties `inner` and `outer`. `inner` gives the inner object and `outer` is a collection of all outer object
-            paired with said inner object.
+            From[Joining[U, V]]: Query builder object wrapping a sequence of `Joining` objects. Each `Joining` object contains
+            the properties `inner` and `outer`. `inner` gives the inner object and `outer` is a collection of all objects in the
+            extension that were paried with the inner object.
         """
 
         def sequence():
@@ -454,17 +455,16 @@ class From(Iterable[T]):
         a new sequence of objects according to the transform specified. Equivalent to INNER JOIN in SQL.
 
         Arguments:
-            extension {Iterable} -- The sequence to join into the current one
-            innerKey -- Expression determining which key to use on the current sequence
-            outerKey -- Expression determining which key to use on the extending sequence
-            transform -- Expression shaping the objects which to returns. Can be any
-            lambda expression or function with two inputs, the inner object followed by the outer object.
+            extension (Iterable): The sequence to join into the current one
+            innerKey (Callable[[T], Any]): Expression determining which key to use on the current sequence
+            outerKey (Callable[[S], Any]): Expression determining which key to use on the extending sequence
+            transform (Callable[[T, S], U]): Expression shaping the objects which to returns.
 
         Raises:
-            ValueError -- If the extension is not Iterable
+            ValueError: If the extension is not Iterable
 
         Returns:
-            Iterable {From} -- `From` object wrapping the new sequence of objects.
+            From: Query build object wrapping the new sequence of objects.
         """
 
         if not isinstance(extension, collections.Iterable):
@@ -483,10 +483,10 @@ class From(Iterable[T]):
         """Selects the amount of elements specified
 
         Arguments:
-            count -- The number of elements to select
+            count: The number of elements to select
 
         Returns:
-            Iterable {From} -- `From` object wrapping the selected elements
+            From: Query builder object wrapping the selected elements
         """
 
         def sequence():
@@ -505,10 +505,10 @@ class From(Iterable[T]):
         """Selects elements as long as the condition is fulfilled
 
         Arguments:
-            condition -- Expression returning `True` or `False`
+            condition (Callable[[T], bool]): Expression returning True or False
 
         Returns:
-            Iterable {From} -- `From` object wrapping the selected elements
+            From: Query builder object wrapping the selected elements
         """
 
         def sequence():
@@ -524,11 +524,11 @@ class From(Iterable[T]):
         """Orders the sequence with respect to the given key
 
         Keyword Arguments:
-            key -- Expression determining which key to use (default: uses the elements as is)
-            descending {bool} -- Whether or not to sort in descending order (default: {False})
+            key (Callable[[T], Any]): Expression determining which key to use (default: uses the elements as is)
+            descending (bool): Whether or not to sort in descending order (default: (False))
 
         Returns:
-            Iterable {From} -- `From` object wrapping the sorted sequence
+            From: Query builder object wrapping the sorted sequence
         """
 
         def sequence():
@@ -540,10 +540,10 @@ class From(Iterable[T]):
         """Skips the first elements in the sequence
 
         Arguments:
-            count {int} -- The number of elements to skip
+            count (int): The number of elements to skip
 
         Returns:
-            Iterable {From} -- The remaining elements wrapped in a From object.
+            From: Query builder wrapping the remaining elements.
         """
 
         def sequence():
@@ -561,10 +561,10 @@ class From(Iterable[T]):
         """Skips the first elements in the sequence while the condition evaluates `True`
 
         Arguments:
-            condition -- The number of elements to skip
+            condition (Callable[[T], bool]): The number of elements to skip
 
         Returns:
-            Iterable {From} -- The remaining elements wrapped in a From object.
+            From: The remaining elements wrapped in a query builder object.
         """
         def sequence():
             skipping = True
@@ -582,13 +582,13 @@ class From(Iterable[T]):
         """Returns the sequence as a dictionary where the key is given by `key`.
 
         Arguments:
-            key -- Expression determining the key for each element. Much evaluate to a unique value for each element.
+            key (Callable[[T], KT]): Expression determining the key for each element. Much evaluate to a unique value for each element.
 
         Keyword Arguments:
-            transform -- Expression describing the transform of the elements before added to the dictionary
+            transform (Callable[[T], VT]): Expression describing the transform of the elements before added to the dictionary
 
         Returns:
-            {Dictionary} -- A dictionary where the keys are giving by `key` and elements by `transform`.
+            Dict[KT, VT]: A dictionary where the keys are giving by `key` and elements by `transform`.
 
         """
 
@@ -608,16 +608,16 @@ class From(Iterable[T]):
         Only unique objects (with respect to the key) are returned.
 
         Arguments:
-            outer {Iterable} -- The other sequence
+            outer (Iterable): The other sequence
 
         Keyword Arguments:
-            key -- Expression determining which key to use for comparison. Key must be hashable (default: uses the elements as is)
+            key (Callable[[T], Any]): Expression determining which key to use for comparison. Key must be hashable (default: uses the elements as is)
 
         Raises:
-            ValueError -- If `outer` is of instance Iterable
+            ValueError: If `outer` is of instance Iterable
 
         Returns:
-            Iterable {From} -- `From` object wrapping the new elements
+            From: Query builder object wrapping the new elements
         """
 
         if not isinstance(outer, collections.Iterable):
