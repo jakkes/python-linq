@@ -1,5 +1,5 @@
 from __future__ import annotations
-import collections
+import collections.abc
 from typing import Iterable, TypeVar, Any, List, Callable, Optional, Generic, NoReturn, Dict
 from python_linq.linq_exceptions import NoSuchElementError
 
@@ -23,7 +23,7 @@ class From(Iterable[T]):
         Raises:
             ValueError: If `iterable` is not an iterable collection
         """
-        if not isinstance(iterable, collections.Iterable):
+        if not isinstance(iterable, collections.abc.Iterable):
             raise ValueError("Object is not iterable")
 
         self._iterable: Iterable[T] = iterable
@@ -283,7 +283,7 @@ class From(Iterable[T]):
             From: Query builder with the extension concatenated.
         """
 
-        if not isinstance(iterable, collections.Iterable):
+        if not isinstance(iterable, collections.abc.Iterable):
             raise ValueError("Object is not iterable")
 
         self._extensions.append(iterable)
@@ -363,7 +363,7 @@ class From(Iterable[T]):
             From: Query builder on the intersection of self and the given iterable.
         """
 
-        if not isinstance(iterable, collections.Iterable):
+        if not isinstance(iterable, collections.abc.Iterable):
             raise ValueError("Object is not iterable")
 
         def sequence():
@@ -467,7 +467,7 @@ class From(Iterable[T]):
             From: Query build object wrapping the new sequence of objects.
         """
 
-        if not isinstance(extension, collections.Iterable):
+        if not isinstance(extension, collections.abc.Iterable):
             raise ValueError("Object is not iterable")
 
         def sequence():
@@ -620,7 +620,7 @@ class From(Iterable[T]):
             From: Query builder object wrapping the new elements
         """
 
-        if not isinstance(outer, collections.Iterable):
+        if not isinstance(outer, collections.abc.Iterable):
             raise ValueError("Object is not iterable")
 
         cache = set()
