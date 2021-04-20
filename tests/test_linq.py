@@ -1,6 +1,4 @@
-from python_linq import From
-from python_linq.core import Grouping
-from python_linq.linq_exceptions import *
+from python_linq import From, Grouping, NoSuchElementError
 import unittest
 
 class TestBasicFunctions(unittest.TestCase):
