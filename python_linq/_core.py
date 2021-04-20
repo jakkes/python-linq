@@ -1,7 +1,7 @@
 from __future__ import annotations
 import collections.abc
 from typing import Iterable, TypeVar, Any, List, Callable, Optional, Generic, NoReturn, Dict
-from python_linq.linq_exceptions import NoSuchElementError
+from ._linq_exceptions import NoSuchElementError
 
 
 T = TypeVar("T")
