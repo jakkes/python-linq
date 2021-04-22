@@ -1,18 +1,20 @@
 from __future__ import annotations
+from typing import Iterable, TypeVar, Any, List, Callable, Optional, NoReturn, Dict
 import collections.abc
-from typing import Iterable, TypeVar, Any, List, Callable, Optional, Generic, NoReturn, Dict
-from ._linq_exceptions import NoSuchElementError
+
+
+import linq
 
 
 T = TypeVar("T")
 S = TypeVar("S")
-U = TypeVar("U")
-V = TypeVar("V")
 KT = TypeVar("KT")
 VT = TypeVar("VT")
+U = TypeVar("U")
+V = TypeVar("V")
 
 
-class From(Iterable[T]):
+class Query(Iterable[T]):
     """Query builder."""
 
     def __init__(self, iterable: Iterable[T]):
@@ -90,18 +92,18 @@ class From(Iterable[T]):
 
         return all(condition(x) for x in self)
 
-    def select(self, transform: Callable[[T], S]) -> From[S]:
+    def select(self, transform: Callable[[T], S]) -> Query[S]:
         """Transforms each object in the sequence.
 
         Arguments:
             transform (Callable[[T], S]): Function describing the transformation
 
         Returns:
-            From: Returns a new query builder based on the transformed object.
+            Query: Returns a new query builder based on the transformed object.
         """
-        return From(transform(x) for x in self)
+        return Query(transform(x) for x in self)
 
-    def selectMany(self, transform: Callable[[T], S] = lambda x: x) -> From[S]:
+    def selectMany(self, transform: Callable[[T], S] = lambda x: x) -> Query[S]:
         """Selects objects, with the possibility of transforming them, from all underlying lists into
         one sequence. Useful when the collection is composed of multiple subcollections. 
 
@@ -109,22 +111,22 @@ class From(Iterable[T]):
             transform: Expression describing the transformation. (default: no transform is applied and the underlying objects are selected as is)
 
         Returns:
-            From: Returns a new query builder based on the transformed object.
+            Query: Returns a new query builder based on the transformed object.
         """
 
-        return From(transform(x) for y in self for x in y)
+        return Query(transform(x) for y in self for x in y)
 
-    def where(self, condition: Callable[[T], bool]) -> From[T]:
+    def where(self, condition: Callable[[T], bool]) -> Query[T]:
         """Filters the sequence for the given condition
 
         Arguments:
             condition (Callable[[T], bool]): Expression returning True or False with a single input.
 
         Returns:
-            From: Returns a new query builder based on the filtered objects.
+            Query: Returns a new query builder based on the filtered objects.
         """
 
-        return From(x for x in self if condition(x))
+        return Query(x for x in self if condition(x))
 
     def max(self) -> T:
         """Returns the maximum value found
@@ -187,7 +189,7 @@ class From(Iterable[T]):
             condition (Callable[[T], bool]): Expression returning True or False (default: Returns the first element in the sequence)
 
         Raises:
-            NoSuchElementError: If no element is found to satisfy the condition
+            linq.errors.NoSuchElementError: If no element is found to satisfy the condition
 
         Returns:
             T: The first element found to satisfy the given condition
@@ -197,7 +199,7 @@ class From(Iterable[T]):
             if condition(x):
                 return x
 
-        raise NoSuchElementError()
+        raise linq.errors.NoSuchElementError()
 
     def firstOrNone(self, condition: Callable[[T], bool] = lambda x: True) -> Optional[T]:
         """Returns the first element found to satisfy the given condition
@@ -236,7 +238,7 @@ class From(Iterable[T]):
             condition (Callable[[T], bool]): Expression returning True or False (default: Returns the first element in the sequence)
 
         Raises:
-            NoSuchElementError: If no element is found to satisfy the condition
+            linq.errors.NoSuchElementError: If no element is found to satisfy the condition
 
         Returns:
             T: The last element found to satisfy the given condition
@@ -245,7 +247,7 @@ class From(Iterable[T]):
         last = self.lastOrNone(condition)
 
         if last is None:
-            raise NoSuchElementError()
+            raise linq.errors.NoSuchElementError()
         else:
             return last
 
@@ -270,7 +272,7 @@ class From(Iterable[T]):
             n += 1
         return s / n
 
-    def concat(self, iterable: Iterable[T]) -> From[T]:
+    def concat(self, iterable: Iterable[T]) -> Query[T]:
         """Adds an iterable to the sequence
 
         Arguments:
@@ -280,7 +282,7 @@ class From(Iterable[T]):
             ValueError: If the supplied object is not iterable
 
         Returns:
-            From: Query builder with the extension concatenated.
+            Query: Query builder with the extension concatenated.
         """
 
         if not isinstance(iterable, collections.abc.Iterable):
@@ -289,14 +291,14 @@ class From(Iterable[T]):
         self._extensions.append(iterable)
         return self
 
-    def distinct(self, key: Callable[[T], Any] = lambda x: x) -> From[T]:
+    def distinct(self, key: Callable[[T], Any] = lambda x: x) -> Query[T]:
         """Filters all objects that are unique in the given key function, i.e. having unique return values.
 
         Keyword Arguments:
             key (Callable[[T], Any]): Expression determining which key to use. The key must be hashable (default: Uses the elements as is)
 
         Returns:
-            From: Query builder with only distinct elements.
+            Query: Query builder with only distinct elements.
         """
 
         cache = set()
@@ -309,7 +311,7 @@ class From(Iterable[T]):
                     cache.add(key(x))
                     yield x
 
-        return From(sequence())
+        return Query(sequence())
 
     def elementAtOrNone(self, i: int) -> Optional[T]:
         """Returns the element at the given position. If there is no element at the given position, `None` is returned.
@@ -347,7 +349,7 @@ class From(Iterable[T]):
         else:
             return result
 
-    def intersect(self, iterable: Iterable[T], key: Callable[[T], Any] = lambda x: x) -> From[T]:
+    def intersect(self, iterable: Iterable[T], key: Callable[[T], Any] = lambda x: x) -> Query[T]:
         """Returns all elements found in both sequences.
 
         Arguments:
@@ -360,7 +362,7 @@ class From(Iterable[T]):
             ValueError: If the given iterable is not Iterable
 
         Returns:
-            From: Query builder on the intersection of self and the given iterable.
+            Query: Query builder on the intersection of self and the given iterable.
         """
 
         if not isinstance(iterable, collections.abc.Iterable):
@@ -369,10 +371,10 @@ class From(Iterable[T]):
         def sequence():
             for x in self:
                 kx = key(x)
-                if From(iterable).any(lambda y: kx == key(y)):
+                if Query(iterable).any(lambda y: kx == key(y)):
                     yield x
 
-        return From(sequence())
+        return Query(sequence())
 
     def toList(self) -> List[T]:
         """Returns the sequence as a list.
@@ -382,7 +384,7 @@ class From(Iterable[T]):
         """
         return list(self)
 
-    def groupBy(self, key: Callable[[T], KT], transform: Callable[[T], VT] = lambda x: x) -> From[Grouping[KT, VT]]:
+    def groupBy(self, key: Callable[[T], KT], transform: Callable[[T], VT] = lambda x: x) -> Query[linq.Grouping[KT, VT]]:
         """Groups all elements based on the given key.
 
         Arguments:
@@ -393,7 +395,7 @@ class From(Iterable[T]):
             Can be any lambda expression or function with a single input argument (default: Use the elements as is)
 
         Returns:
-            From[Grouping[KT, VT]]: Query builder object wrapping a sequence of `Grouping` objects.
+            Query[linq.Grouping[KT, VT]]: Query builder object wrapping a sequence of `Grouping` objects.
             Every `Grouping` object has two attributes, `key`, and `values` which contains the
             transformed objects.
         """
@@ -408,9 +410,9 @@ class From(Iterable[T]):
                     groups[k] = [transform(x)]
 
             for k in groups:
-                yield Grouping(k, groups[k])
+                yield linq.Grouping(k, groups[k])
 
-        return From(sequence())
+        return Query(sequence())
 
     def forEach(self, func: Callable[[T], NoReturn]) -> NoReturn:
         """Executes a function for each element.
@@ -419,7 +421,7 @@ class From(Iterable[T]):
         for x in self:
             func(x)
 
-    def groupJoin(self, extension: Iterable[S], innerKey: Callable[[T], Any], outerKey: Callable[[S], Any], innerTransform: Callable[[T], U], outerTransform: Callable[[S], V]) -> From[Joining[U, V]]:
+    def groupJoin(self, extension: Iterable[S], innerKey: Callable[[T], Any], outerKey: Callable[[S], Any], innerTransform: Callable[[T], U], outerTransform: Callable[[S], V]) -> Query[linq.Joining[U, V]]:
         """Joins the sequence with objects from another sequence.
 
         Arguments:
@@ -430,7 +432,7 @@ class From(Iterable[T]):
             outerTransform (Callable[[S], V]): The transform to apply to the outer objects
 
         Returns:
-            From[Joining[U, V]]: Query builder object wrapping a sequence of `Joining` objects. Each `Joining` object contains
+            Query[linq.Joining[U, V]]: Query builder object wrapping a sequence of `linq.Joining` objects. Each `linq.Joining` object contains
             the properties `inner` and `outer`. `inner` gives the inner object and `outer` is a collection of all objects in the
             extension that were paried with the inner object.
         """
@@ -438,19 +440,19 @@ class From(Iterable[T]):
         def sequence():
             for innerObj in self:
                 outerObjs = (
-                    From(extension)
+                    Query(extension)
                     .where(lambda x: innerKey(innerObj) == outerKey(x))
                     .select(outerTransform)
                     .toList()
                 )
-                yield Joining(
+                yield linq.Joining(
                     innerTransform(innerObj),
                     outerObjs
                 )
 
-        return From(sequence())
+        return Query(sequence())
 
-    def join(self, extension: Iterable[S], innerKey: Callable[[T], Any], outerKey: Callable[[S], Any], transform: Callable[[T, S], U]) -> From[U]:
+    def join(self, extension: Iterable[S], innerKey: Callable[[T], Any], outerKey: Callable[[S], Any], transform: Callable[[T, S], U]) -> Query[U]:
         """Joins the sequence of objects with another sequence of objects on the given keys and yields a
         a new sequence of objects according to the transform specified. Equivalent to INNER JOIN in SQL.
 
@@ -464,7 +466,7 @@ class From(Iterable[T]):
             ValueError: If the extension is not Iterable
 
         Returns:
-            From: Query build object wrapping the new sequence of objects.
+            Query: Query build object wrapping the new sequence of objects.
         """
 
         if not isinstance(extension, collections.abc.Iterable):
@@ -472,21 +474,21 @@ class From(Iterable[T]):
 
         def sequence():
             for x in self:
-                outerObjs = From(extension).where(
+                outerObjs = Query(extension).where(
                     lambda y: innerKey(x) == outerKey(y))
                 for outerObj in outerObjs:
                     yield transform(x, outerObj)
 
-        return From(sequence())
+        return Query(sequence())
 
-    def take(self, count: int) -> From[T]:
+    def take(self, count: int) -> Query[T]:
         """Selects the amount of elements specified
 
         Arguments:
             count: The number of elements to select
 
         Returns:
-            From: Query builder object wrapping the selected elements
+            Query: Query builder object wrapping the selected elements
         """
 
         def sequence():
@@ -499,16 +501,16 @@ class From(Iterable[T]):
                 yield x
                 n += 1
 
-        return From(sequence())
+        return Query(sequence())
 
-    def takeWhile(self, condition: Callable[[T], bool]) -> From[T]:
+    def takeWhile(self, condition: Callable[[T], bool]) -> Query[T]:
         """Selects elements as long as the condition is fulfilled
 
         Arguments:
             condition (Callable[[T], bool]): Expression returning True or False
 
         Returns:
-            From: Query builder object wrapping the selected elements
+            Query: Query builder object wrapping the selected elements
         """
 
         def sequence():
@@ -518,9 +520,9 @@ class From(Iterable[T]):
                 else:
                     break
 
-        return From(sequence())
+        return Query(sequence())
 
-    def order(self, key: Callable[[T], Any] = lambda x: x, descending=False) -> From[T]:
+    def order(self, key: Callable[[T], Any] = lambda x: x, descending=False) -> Query[T]:
         """Orders the sequence with respect to the given key
 
         Keyword Arguments:
@@ -528,22 +530,22 @@ class From(Iterable[T]):
             descending (bool): Whether or not to sort in descending order (default: (False))
 
         Returns:
-            From: Query builder object wrapping the sorted sequence
+            Query: Query builder object wrapping the sorted sequence
         """
 
         def sequence():
             yield from sorted(self, key=key, reverse=descending)
 
-        return From(sequence())
+        return Query(sequence())
 
-    def skip(self, count: int) -> From[T]:
+    def skip(self, count: int) -> Query[T]:
         """Skips the first elements in the sequence
 
         Arguments:
             count (int): The number of elements to skip
 
         Returns:
-            From: Query builder wrapping the remaining elements.
+            Query: Query builder wrapping the remaining elements.
         """
 
         def sequence():
@@ -555,16 +557,16 @@ class From(Iterable[T]):
 
                 yield obj
 
-        return From(sequence())
+        return Query(sequence())
 
-    def skipWhile(self, condition: Callable[[T], bool]) -> From[T]:
+    def skipWhile(self, condition: Callable[[T], bool]) -> Query[T]:
         """Skips the first elements in the sequence while the condition evaluates `True`
 
         Arguments:
             condition (Callable[[T], bool]): The number of elements to skip
 
         Returns:
-            From: The remaining elements wrapped in a query builder object.
+            Query: The remaining elements wrapped in a query builder object.
         """
         def sequence():
             skipping = True
@@ -576,7 +578,7 @@ class From(Iterable[T]):
                         skipping = False
                 yield obj
 
-        return From(sequence())
+        return Query(sequence())
 
     def toDict(self, key: Callable[[T], KT], transform: Callable[[T], VT]=lambda x: x) -> Dict[KT, VT]:
         """Returns the sequence as a dictionary where the key is given by `key`.
@@ -603,7 +605,7 @@ class From(Iterable[T]):
 
         return re
 
-    def union(self, outer: Iterable[T], key: Callable[[T], Any]=lambda x: x) -> From[T]:
+    def union(self, outer: Iterable[T], key: Callable[[T], Any]=lambda x: x) -> Query[T]:
         """Find the union of two sequences, i.e. all objects that are within either one the two sequences.
         Only unique objects (with respect to the key) are returned.
 
@@ -617,7 +619,7 @@ class From(Iterable[T]):
             ValueError: If `outer` is of instance Iterable
 
         Returns:
-            From: Query builder object wrapping the new elements
+            Query: Query builder object wrapping the new elements
         """
 
         if not isinstance(outer, collections.abc.Iterable):
@@ -640,49 +642,4 @@ class From(Iterable[T]):
                     cache.add(key(x))
                     yield x
 
-        return From(sequence())
-
-
-class Grouping(Generic[KT, VT]):
-    def __init__(self, key: KT, values: List[VT]):
-        self._values = values
-        self._key = key
-
-    @property
-    def values(self) -> List[VT]:
-        return self._values
-
-    @property
-    def key(self) -> KT:
-        return self._key
-
-    def __iter__(self):
-        yield from self._values
-
-    def __repr__(self):
-        return {
-            self._key: self._values
-        }.__repr__()
-
-
-class Joining(Generic[T, S]):
-    def __init__(self, inner: T, outer: Iterable[S]):
-        self._inner = inner
-        self._outer = outer
-
-    @property
-    def inner(self) -> T:
-        return self._inner
-
-    @property
-    def outer(self) -> List[S]:
-        return self._outer
-
-    def __iter__(self):
-        yield from self._outer
-
-    def __repr__(self):
-        return {
-            "inner": self._inner,
-            "outer": self._outer
-        }.__repr__()
+        return Query(sequence())

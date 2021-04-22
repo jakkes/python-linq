@@ -1,4 +1,6 @@
 class NoSuchElementError(Exception):
+    """Raised whenever a requested element was not retrievable."""
+
     def __init__(self, err=""):
         self.err = err
 
