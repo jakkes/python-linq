@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Iterable, TypeVar, Any, List, Callable, Optional, NoReturn, Dict
+from typing import Iterable, TypeVar, Any, List, Callable, Optional, NoReturn, Dict, Iterator
 import collections.abc
 
 
@@ -48,7 +48,7 @@ class Query(Iterable[T]):
         """
         return obj in self
 
-    def __iter__(self) -> T:
+    def __iter__(self) -> Iterator[T]:
         for obj in self._iterable:
             yield obj
 
