@@ -134,4 +134,17 @@ class DistributedQuery(Generic[T]):
         return self
 
     def max(self) -> T:
+        """Computes the maximum value.
+
+        Returns:
+            T: The maximum value encountered.
+        """
         return max(self)
+
+    def min(self) -> T:
+        """Computes the minimum value.
+
+        Returns:
+            T: Minimum value encountered.
+        """
+        return min(self)
