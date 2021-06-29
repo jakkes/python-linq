@@ -1,4 +1,5 @@
-from typing import Any, Generic, Iterator, Sequence, TypeVar, Iterable, Callable
+from typing import Any, Generic, Iterator, Sequence, TypeVar, Iterable, Callable, List
+import abc
 import multiprocessing as mp
 import threading as th
 import queue
@@ -37,9 +38,39 @@ class _Worker(mp.Process):
             self.__feed_queue.task_done()
 
 
+class _Query:
+    def __init__(self):
+        self.__blocks: "List[_QueryBlock]" = []
+
+    def add_block(self, block: "_QueryBlock"):
+        self.__blocks.append(block)
+
+    def execute(self, data: Sequence[Any]) -> Iterator[Any]:
+        if len(self.__blocks) == 0:
+            return data
+
+        iterator = self.__blocks[0].iterator(data)
+        for i in range(1, len(self.__blocks)):
+            iterator = self.__blocks[i].iterator(iterator)
+        yield from iterator
+
+class _QueryBlock(abc.ABC):
+    
+    @abc.abstractmethod
+    def iterator(self, data: Iterable[Any]) -> Iterator[Any]:
+        raise NotImplementedError
+
+class _WhereBlock(_QueryBlock):
+    pass
+
 class DistributedQuery(Generic[T]):
     """A query that distributes execution across multiple processes, allowing for
-    utilization of multiple cores."""
+    utilization of multiple cores.
+    
+    Data and arguments are distributed across processes using queues from Python's
+    `multiprocessing` package. This means that everything needs to be pickled, including
+    functions passed to, e.g., `select`. Therefore, lambdas and local functions are not
+    supported arguments to the query."""
 
     def __init__(
         self, sequence: Iterable[T], processes: int = None, chunk_size: int = 1
@@ -148,3 +179,15 @@ class DistributedQuery(Generic[T]):
             T: Minimum value encountered.
         """
         return min(self)
+
+    def count(self) -> int:
+        """Counts the number of elements in the query.
+
+        Returns:
+            int: Number of elements matching the query.
+        """
+        return sum(1 for _ in self)
+
+    def where(self, condition: Callable[[T], bool]) -> "DistributedQuery[T]":
+        self.__operations.append(_Where(condition))
+        return self
