@@ -1,5 +1,5 @@
 from typing import Callable, List, Sequence, Any, Iterator, TypeVar
-from . import blocks
+from . import blocks, aggregators
 
 
 T = TypeVar("T")
@@ -8,12 +8,12 @@ T = TypeVar("T")
 class Executor:
     def __init__(self):
         self._blocks: List[blocks.Base] = []
-        self._aggregator: Callable[[Iterator], Any] = list
+        self._aggregator: aggregators.Base = aggregators.List()
 
     def add_block(self, block: blocks.Base):
         self._blocks.append(block)
 
-    def set_aggregator(self, aggregator: Callable[[Iterator], Any]):
+    def set_aggregator(self, aggregator: aggregators.Base):
         self._aggregator = aggregator
 
     def _iterator(self, data: Sequence[T]) -> Iterator[T]:
@@ -27,4 +27,4 @@ class Executor:
         yield from iterator
 
     def execute(self, data: Sequence[T]) -> Any:
-        return self._aggregator(self._iterator(data))
+        return self._aggregator.aggregate(self._iterator(data))

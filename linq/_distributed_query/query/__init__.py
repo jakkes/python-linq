@@ -1,2 +1,2 @@
-from . import blocks
+from . import blocks, aggregators
 from .executor import Executor

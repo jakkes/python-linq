@@ -17,9 +17,6 @@ S = TypeVar("S")
 def identity(x: T) -> T:
     return x
 
-def count(iterable) -> int:
-    return sum(1 for _ in iterable)
-
 
 class DistributedQuery(Generic[T]):
     """A query that distributes execution across multiple processes, allowing for
@@ -89,11 +86,11 @@ class DistributedQuery(Generic[T]):
             worker.join()
 
     def __contains__(self, obj: T) -> bool:
+        self._query.set_aggregator(query.aggregators.Contains(obj))
         return_value = False
         for x in self:
-            for y in x:
-                if obj == y:
-                    return_value = True
+            if x:
+                return_value = True
         return return_value
 
     def all(self, condition: Callable[[T], bool] = identity) -> bool:
@@ -110,7 +107,7 @@ class DistributedQuery(Generic[T]):
                 False.
         """
         self._query.add_block(query.blocks.Select(condition))
-        self._query.set_aggregator(all)
+        self._query.set_aggregator(query.aggregators.All())
         return_value = True
         for x in self:
             if not x:
@@ -131,7 +128,7 @@ class DistributedQuery(Generic[T]):
                 False.
         """
         self._query.add_block(query.blocks.Select(condition))
-        self._query.set_aggregator(any)
+        self._query.set_aggregator(query.aggregators.Any())
         return_value = False
         for x in self:
             if x:
@@ -181,7 +178,7 @@ class DistributedQuery(Generic[T]):
         Returns:
             T: The maximum value encountered.
         """
-        self._query.set_aggregator(max)
+        self._query.set_aggregator(query.aggregators.Max())
         return max(self)
 
     def min(self) -> T:
@@ -190,7 +187,7 @@ class DistributedQuery(Generic[T]):
         Returns:
             T: Minimum value encountered.
         """
-        self._query.set_aggregator(min)
+        self._query.set_aggregator(query.aggregators.Min())
         return min(self)
 
     def count(self) -> int:
@@ -199,7 +196,7 @@ class DistributedQuery(Generic[T]):
         Returns:
             int: Number of elements matching the query.
         """
-        self._query.set_aggregator(count)
+        self._query.set_aggregator(query.aggregators.Count())
         return sum(self)
 
     def where(self, condition: Callable[[T], bool]) -> "DistributedQuery[T]":
@@ -226,3 +223,6 @@ class DistributedQuery(Generic[T]):
             bool: True if the object was found, otherwise False.
         """
         return obj in self
+
+    def argmax(self, value: Callable[[T], Any]) -> T:
+        pass
