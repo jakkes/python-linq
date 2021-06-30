@@ -8,7 +8,7 @@ class Worker(mp.Process):
     def __init__(
         self,
         feed_queue: mp.JoinableQueue,
-        result_queue: mp.JoinableQueue,
+        result_queue: mp.Queue,
         feed_complete_event: th.Event,
         query: query.Executor,
     ):
