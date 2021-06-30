@@ -27,4 +27,4 @@ class Worker(mp.Process):
                 data: Sequence[Any] = self._feed_queue.get(block=True, timeout=0.1)
             except queue.Empty:
                 continue
-            self._result_queue.put(list(self._query.execute(data)))
+            self._result_queue.put(self._query.execute(data))

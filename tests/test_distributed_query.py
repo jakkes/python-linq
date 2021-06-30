@@ -22,7 +22,11 @@ def test_distributed_query_single_process():
 
 
 def test_distributed_query_multiple_processes():
-    assert DistributedQuery(range(100), processes=4).select(square).min() == 0
+    assert DistributedQuery(range(100), processes=2).select(square).min() == 0
+
+
+def test_chunk_size():
+    assert DistributedQuery(range(100), processes=2, chunk_size=23).select(square).count() == 100
 
 
 def test_long_query():
@@ -82,6 +86,7 @@ def test_contains_3():
 def test_contains_4():
     assert -1 not in DistributedQuery(range(100), processes=1)
 
-
-if __name__ == "__main__":
-    test_where()
+def test_flatten():
+    y = DistributedQuery([[1,2,3], [4,5,6], [7,8,9]], processes=1).flatten().to_list()
+    for x in range(1,10):
+        assert x in y

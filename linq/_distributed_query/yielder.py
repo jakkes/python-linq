@@ -16,4 +16,4 @@ class Yielder:
             except queue.Empty:
                 continue
             self._task_complete_queue.put(1)
-            yield from data
+            yield data

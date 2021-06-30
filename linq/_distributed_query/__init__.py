@@ -1,4 +1,4 @@
-from typing import Any, Generic, Iterator, Sequence, TypeVar, Iterable, Callable
+from typing import Any, Generic, Iterator, List, Sequence, TypeVar, Iterable, Callable
 import multiprocessing as mp
 import threading as th
 import queue
@@ -16,6 +16,9 @@ S = TypeVar("S")
 
 def identity(x: T) -> T:
     return x
+
+def count(iterable) -> int:
+    return sum(1 for _ in iterable)
 
 
 class DistributedQuery(Generic[T]):
@@ -88,8 +91,9 @@ class DistributedQuery(Generic[T]):
     def __contains__(self, obj: T) -> bool:
         return_value = False
         for x in self:
-            if obj == x:
-                return_value = True
+            for y in x:
+                if obj == y:
+                    return_value = True
         return return_value
 
     def all(self, condition: Callable[[T], bool] = identity) -> bool:
@@ -105,9 +109,11 @@ class DistributedQuery(Generic[T]):
             bool: True if condition returns True for all query elements, otherwise
                 False.
         """
+        self._query.add_block(query.blocks.Select(condition))
+        self._query.set_aggregator(all)
         return_value = True
         for x in self:
-            if not condition(x):
+            if not x:
                 return_value = False
         return return_value
 
@@ -124,9 +130,11 @@ class DistributedQuery(Generic[T]):
             bool: True if condition evaluates to True for any query element, otherwise
                 False.
         """
+        self._query.add_block(query.blocks.Select(condition))
+        self._query.set_aggregator(any)
         return_value = False
         for x in self:
-            if condition(x):
+            if x:
                 return_value = True
         return return_value
 
@@ -142,12 +150,38 @@ class DistributedQuery(Generic[T]):
         self._query.add_block(query.blocks.Select(transform))
         return self
 
+    def flatten(self) -> "DistributedQuery":
+        """Flattens the query elements one step, i.e. given a list of lists,
+        concatenates them into one long list.
+
+        Returns:
+            DistributedQuery: Query over flattened elements.
+
+        Example:
+        ```python
+        >>> data = [[1,2,3], [4,5,6], [7, 8, 9]]
+        >>> DistributedQuery(data).flatten().toList()
+        [1, 2, 3, 4, 5, 6, 7, 8, 9]  # not necessarily ordered
+        ```
+        """
+        self._query.add_block(query.blocks.Flatten())
+        return self
+
+    def to_list(self) -> List[T]:
+        """Executes the query and stores the result into a list.
+
+        Returns:
+            List[T]: List of output.
+        """
+        return sum(self, [])
+
     def max(self) -> T:
         """Computes the maximum value.
 
         Returns:
             T: The maximum value encountered.
         """
+        self._query.set_aggregator(max)
         return max(self)
 
     def min(self) -> T:
@@ -156,6 +190,7 @@ class DistributedQuery(Generic[T]):
         Returns:
             T: Minimum value encountered.
         """
+        self._query.set_aggregator(min)
         return min(self)
 
     def count(self) -> int:
@@ -164,7 +199,8 @@ class DistributedQuery(Generic[T]):
         Returns:
             int: Number of elements matching the query.
         """
-        return sum(1 for _ in self)
+        self._query.set_aggregator(count)
+        return sum(self)
 
     def where(self, condition: Callable[[T], bool]) -> "DistributedQuery[T]":
         """Filters the query on a given condition.
