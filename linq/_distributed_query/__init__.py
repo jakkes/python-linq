@@ -111,6 +111,16 @@ class DistributedQuery(Generic[T]):
         return sum(1 for _ in self)
 
     def where(self, condition: Callable[[T], bool]) -> "DistributedQuery[T]":
+        """Filters the query on a given condition.
+
+        Args:
+            condition (Callable[[T], bool]): Condition accepting one argument and
+                returning a boolean. Elements for which the condition evaluates to True
+                are kept.
+
+        Returns:
+            DistributedQuery[T]: Query where elements pass the condition.
+        """
         self._query.add_block(query.blocks.Where(condition))
         return self
 
