@@ -7,6 +7,7 @@ from . import query
 from .worker import Worker
 from .feeder import Feeder
 from .yielder import Yielder
+from .task_tracker import TaskTracker
 
 
 T = TypeVar("T")
@@ -20,7 +21,7 @@ def identity(x: T) -> T:
 class DistributedQuery(Generic[T]):
     """A query that distributes execution across multiple processes, allowing for
     utilization of multiple cores.
-    
+
     Data and arguments are distributed across processes using queues from Python's
     `multiprocessing` package. This means that everything needs to be pickled, including
     functions passed to, e.g., `select`. Therefore, lambdas and local functions are not
@@ -51,21 +52,34 @@ class DistributedQuery(Generic[T]):
                 raise AttributeError("Query has already been executed.")
             self._executed = True
 
-        feed_queue = mp.JoinableQueue(maxsize=self._processes * 2)
+        feed_queue = mp.Queue(maxsize=self._processes * 2)
+        task_queue = mp.Queue()
+        task_complete_queue = mp.Queue()
         result_queue = mp.Queue(maxsize=self._processes * 2)
         feed_complete_event = mp.Event()
         tasks_complete_event = mp.Event()
-        feeder = Feeder(feed_queue, self._sequence, self._chunk_size, feed_complete_event, tasks_complete_event)
+        feeder = Feeder(
+            feed_queue,
+            task_queue,
+            self._sequence,
+            self._chunk_size,
+            feed_complete_event,
+        )
         feeder.start()
 
+        task_tracker = TaskTracker(
+            task_queue, task_complete_queue, feed_complete_event, tasks_complete_event
+        )
+        task_tracker.start()
+
         workers = [
-            Worker(feed_queue, result_queue, feed_complete_event, self._query)
+            Worker(feed_queue, result_queue, feed_complete_event, tasks_complete_event, self._query)
             for _ in range(self._processes)
         ]
         for worker in workers:
             worker.start()
 
-        yield from Yielder(result_queue, tasks_complete_event)
+        yield from Yielder(result_queue, task_complete_queue, tasks_complete_event)
 
         feeder.join()
         for worker in workers:
@@ -102,7 +116,7 @@ class DistributedQuery(Generic[T]):
 
         Args:
             condition (Callable[[T], bool], optional): Callable accepting one argument
-                and returning a boolean. If condition returns True for any element 
+                and returning a boolean. If condition returns True for any element
                 the query, then the function evaluates to True, otherwise False.
                 Defaults to the identity function.
 
@@ -175,6 +189,4 @@ class DistributedQuery(Generic[T]):
         Returns:
             bool: True if the object was found, otherwise False.
         """
-        return obj in self    
-
-
+        return obj in self

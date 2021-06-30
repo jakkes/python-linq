@@ -81,3 +81,7 @@ def test_contains_3():
 
 def test_contains_4():
     assert -1 not in DistributedQuery(range(100), processes=1)
+
+
+if __name__ == "__main__":
+    test_where()
