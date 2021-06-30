@@ -68,10 +68,11 @@ class DistributedQuery(Generic[T]):
             worker.join()
 
     def __contains__(self, obj: T) -> bool:
+        return_value = False
         for x in self:
             if obj == x:
-                return True
-        return False
+                return_value = True
+        return return_value
 
     def select(self, transform: Callable[[T], S]) -> "DistributedQuery[S]":
         """Applies a transformation on each sequence element.

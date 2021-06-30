@@ -1,4 +1,5 @@
 from typing import Sequence, Any
+import queue
 import multiprocessing as mp
 import threading as th
 from . import query
@@ -19,7 +20,7 @@ class Worker(mp.Process):
         self._query = query
 
     def run(self):
-        while not self._feed_complete_event.is_set() or not self._feed_queue.empty():
+        while not (self._feed_complete_event.is_set() and self._feed_queue.empty()):
             try:
                 data: Sequence[Any] = self._feed_queue.get(block=True, timeout=1.0)
             except queue.Empty:

@@ -24,8 +24,14 @@ def test_where():
     assert DistributedQuery(range(100), processes=1).where(smaller_than_10).count() == 10
 
 
-def test_contains():
+def test_contains_1():
     assert DistributedQuery(range(100), processes=1).contains(50)
+
+def test_contains_2():    
     assert not DistributedQuery(range(100), processes=1).contains(-1)
+
+def test_contains_3():    
     assert 50 in DistributedQuery(range(100), processes=1)
+
+def test_contains_4():    
     assert -1 not in DistributedQuery(range(100), processes=1)
