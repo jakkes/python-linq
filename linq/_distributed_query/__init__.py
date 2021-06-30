@@ -1,4 +1,4 @@
-from typing import Generic, Iterator, Sequence, TypeVar, Iterable, Callable
+from typing import Any, Generic, Iterator, Sequence, TypeVar, Iterable, Callable
 import multiprocessing as mp
 import threading as th
 import queue
@@ -11,6 +11,10 @@ from .yielder import Yielder
 
 T = TypeVar("T")
 S = TypeVar("S")
+
+
+def identity(x: T) -> T:
+    return x
 
 
 class DistributedQuery(Generic[T]):
@@ -74,6 +78,44 @@ class DistributedQuery(Generic[T]):
                 return_value = True
         return return_value
 
+    def all(self, condition: Callable[[T], bool] = identity) -> bool:
+        """Determines whether all elements in the query fulfill a given condition.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument
+                and returning a boolean. If condition returns True for all elements in
+                the query, then the function evaluates to True, otherwise False.
+                Defaults to the identity function.
+
+        Returns:
+            bool: True if condition returns True for all query elements, otherwise
+                False.
+        """
+        return_value = True
+        for x in self:
+            if not condition(x):
+                return_value = False
+        return return_value
+
+    def any(self, condition: Callable[[T], bool] = identity) -> bool:
+        """Determines whether any element in the query fulfills a given condition.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument
+                and returning a boolean. If condition returns True for any element 
+                the query, then the function evaluates to True, otherwise False.
+                Defaults to the identity function.
+
+        Returns:
+            bool: True if condition evaluates to True for any query element, otherwise
+                False.
+        """
+        return_value = False
+        for x in self:
+            if condition(x):
+                return_value = True
+        return return_value
+
     def select(self, transform: Callable[[T], S]) -> "DistributedQuery[S]":
         """Applies a transformation on each sequence element.
 
@@ -134,3 +176,5 @@ class DistributedQuery(Generic[T]):
             bool: True if the object was found, otherwise False.
         """
         return obj in self    
+
+

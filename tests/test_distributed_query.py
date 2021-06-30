@@ -5,6 +5,10 @@ def square(x):
     return x * x
 
 
+def add_1(x):
+    return x + 1
+
+
 def smaller_than_10(x):
     return x < 10
 
@@ -30,6 +34,26 @@ def test_long_query():
         .where(greater_than_0)
         .count()
         == 3
+    )
+
+
+def test_all_1():
+    assert DistributedQuery(range(100), processes=1).select(add_1).all(greater_than_0)
+
+
+def test_all_2():
+    assert not DistributedQuery(range(100), processes=1).all(smaller_than_10)
+
+
+def test_any_1():
+    assert DistributedQuery(range(100), processes=1).select(square).any(greater_than_0)
+
+
+def test_any_2():
+    assert (
+        not DistributedQuery(range(10, 100), processes=1)
+        .select(add_1)
+        .any(smaller_than_10)
     )
 
 
