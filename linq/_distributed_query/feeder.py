@@ -12,7 +12,7 @@ class Feeder(th.Thread):
         all_data_fed_event: th.Event,
         all_tasks_complete_event: th.Event,
     ):
-        super().__init__()
+        super().__init__(daemon=True)
 
         self._feed_queue = feed_queue
         self._data = data
