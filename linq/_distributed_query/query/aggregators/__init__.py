@@ -6,3 +6,4 @@ from .all import All
 from .max import Max
 from .min import Min
 from .contains import Contains
+from .argmax import ArgMax

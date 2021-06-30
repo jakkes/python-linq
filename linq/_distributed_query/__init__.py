@@ -224,5 +224,32 @@ class DistributedQuery(Generic[T]):
         """
         return obj in self
 
-    def argmax(self, value: Callable[[T], Any]) -> T:
-        pass
+    def argmax(self, value_fn: Callable[[T], Any]) -> T:
+        """Returns the query element for which the given value function returns the
+        largest value.
+
+        Args:
+            value_fn (Callable[[T], Any]): Function accepting one argument and returning
+                a comparable object.
+
+        Returns:
+            T: Query element for which `value_fn` returned the largest value.
+        """
+        aggregator = query.aggregators.ArgMax(value_fn)
+        self._query.set_aggregator(aggregator)
+        return aggregator.aggregate(self)
+    
+    def argmin(self, value_fn: Callable[[T], Any]) -> T:
+        """Returns the query element for which the given value function returns the
+        smallest value.
+
+        Args:
+            value_fn (Callable[[T], Any]): Function accepting one argument and returning
+                a comparable object.
+
+        Returns:
+            T: Query element for which `value_fn` returned the smallest value.
+        """
+        aggregator = query.aggregators.ArgMax(value_fn, invert_value=True)
+        self._query.set_aggregator(aggregator)
+        return aggregator.aggregate(self)

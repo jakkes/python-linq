@@ -9,6 +9,10 @@ def add_1(x):
     return x + 1
 
 
+def negative_square(x):
+    return -x*x
+
+
 def smaller_than_10(x):
     return x < 10
 
@@ -90,3 +94,9 @@ def test_flatten():
     y = DistributedQuery([[1,2,3], [4,5,6], [7,8,9]], processes=1).flatten().to_list()
     for x in range(1,10):
         assert x in y
+
+def test_argmax():
+    assert DistributedQuery(range(-4, 5)).argmax(negative_square) == 0
+
+def test_argmin():
+    assert DistributedQuery(range(-4, 5)).argmin(square) == 0
