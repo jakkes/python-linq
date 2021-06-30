@@ -3,6 +3,7 @@ import abc
 import multiprocessing as mp
 import threading as th
 import queue
+import time
 
 
 T = TypeVar("T")
@@ -15,44 +16,41 @@ class _Worker(mp.Process):
         feed_queue: mp.JoinableQueue,
         result_queue: mp.JoinableQueue,
         feed_complete_event: th.Event,
-        operations,
+        query: "_Query",
     ):
         super().__init__(daemon=True)
-        self.__feed_queue = feed_queue
-        self.__result_queue = result_queue
-        self.__feed_complete_event = feed_complete_event
-        self.__operations = operations
-
-    def __execute(self, data: Any) -> Any:
-        for op in self.__operations:
-            data = op(data)
-        return data
+        self._feed_queue = feed_queue
+        self._result_queue = result_queue
+        self._feed_complete_event = feed_complete_event
+        self._query = query
 
     def run(self):
-        while not self.__feed_complete_event.is_set() or not self.__feed_queue.empty():
+        while not self._feed_complete_event.is_set() or not self._feed_queue.empty():
             try:
-                data: Sequence[Any] = self.__feed_queue.get(block=True, timeout=1.0)
+                data: Sequence[Any] = self._feed_queue.get(block=True, timeout=1.0)
             except queue.Empty:
                 continue
-            self.__result_queue.put([self.__execute(x) for x in data])
-            self.__feed_queue.task_done()
+            self._result_queue.put(list(self._query.execute(data)))
+            self._feed_queue.task_done()
 
 
 class _Query:
     def __init__(self):
-        self.__blocks: "List[_QueryBlock]" = []
+        self._blocks: "List[_QueryBlock]" = []
 
     def add_block(self, block: "_QueryBlock"):
-        self.__blocks.append(block)
+        self._blocks.append(block)
 
     def execute(self, data: Sequence[Any]) -> Iterator[Any]:
-        if len(self.__blocks) == 0:
-            return data
+        if len(self._blocks) == 0:
+            yield from data
+            return
 
-        iterator = self.__blocks[0].iterator(data)
-        for i in range(1, len(self.__blocks)):
-            iterator = self.__blocks[i].iterator(iterator)
+        iterator = self._blocks[0].iterator(data)
+        for i in range(1, len(self._blocks)):
+            iterator = self._blocks[i].iterator(iterator)
         yield from iterator
+
 
 class _QueryBlock(abc.ABC):
     
@@ -60,8 +58,27 @@ class _QueryBlock(abc.ABC):
     def iterator(self, data: Iterable[Any]) -> Iterator[Any]:
         raise NotImplementedError
 
+
 class _WhereBlock(_QueryBlock):
-    pass
+    def __init__(self, condition: Callable[[Any], bool]) -> None:
+        super().__init__()
+        self._condition = condition
+
+    def iterator(self, data: Iterable[Any]) -> Iterator[Any]:
+        for x in data:
+            if self._condition(x):
+                yield x
+
+
+class _SelectBlock(_QueryBlock):
+    def __init__(self, transform: Callable[[Any], Any]) -> None:
+        super().__init__()
+        self._transform = transform
+
+    def iterator(self, data: Iterable[Any]) -> Iterator[Any]:
+        for x in data:
+            yield self._transform(x)
+
 
 class DistributedQuery(Generic[T]):
     """A query that distributes execution across multiple processes, allowing for
@@ -83,47 +100,47 @@ class DistributedQuery(Generic[T]):
             chunk_size (int, optional): Data are distributed using this chunk size.
                 Defaults to 1.
         """
-        self.__sequence = sequence
-        self.__processes = processes if processes is not None else mp.cpu_count()
-        self.__chunk_size = chunk_size
-        self.__operations = []
-        self.__lock = th.Lock()
+        self._sequence = sequence
+        self._processes = processes if processes is not None else mp.cpu_count()
+        self._chunk_size = chunk_size
+        self._query = _Query()
+        self._lock = th.Lock()
 
-        self.__executed = False
+        self._executed = False
 
-    def __feeder(self, feed_queue: mp.JoinableQueue, complete_event: th.Event):
+    def _feeder(self, feed_queue: mp.JoinableQueue, complete_event: th.Event):
         chunk = []
-        for data in self.__sequence:
+        for data in self._sequence:
             chunk.append(data)
-            if len(chunk) >= self.__chunk_size:
+            if len(chunk) >= self._chunk_size:
                 feed_queue.put(chunk.copy())
                 chunk.clear()
         if len(chunk) > 0:
             feed_queue.put(chunk)
         complete_event.set()
 
-    def __feeder_tasks_done(self, queue: mp.JoinableQueue, event: th.Event):
+    def _feeder_tasks_done(self, queue: mp.JoinableQueue, event: th.Event):
         queue.join()
         event.set()
 
     def __iter__(self) -> Iterator[T]:
-        with self.__lock:
-            if self.__executed:
+        with self._lock:
+            if self._executed:
                 raise AttributeError("Query has already been executed.")
-            self.__executed = True
+            self._executed = True
 
-        feed_queue = mp.JoinableQueue(maxsize=self.__processes * 2)
+        feed_queue = mp.JoinableQueue(maxsize=self._processes * 2)
         feed_complete_event = mp.Event()
         feeder_thread = th.Thread(
-            target=self.__feeder, args=(feed_queue, feed_complete_event)
+            target=self._feeder, args=(feed_queue, feed_complete_event)
         )
         feeder_thread.start()
 
-        result_queue = mp.JoinableQueue(maxsize=self.__processes * 2)
+        result_queue = mp.JoinableQueue(maxsize=self._processes * 2)
 
         workers = [
-            _Worker(feed_queue, result_queue, feed_complete_event, self.__operations)
-            for _ in range(self.__processes)
+            _Worker(feed_queue, result_queue, feed_complete_event, self._query)
+            for _ in range(self._processes)
         ]
         for worker in workers:
             worker.start()
@@ -138,7 +155,7 @@ class DistributedQuery(Generic[T]):
 
         feeder_tasks_done = th.Event()
         feeder_tasks_done_thread = th.Thread(
-            target=self.__feeder_tasks_done, args=(feed_queue, feeder_tasks_done)
+            target=self._feeder_tasks_done, args=(feed_queue, feeder_tasks_done)
         )
         feeder_tasks_done_thread.start()
 
@@ -152,6 +169,12 @@ class DistributedQuery(Generic[T]):
         for worker in workers:
             worker.join()
 
+    def __contains__(self, obj: T) -> bool:
+        for x in self:
+            if obj == x:
+                return True
+        return False
+
     def select(self, transform: Callable[[T], S]) -> "DistributedQuery[S]":
         """Applies a transformation on each sequence element.
 
@@ -161,7 +184,7 @@ class DistributedQuery(Generic[T]):
         Returns:
             S: Return type of the transform.
         """
-        self.__operations.append(transform)
+        self._query.add_block(_SelectBlock(transform))
         return self
 
     def max(self) -> T:
@@ -189,5 +212,16 @@ class DistributedQuery(Generic[T]):
         return sum(1 for _ in self)
 
     def where(self, condition: Callable[[T], bool]) -> "DistributedQuery[T]":
-        self.__operations.append(_Where(condition))
+        self._query.add_block(_WhereBlock(condition))
         return self
+
+    def contains(self, obj: T) -> bool:
+        """Determines whether the given object is found in the query.
+
+        Args:
+            obj (T): Object to search for.
+
+        Returns:
+            bool: True if the object was found, otherwise False.
+        """
+        return obj in self    
