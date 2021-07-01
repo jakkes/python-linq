@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import (
     Any,
     Dict,
@@ -171,7 +172,7 @@ class DistributedQuery(Generic[T]):
                 return_value = True
         return return_value
 
-    def __enter__(self) -> "DistributedQuery[T]":
+    def __enter__(self) -> DistributedQuery[T]:
         return self
 
     def __exit__(self, *args):
@@ -235,7 +236,7 @@ class DistributedQuery(Generic[T]):
         with self as self:
             return aggregator.aggregate(self)
 
-    def select(self, transform: Callable[[T], S]) -> "DistributedQuery[S]":
+    def select(self, transform: Callable[[T], S]) -> DistributedQuery[S]:
         """Applies a transformation on each sequence element.
 
         Args:
@@ -299,7 +300,7 @@ class DistributedQuery(Generic[T]):
         self._query.set_aggregator(query.aggregators.Count())
         return sum(self)
 
-    def where(self, condition: Callable[[T], bool]) -> "DistributedQuery[T]":
+    def where(self, condition: Callable[[T], bool]) -> DistributedQuery[T]:
         """Filters the query on a given condition.
 
         Args:
