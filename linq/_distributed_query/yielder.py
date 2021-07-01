@@ -10,7 +10,7 @@ class Yielder:
         self._task_complete_queue = task_complete_queue
 
     def __iter__(self) -> Iterator[Any]:
-        while not self._tasks_done_event.is_set() or not self._result_queue.empty():
+        while not self._tasks_done_event.is_set():
             try:
                 data = self._result_queue.get(block=True, timeout=0.1)
             except queue.Empty:

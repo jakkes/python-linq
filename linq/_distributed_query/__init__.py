@@ -1,7 +1,8 @@
-from typing import Any, Generic, Iterator, List, Sequence, TypeVar, Iterable, Callable
+from typing import Any, Generic, Iterator, List, Optional, Sequence, TypeVar, Iterable, Callable
 import multiprocessing as mp
 import threading as th
-import queue
+
+from linq import errors
 
 from . import query
 from .worker import Worker
@@ -16,6 +17,10 @@ S = TypeVar("S")
 
 def identity(x: T) -> T:
     return x
+
+
+def true(x):
+    return True
 
 
 class DistributedQuery(Generic[T]):
@@ -44,7 +49,18 @@ class DistributedQuery(Generic[T]):
         self._query = query.Executor()
         self._lock = th.Lock()
 
+        self._feed_queue: mp.Queue = None
+        self._task_queue: mp.Queue = None
+        self._task_complete_queue: mp.Queue = None
+        self._result_queue: mp.Queue = None
+        self._feed_complete_event: th.Event = None
+        self._tasks_complete_event: th.Event = None
+        self._feeder: Feeder = None
+        self._task_tracker: TaskTracker = None
+        self._workers: List[Worker] = None
+
         self._executed = False
+        self._closed = False
 
     def __iter__(self) -> Iterator[T]:
         with self._lock:
@@ -52,37 +68,38 @@ class DistributedQuery(Generic[T]):
                 raise AttributeError("Query has already been executed.")
             self._executed = True
 
-        feed_queue = mp.Queue(maxsize=self._processes * 2)
-        task_queue = mp.Queue()
-        task_complete_queue = mp.Queue()
-        result_queue = mp.Queue(maxsize=self._processes * 2)
-        feed_complete_event = mp.Event()
-        tasks_complete_event = mp.Event()
-        feeder = Feeder(
-            feed_queue,
-            task_queue,
+        self._feed_queue = mp.Queue(maxsize=self._processes * 2)
+        self._task_queue = mp.Queue()
+        self._task_complete_queue = mp.Queue()
+        self._result_queue = mp.Queue(maxsize=self._processes * 2)
+        self._feed_complete_event = mp.Event()
+        self._tasks_complete_event = mp.Event()
+        self._feeder = Feeder(
+            self._feed_queue,
+            self._task_queue,
             self._sequence,
             self._chunk_size,
-            feed_complete_event,
+            self._feed_complete_event,
         )
-        feeder.start()
+        self._feeder.start()
 
-        task_tracker = TaskTracker(
-            task_queue, task_complete_queue, feed_complete_event, tasks_complete_event
+        self._task_tracker = TaskTracker(
+            self._task_queue, self._task_complete_queue, self._feed_complete_event, self._tasks_complete_event
         )
-        task_tracker.start()
+        self._task_tracker.start()
 
-        workers = [
-            Worker(feed_queue, result_queue, feed_complete_event, tasks_complete_event, self._query)
+        self._workers = [
+            Worker(self._feed_queue, self._result_queue, self._feed_complete_event, self._tasks_complete_event, self._query)
             for _ in range(self._processes)
         ]
-        for worker in workers:
+        for worker in self._workers:
             worker.start()
 
-        yield from Yielder(result_queue, task_complete_queue, tasks_complete_event)
+        yield from Yielder(self._result_queue, self._task_complete_queue, self._tasks_complete_event)
 
-        feeder.join()
-        for worker in workers:
+        self._feeder.join()
+        self._task_tracker.join()
+        for worker in self._workers:
             worker.join()
 
     def __contains__(self, obj: T) -> bool:
@@ -92,6 +109,31 @@ class DistributedQuery(Generic[T]):
             if x:
                 return_value = True
         return return_value
+
+    def __enter__(self) -> "DistributedQuery[T]":
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
+    def close(self):
+        """Closes the query and all background threads and processes."""
+        if not self._executed or self._closed:
+            return
+
+        self._feed_complete_event.set()
+        self._tasks_complete_event.set()
+
+        while not self._feed_queue.empty():
+            self._feed_queue.get_nowait()
+
+        while not self._result_queue.empty():
+            self._result_queue.get_nowait()
+
+        self._feeder.join()
+        self._task_tracker.join()
+        for worker in self._workers:
+            worker.join()
 
     def all(self, condition: Callable[[T], bool] = identity) -> bool:
         """Determines whether all elements in the query fulfill a given condition.
@@ -106,13 +148,11 @@ class DistributedQuery(Generic[T]):
             bool: True if condition returns True for all query elements, otherwise
                 False.
         """
+        aggregator = query.aggregators.All()
         self._query.add_block(query.blocks.Select(condition))
-        self._query.set_aggregator(query.aggregators.All())
-        return_value = True
-        for x in self:
-            if not x:
-                return_value = False
-        return return_value
+        self._query.set_aggregator(aggregator)
+        with self as self:
+            return aggregator.aggregate(self)
 
     def any(self, condition: Callable[[T], bool] = identity) -> bool:
         """Determines whether any element in the query fulfills a given condition.
@@ -127,13 +167,11 @@ class DistributedQuery(Generic[T]):
             bool: True if condition evaluates to True for any query element, otherwise
                 False.
         """
+        aggregator = query.aggregators.Any()
         self._query.add_block(query.blocks.Select(condition))
-        self._query.set_aggregator(query.aggregators.Any())
-        return_value = False
-        for x in self:
-            if x:
-                return_value = True
-        return return_value
+        self._query.set_aggregator(aggregator)
+        with self as self:
+            return aggregator.aggregate(self)
 
     def select(self, transform: Callable[[T], S]) -> "DistributedQuery[S]":
         """Applies a transformation on each sequence element.
@@ -253,3 +291,51 @@ class DistributedQuery(Generic[T]):
         aggregator = query.aggregators.ArgMax(value_fn, invert_value=True)
         self._query.set_aggregator(aggregator)
         return aggregator.aggregate(self)
+
+    def first_or_none(self, condition: Callable[[T], bool] = true) -> Optional[T]:
+        """Returns the first element found to satisfy the given condition. If no element
+        is found, `None` is returned.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument.
+                The first element for which condition returns True is returned. Defaults
+                to returning `True` for any input, i.e. the result will be the first
+                element encountered in the query.
+
+        Returns:
+            Optional[T]: First element encountered for which `condition` returns `True`.
+                If no element is found, returns `None`.
+        """
+        aggregator = query.aggregators.FirstOrNone(condition)
+        self._query.set_aggregator(aggregator)
+        re = None
+        for x in self:
+            if x is None:
+                continue
+            if condition(x):
+                re = x
+                break
+        self.close()
+        return re
+
+    def first(self, condition: Callable[[T], bool] = true) -> T:
+        """Returns the first element found to satisfy the given condition. If no element
+        is found, an exception is raised.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument.
+                The first element for which condition returns True is returned. Defaults
+                to returning `True` for any input, i.e. the result will be the first
+                element encountered in the query.
+
+        Raises:
+            errors.NoSuchElementError: In case no element is found to satisfy the
+                condition.
+
+        Returns:
+            T: First element encountered for which `condition` returns `True`.
+        """
+        re = self.first_or_none(condition)
+        if re is None:
+            raise errors.NoSuchElementError()
+        return re

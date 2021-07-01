@@ -24,6 +24,9 @@ class Feeder(th.Thread):
         chunk = []
 
         for data in self._data:
+            if self._data_fed_event.is_set():
+                return
+
             chunk.append(data)
             if len(chunk) >= self._chunk_size:
                 self._feed_queue.put(chunk.copy())

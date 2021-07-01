@@ -26,7 +26,7 @@ class TaskTracker(th.Thread):
             except queue.Empty:
                 continue
 
-        while tasks > 0:
+        while tasks > 0 and not self._complete_event.is_set():
             try:
                 self._complete_queue.get(timeout=0.1)
             except queue.Empty:
