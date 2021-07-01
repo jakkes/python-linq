@@ -1,20 +1,44 @@
-# Python-linq
+# LINQ
 Provides simple to use LINQ features to Python 3.x.
 
-Inspired by `py-linq` and `linq.py`.
-
-## Install
-Install using pip
-```
+## Installing
+### From pip
+```bash
 pip install python-linq
+```
+### From source
+```bash
+git clone https://github.com/jakkes/python-linq.git
+cd python-linq
+pip install -r requirements.txt
 ```
 
 ## Usage
-1. Import the From class
-    - `from python_linq import From`
-1. Write beautiful queries!
-    - `sq3 = From([1, 2, 3]).select(lambda x: x * x + 3).to_list()`
-        - `>>> [4, 7, 12]`
+1. Import the `Query` class
+2. Write beautiful queries!
+```python
+>>> from linq import Query
+>>> x = Query([1, 2, 3]).select(lambda x: x * x + 3).to_list()
+>>> assert x == [4, 7, 12]
+```
 
-## Documentation & Examples
-[See this link](https://jakkes.github.io/python-linq/docs.html)
+Distribute heavy queries across multiple processes.
+```python
+>>> import time
+>>> from linq import DistributedQuery
+>>> 
+>>> def heavy_transformation(x: int):
+>>>     time.sleep(10)
+>>>     return x*2
+>>> 
+>>> def less_than_5(x: int):
+>>>     return x < 5
+>>> 
+>>> x = (
+>>>     DistributedQuery(range(100))
+>>>     .where(less_than_5)
+>>>     .select(heavy_transformation)
+>>>     .to_list()
+>>> )
+>>> assert x == [0, 1, 4, 9, 16]
+```
