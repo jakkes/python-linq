@@ -46,20 +46,20 @@ class DistributedQuery(Generic[T]):
     functions passed to, e.g., `select`. Therefore, lambdas and local functions are not
     supported arguments to the query.
     
-    Notes to be aware of:
+    ## Notes:
     1. Data and arguments are distributed across processes using queues from Python's
-        `multiprocessing` package. This means that everything needs to be pickled,
-        including functions passed to, e.g., `select` or `where`. Therefore, lambdas and
-        local functions are not supported arguments to the query.
+    `multiprocessing` package. This means that everything needs to be pickled,
+    including functions passed to, e.g., `select` or `where`. Therefore, lambdas and
+    local functions are not supported arguments to the query.
     2. The query may be consumed either through its execution methods, i.e. those not
-        returning another `DistributedQuery` instance, or through an iterator. If
-        consuming through an iterator and the iterator is not fully consumed, i.e. not
-        fully looped through, then the query must be closed using its `close` method.
-        Alternativly, the iteration may occur within a context manager (`with`
-        statement), in which case the query is closed automatically. If unsure,
-        `close` can be executed just in case. If not neceassry, it is a no-op.
+    returning another `DistributedQuery` instance, or through an iterator. If
+    consuming through an iterator and the iterator is not fully consumed, i.e. not
+    fully looped through, then the query must be closed using its `close` method.
+    Alternativly, the iteration may occur within a context manager (`with`
+    statement), in which case the query is closed automatically. If unsure,
+    `close` can be executed just in case. If not neceassry, it is a no-op.
         
-    Example usage
+    ## Example usage
     ```python
     >>> import time
     >>> 
