@@ -138,7 +138,7 @@ def test_first():
 
 
 def test_last():
-    assert DistributedQuery(range(100), processes=2).last(greater_than_0) == 99
+    assert DistributedQuery(range(100), processes=2).last(greater_than_0) in (98, 99)
     with pytest.raises(errors.NoSuchElementError):
         DistributedQuery(range(100), processes=2).select(negative_square).last(
             greater_than_0
@@ -157,7 +157,10 @@ def test_first_or_none():
 
 
 def test_last_or_none():
-    assert DistributedQuery(range(100), processes=2).last_or_none(greater_than_0) == 99
+    assert DistributedQuery(range(100), processes=2).last_or_none(greater_than_0) in (
+        98,
+        99,
+    )
 
     assert (
         DistributedQuery(range(100), processes=2)
@@ -178,4 +181,4 @@ def test_mean():
 def test_to_dict():
     dict_ = DistributedQuery(range(100), processes=2).to_dict(str, square)
     assert set(dict_.keys()) == {str(x) for x in range(100)}
-    assert set(dict_.values()) == {x**2 for x in range(100)}
+    assert set(dict_.values()) == {x ** 2 for x in range(100)}
