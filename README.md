@@ -38,7 +38,7 @@ Distribute heavy queries across multiple processes.
 >>>     return x < 5
 >>> 
 >>> x = (
->>>     DistributedQuery(range(100))
+>>>     DistributedQuery(range(100), processes=8)
 >>>     .where(less_than_5)
 >>>     .select(heavy_transformation)
 >>>     .to_list()
