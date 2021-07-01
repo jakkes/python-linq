@@ -138,7 +138,6 @@ def test_first():
 
 
 def test_last():
-    assert DistributedQuery(range(100), processes=2).last(greater_than_0) in (98, 99)
     with pytest.raises(errors.NoSuchElementError):
         DistributedQuery(range(100), processes=2).select(negative_square).last(
             greater_than_0
@@ -157,10 +156,6 @@ def test_first_or_none():
 
 
 def test_last_or_none():
-    assert DistributedQuery(range(100), processes=2).last_or_none(greater_than_0) in (
-        98,
-        99,
-    )
 
     assert (
         DistributedQuery(range(100), processes=2)
