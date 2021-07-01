@@ -1,5 +1,15 @@
 from __future__ import annotations
-from typing import Iterable, TypeVar, Any, List, Callable, Optional, NoReturn, Dict, Iterator
+from typing import (
+    Iterable,
+    TypeVar,
+    Any,
+    List,
+    Callable,
+    Optional,
+    NoReturn,
+    Dict,
+    Iterator,
+)
 import collections.abc
 
 
@@ -15,12 +25,12 @@ V = TypeVar("V")
 
 
 class Query(Iterable[T]):
-    """Query builder."""
+    """The most basic query."""
 
     def __init__(self, iterable: Iterable[T]):
         """
-        Arguments:
-            iterable (Iterable): An iterable collection of objects of type T
+        Args:
+            iterable (Iterable[T]): An iterable collection of objects of type `T`
 
         Raises:
             ValueError: If `iterable` is not an iterable collection
@@ -38,13 +48,13 @@ class Query(Iterable[T]):
         return False
 
     def contains(self, obj: T) -> bool:
-        """Determines if the sequence contains the given object
+        """Determines if the sequence contains the given object.
 
-        Arguments:
-            obj (T): The object to look for
+        Args:
+            obj (T): Object to look for
 
         Returns:
-            bool: True if the object is found, otherwise `False`.
+            bool: `True` if the object is found, otherwise `False`.
         """
         return obj in self
 
@@ -59,8 +69,9 @@ class Query(Iterable[T]):
     def count(self, condition: Callable[[T], bool] = lambda x: True) -> int:
         """Counts the objects satisfying the condition
 
-        Keyword Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False. (default: counts all objects)
+        Args:
+            condition (Callable[[T], bool], optional): Expression returning `True` or
+                `False`. Defaults to counting all objects.
 
         Returns:
             int: The number of objects found satisfying the condition
@@ -71,11 +82,11 @@ class Query(Iterable[T]):
     def any(self, condition: Callable[[T], bool]) -> bool:
         """Checks whether the sequence contains any object fulfilling the condition
 
-        Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False.
+        Args:
+            condition (Callable[[T], bool]): Expression returning `True` or `False`.
 
         Returns:
-            bool: True if any satisfactory object is found, otherwise False
+            bool: `True` if any satisfactory object is found, otherwise `False`
         """
 
         return any(condition(x) for x in self)
@@ -83,11 +94,12 @@ class Query(Iterable[T]):
     def all(self, condition: Callable[[T], bool]) -> bool:
         """Checks whether all objects satisfy a given condition
 
-        Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False.
+        Args:
+            condition (Callable[[T], bool]): Expression returning `True` or `False`.
 
         Returns:
-            bool: True if all objects are found to satisfy the condition, otherwise False
+            bool: `True` if all objects are found to satisfy the condition, otherwise
+                `False`
         """
 
         return all(condition(x) for x in self)
@@ -95,32 +107,31 @@ class Query(Iterable[T]):
     def select(self, transform: Callable[[T], S]) -> Query[S]:
         """Transforms each object in the sequence.
 
-        Arguments:
+        Args:
             transform (Callable[[T], S]): Function describing the transformation
 
         Returns:
-            Query: Returns a new query builder based on the transformed object.
+            Query: Returns a new query builder based on the transformed objects.
         """
         return Query(transform(x) for x in self)
 
-    def selectMany(self, transform: Callable[[T], S] = lambda x: x) -> Query[S]:
-        """Selects objects, with the possibility of transforming them, from all underlying lists into
-        one sequence. Useful when the collection is composed of multiple subcollections. 
-
-        Keyword Arguments:
-            transform: Expression describing the transformation. (default: no transform is applied and the underlying objects are selected as is)
+    def flatten(self) -> Query[T]:
+        """Selects objects from all underlying lists into one sequence, i.e. a
+        flattening operation. Useful when the collection is composed of multiple
+        subcollections.
 
         Returns:
-            Query: Returns a new query builder based on the transformed object.
+            Query: Returns a new query builder based on the flattened query.
         """
 
-        return Query(transform(x) for y in self for x in y)
+        return Query(x for y in self for x in y)
 
     def where(self, condition: Callable[[T], bool]) -> Query[T]:
         """Filters the sequence for the given condition
 
-        Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False with a single input.
+        Args:
+            condition (Callable[[T], bool]): Expression returning `True` or `False`
+                with a single input.
 
         Returns:
             Query: Returns a new query builder based on the filtered objects.
@@ -136,24 +147,25 @@ class Query(Iterable[T]):
         """
         return max(self)
 
-    def argmax(self, key: Callable[[T], Any]) -> T:
-        """Return the object that maximizes the value given by key. NOTE: does not return the index of the object.
+    def argmax(self, value: Callable[[T], Any]) -> T:
+        """Return the object that maximizes the given value function. NOTE: does not
+        return the index of the object.
 
-        Arguments:
-            key (Callable[[T], Any]): Expression determining which value to use
+        Args:
+            value (Callable[[T], Any]): Expression determining which value to use
 
         Returns:
-            T: Returns the object which maximizes the value
+            T: Returns the object which maximizes the value function
         """
         m = None
         vm = None
         for x in self:
-            vx = key(x)
+            vx = value(x)
             if m is None or vx > vm:
                 m = x
                 vm = vx
         if m is None:
-            raise ValueError("Cannot find maximum of an empty sequence")
+            raise ValueError("Cannot find the maximum of an empty sequence")
         return m
 
     def min(self) -> T:
@@ -165,31 +177,33 @@ class Query(Iterable[T]):
 
         return min(self)
 
-    def argmin(self, key: Callable[[T], Any]) -> T:
-        """Return the object that minimizes the value given by key.
+    def argmin(self, value: Callable[[T], Any]) -> T:
+        """Return the object that minimizes the value given by value.
 
-        Arguments:
-            key (Callable[[T], Any]): Expression determining which value to use
+        Args:
+            value (Callable[[T], Any]): Expression determining which value to use
 
         Returns:
             T: Returns the object which minimizes the value
         """
         m = None
         for x in self:
-            if m is None or key(x) < key(m):
+            if m is None or value(x) < value(m):
                 m = x
         if m is None:
-            raise ValueError("Cannot find maximum in an empty sequence")
+            raise ValueError("Cannot find a minimum in an empty sequence")
         return m
 
     def first(self, condition: Callable[[T], bool] = lambda x: True) -> T:
         """Returns the first element found to satisfy the given condition
 
-        Keyword Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False (default: Returns the first element in the sequence)
+        Args:
+            condition (Callable[[T], bool], optional): Expression returning `True` or
+            `False`. By default, returns the first element in the sequence.
 
         Raises:
-            linq.errors.NoSuchElementError: If no element is found to satisfy the condition
+            linq.errors.NoSuchElementError: If no element is found to satisfy the
+                condition
 
         Returns:
             T: The first element found to satisfy the given condition
@@ -201,14 +215,19 @@ class Query(Iterable[T]):
 
         raise linq.errors.NoSuchElementError()
 
-    def firstOrNone(self, condition: Callable[[T], bool] = lambda x: True) -> Optional[T]:
-        """Returns the first element found to satisfy the given condition
+    def first_or_none(
+        self, condition: Callable[[T], bool] = lambda x: True
+    ) -> Optional[T]:
+        """Returns the first element found to satisfy the given condition, or `None` if
+        no such element was found.
 
-        Keyword Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False (default: (lambda x: True))
+        Args:
+            condition (Callable[[T], bool], optional): Expression returning `True` or
+            `False`. Defaults to returning `True` for any input.
 
         Returns:
-            Optional[T]: The first element found to satisfy the given condition. If no element is found, None is returned.
+            Optional[T]: The first element found to satisfy the given condition. If no
+                element is found, then `None` is returned.
         """
 
         for x in self:
@@ -216,14 +235,19 @@ class Query(Iterable[T]):
                 return x
         return None
 
-    def lastOrNone(self, condition: Callable[[T], bool] = lambda x: True) -> Optional[T]:
-        """Returns the last element found to satisfy the given condition
+    def last_or_none(
+        self, condition: Callable[[T], bool] = lambda x: True
+    ) -> Optional[T]:
+        """Returns the last element found to satisfy the given condition, or `None` if
+        no such element was found.
 
-        Keyword Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False (default: (lambdax:True))
+        Args:
+            condition (Callable[[T], bool], optional): Expression returning `True` or
+                `False`. Defaults to returning `True` for any input.
 
         Returns:
-            Optional[T]: The last element found to satisfy the given condition. If no element is found, None is returned.
+            Optional[T]: The last element found to satisfy the given condition. If no
+                element is found, then `None` is returned.
         """
         last = None
         for x in self:
@@ -234,17 +258,19 @@ class Query(Iterable[T]):
     def last(self, condition: Callable[[T], bool] = lambda x: True) -> T:
         """Returns the last element found to satisfy the given condition
 
-        Keyword Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False (default: Returns the first element in the sequence)
+        Args:
+            condition (Callable[[T], bool], bool): Expression returning `True` or
+                `False`. Defaults to returning `True` for any input.
 
         Raises:
-            linq.errors.NoSuchElementError: If no element is found to satisfy the condition
+            linq.errors.NoSuchElementError: If no element is found to satisfy the
+                condition
 
         Returns:
             T: The last element found to satisfy the given condition
         """
 
-        last = self.lastOrNone(condition)
+        last = self.last_or_none(condition)
 
         if last is None:
             raise linq.errors.NoSuchElementError()
@@ -259,7 +285,7 @@ class Query(Iterable[T]):
         """
         return sum(self)
 
-    def average(self) -> T:
+    def mean(self) -> T:
         """Returns the average of all elements
 
         Returns:
@@ -272,33 +298,18 @@ class Query(Iterable[T]):
             n += 1
         return s / n
 
-    def concat(self, iterable: Iterable[T]) -> Query[T]:
-        """Adds an iterable to the sequence
-
-        Arguments:
-            iterable (Iterable): The collection to add
-
-        Raises:
-            ValueError: If the supplied object is not iterable
-
-        Returns:
-            Query: Query builder with the extension concatenated.
-        """
-
-        if not isinstance(iterable, collections.abc.Iterable):
-            raise ValueError("Object is not iterable")
-
-        self._extensions.append(iterable)
-        return self
-
     def distinct(self, key: Callable[[T], Any] = lambda x: x) -> Query[T]:
-        """Filters all objects that are unique in the given key function, i.e. having unique return values.
+        """Filters all objects that are unique in the given key function, i.e. having
+        unique return values.
 
-        Keyword Arguments:
-            key (Callable[[T], Any]): Expression determining which key to use. The key must be hashable (default: Uses the elements as is)
+        Args:
+            key (Callable[[T], Any], optional): Expression determining the value to use
+                for comparisons, must be hashable. By default, elements are compared as
+                is, i.e. `lambda x: x`.
 
         Returns:
-            Query: Query builder with only distinct elements.
+            Query: Query builder with only distinct elements, as defined by the `key`
+                callable.
         """
 
         cache = set()
@@ -313,14 +324,16 @@ class Query(Iterable[T]):
 
         return Query(sequence())
 
-    def elementAtOrNone(self, i: int) -> Optional[T]:
-        """Returns the element at the given position. If there is no element at the given position, `None` is returned.
+    def element_at_or_none(self, i: int) -> Optional[T]:
+        """Returns the element at the given position. If there is no element at the
+        given position, then `None` is returned.
 
-        Arguments:
+        Args:
             i (int): The position at which to retrieve the element from
 
         Returns:
-            Optional[T]: The object at the given position. `None` if there is none.
+            Optional[T]: The object at the given position. `None` if there is no such
+                element.
         """
 
         n = 0
@@ -330,10 +343,10 @@ class Query(Iterable[T]):
             n += 1
         return None
 
-    def elementAt(self, i: int) -> T:
+    def element_at(self, i: int) -> T:
         """Returns the element at the given position.
 
-        Arguments:
+        Args:
             i (int): The position at which to retrieve the element from
 
         Raises:
@@ -343,20 +356,21 @@ class Query(Iterable[T]):
             T: The element at the given position
         """
 
-        result = self.elementAtOrNone(i)
+        result = self.element_at_or_none(i)
         if result is None:
             raise IndexError()
         else:
             return result
 
-    def intersect(self, iterable: Iterable[T], key: Callable[[T], Any] = lambda x: x) -> Query[T]:
+    def intersect(
+        self, iterable: Iterable[T], key: Callable[[T], Any] = lambda x: x
+    ) -> Query[T]:
         """Returns all elements found in both sequences.
 
-        Arguments:
+        Args:
             iterable (Iterable): The other iterable to compare to.
-
-        Keyword Arguments:
-            key (Callable[[T], Any]): Expression determining which key to use. Key must be hashable. (default: The elements are used as is)
+            key (Callable[[T], Any], optional): Expression determining value to use for
+                comparison, must be hashable. Defaults to `lambda x: x`.
 
         Raises:
             ValueError: If the given iterable is not Iterable
@@ -376,7 +390,7 @@ class Query(Iterable[T]):
 
         return Query(sequence())
 
-    def toList(self) -> List[T]:
+    def to_list(self) -> List[T]:
         """Returns the sequence as a list.
 
         Returns:
@@ -384,83 +398,25 @@ class Query(Iterable[T]):
         """
         return list(self)
 
-    def groupBy(self, key: Callable[[T], KT], transform: Callable[[T], VT] = lambda x: x) -> Query[linq.Grouping[KT, VT]]:
-        """Groups all elements based on the given key.
+    def join(
+        self,
+        extension: Iterable[S],
+        innerKey: Callable[[T], Any],
+        outerKey: Callable[[S], Any],
+        transform: Callable[[T, S], U],
+    ) -> Query[U]:
+        """Joins the sequence of objects with another sequence of objects on the given
+        keys and yields a new sequence of objects according to the transform specified.
+        Equivalent to INNER JOIN in SQL.
 
-        Arguments:
-            key (Callable[[T], KT]): Expression determining which key to use
-
-        Keyword Arguments:
-            transform (Callable[[T], VT]): Expression describing the transform the objects when creating the groups.
-            Can be any lambda expression or function with a single input argument (default: Use the elements as is)
-
-        Returns:
-            Query[linq.Grouping[KT, VT]]: Query builder object wrapping a sequence of `Grouping` objects.
-            Every `Grouping` object has two attributes, `key`, and `values` which contains the
-            transformed objects.
-        """
-
-        def sequence():
-            groups = dict()
-            for x in self:
-                k = key(x)
-                if k in groups:
-                    groups[k].append(transform(x))
-                else:
-                    groups[k] = [transform(x)]
-
-            for k in groups:
-                yield linq.Grouping(k, groups[k])
-
-        return Query(sequence())
-
-    def forEach(self, func: Callable[[T], NoReturn]) -> NoReturn:
-        """Executes a function for each element.
-        """
-
-        for x in self:
-            func(x)
-
-    def groupJoin(self, extension: Iterable[S], innerKey: Callable[[T], Any], outerKey: Callable[[S], Any], innerTransform: Callable[[T], U], outerTransform: Callable[[S], V]) -> Query[linq.Joining[U, V]]:
-        """Joins the sequence with objects from another sequence.
-
-        Arguments:
-            extension (Iterable[S]): The other sequence
-            innerKey (Callable[[T], Any]): Expression determining what key to use from the inner objects
-            outerKey (Callable[[S], Any]): Expression determining what key to use from the outer objects
-            innerTransform (Callable[[T], U]): The transform to apply to the inner objects
-            outerTransform (Callable[[S], V]): The transform to apply to the outer objects
-
-        Returns:
-            Query[linq.Joining[U, V]]: Query builder object wrapping a sequence of `linq.Joining` objects. Each `linq.Joining` object contains
-            the properties `inner` and `outer`. `inner` gives the inner object and `outer` is a collection of all objects in the
-            extension that were paried with the inner object.
-        """
-
-        def sequence():
-            for innerObj in self:
-                outerObjs = (
-                    Query(extension)
-                    .where(lambda x: innerKey(innerObj) == outerKey(x))
-                    .select(outerTransform)
-                    .toList()
-                )
-                yield linq.Joining(
-                    innerTransform(innerObj),
-                    outerObjs
-                )
-
-        return Query(sequence())
-
-    def join(self, extension: Iterable[S], innerKey: Callable[[T], Any], outerKey: Callable[[S], Any], transform: Callable[[T, S], U]) -> Query[U]:
-        """Joins the sequence of objects with another sequence of objects on the given keys and yields a
-        a new sequence of objects according to the transform specified. Equivalent to INNER JOIN in SQL.
-
-        Arguments:
-            extension (Iterable): The sequence to join into the current one
-            innerKey (Callable[[T], Any]): Expression determining which key to use on the current sequence
-            outerKey (Callable[[S], Any]): Expression determining which key to use on the extending sequence
-            transform (Callable[[T, S], U]): Expression shaping the objects which to returns.
+        Args:
+            extension (Iterable): The sequence to join into the query.
+            innerKey (Callable[[T], Any]): Expression determining which key to join on
+                in the query.
+            outerKey (Callable[[S], Any]): Expression determining which key to join on
+                in the extension.
+            transform (Callable[[T, S], U]): Transform, taking two arguments, the inner
+                and outer elements to join respectively, returning the joined object.
 
         Raises:
             ValueError: If the extension is not Iterable
@@ -474,43 +430,38 @@ class Query(Iterable[T]):
 
         def sequence():
             for x in self:
-                outerObjs = Query(extension).where(
-                    lambda y: innerKey(x) == outerKey(y))
+                outerObjs = Query(extension).where(lambda y: innerKey(x) == outerKey(y))
                 for outerObj in outerObjs:
                     yield transform(x, outerObj)
 
         return Query(sequence())
 
     def take(self, count: int) -> Query[T]:
-        """Selects the amount of elements specified
+        """Selects the first `n` elements from the query.
 
-        Arguments:
-            count: The number of elements to select
+        Args:
+            count: The number of elements to select.
 
         Returns:
-            Query: Query builder object wrapping the selected elements
+            Query: Query builder object wrapping the selected elements.
         """
 
         def sequence():
-            n = 0
-            for x in self:
-
-                if n >= count:
+            for n, x in enumerate(self):
+                if n + 1 >= count:
                     break
-
                 yield x
-                n += 1
 
         return Query(sequence())
 
-    def takeWhile(self, condition: Callable[[T], bool]) -> Query[T]:
-        """Selects elements as long as the condition is fulfilled
+    def take_while(self, condition: Callable[[T], bool]) -> Query[T]:
+        """Selects elements as long as the condition is fulfilled.
 
-        Arguments:
-            condition (Callable[[T], bool]): Expression returning True or False
+        Args:
+            condition (Callable[[T], bool]): Expression returning `True` or `False`.
 
         Returns:
-            Query: Query builder object wrapping the selected elements
+            Query: Query builder object wrapping the selected elements.
         """
 
         def sequence():
@@ -522,27 +473,31 @@ class Query(Iterable[T]):
 
         return Query(sequence())
 
-    def order(self, key: Callable[[T], Any] = lambda x: x, descending=False) -> Query[T]:
+    def order(
+        self, value: Callable[[T], Any] = lambda x: x, descending=False
+    ) -> Query[T]:
         """Orders the sequence with respect to the given key
 
-        Keyword Arguments:
-            key (Callable[[T], Any]): Expression determining which key to use (default: uses the elements as is)
-            descending (bool): Whether or not to sort in descending order (default: (False))
+        Args:
+            value (Callable[[T], Any], optional): Expression determining which value to
+                sort on. Defaults to `lambda x: x`.
+            descending (bool, optional): Whether or not to sort in descending order.
+                Defaults to `False`.
 
         Returns:
             Query: Query builder object wrapping the sorted sequence
         """
 
         def sequence():
-            yield from sorted(self, key=key, reverse=descending)
+            yield from sorted(self, key=value, reverse=descending)
 
         return Query(sequence())
 
     def skip(self, count: int) -> Query[T]:
-        """Skips the first elements in the sequence
+        """Skips the first elements in the sequence.
 
-        Arguments:
-            count (int): The number of elements to skip
+        Args:
+            count (int): The number of elements to skip.
 
         Returns:
             Query: Query builder wrapping the remaining elements.
@@ -559,15 +514,17 @@ class Query(Iterable[T]):
 
         return Query(sequence())
 
-    def skipWhile(self, condition: Callable[[T], bool]) -> Query[T]:
-        """Skips the first elements in the sequence while the condition evaluates `True`
+    def skip_while(self, condition: Callable[[T], bool]) -> Query[T]:
+        """Skips the first elements in the sequence while the condition is fulfilled.
 
-        Arguments:
-            condition (Callable[[T], bool]): The number of elements to skip
+        Args:
+            condition (Callable[[T], bool]): Callable, elements are skipped as long as
+                `True` is returned.
 
         Returns:
             Query: The remaining elements wrapped in a query builder object.
         """
+
         def sequence():
             skipping = True
             for obj in self:
@@ -580,17 +537,20 @@ class Query(Iterable[T]):
 
         return Query(sequence())
 
-    def toDict(self, key: Callable[[T], KT], transform: Callable[[T], VT]=lambda x: x) -> Dict[KT, VT]:
+    def to_dict(
+        self, key: Callable[[T], KT], value: Callable[[T], VT] = lambda x: x
+    ) -> Dict[KT, VT]:
         """Returns the sequence as a dictionary where the key is given by `key`.
 
-        Arguments:
-            key (Callable[[T], KT]): Expression determining the key for each element. Much evaluate to a unique value for each element.
-
-        Keyword Arguments:
-            transform (Callable[[T], VT]): Expression describing the transform of the elements before added to the dictionary
+        Args:
+            key (Callable[[T], KT]): Expression determining the key for each element.
+                Must evaluate to a unique value for each element.
+            value (Callable[[T], VT], optional): Expression describing the value of the
+                elements before added to the dictionary. Defaults to `lambda x: x`.
 
         Returns:
-            Dict[KT, VT]: A dictionary where the keys are giving by `key` and elements by `transform`.
+            Dict[KT, VT]: A dictionary where the keys are giving by `key` and elements
+                by `value`.
 
         """
 
@@ -601,22 +561,24 @@ class Query(Iterable[T]):
             if k_ey in keys:
                 raise KeyError("Key already exists.")
             keys.add(k_ey)
-            re[k_ey] = transform(el)
+            re[k_ey] = value(el)
 
         return re
 
-    def union(self, outer: Iterable[T], key: Callable[[T], Any]=lambda x: x) -> Query[T]:
-        """Find the union of two sequences, i.e. all objects that are within either one the two sequences.
-        Only unique objects (with respect to the key) are returned.
+    def union(
+        self, outer: Iterable[T], value: Callable[[T], Any] = lambda x: x
+    ) -> Query[T]:
+        """Finds the union with another sequence, i.e. all objects that are within
+        either one the two sequences. Only unique objects (with respect to the `value`)
+        are returned.
 
-        Arguments:
+        Args:
             outer (Iterable): The other sequence
-
-        Keyword Arguments:
-            key (Callable[[T], Any]): Expression determining which key to use for comparison. Key must be hashable (default: uses the elements as is)
+            value (Callable[[T], Any]): Expression determining which value to use for
+                comparison, must be hashable. Defaults to `lambda x: x`.
 
         Raises:
-            ValueError: If `outer` is of instance Iterable
+            ValueError: If `outer` is not of instance Iterable
 
         Returns:
             Query: Query builder object wrapping the new elements
@@ -629,17 +591,17 @@ class Query(Iterable[T]):
 
         def sequence():
             for x in self:
-                if key(x) in cache:
+                if value(x) in cache:
                     continue
                 else:
-                    cache.add(key(x))
+                    cache.add(value(x))
                     yield x
 
             for x in outer:
-                if key(x) in cache:
+                if value(x) in cache:
                     continue
                 else:
-                    cache.add(key(x))
+                    cache.add(value(x))
                     yield x
 
         return Query(sequence())

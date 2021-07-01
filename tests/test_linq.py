@@ -53,12 +53,12 @@ class TestBasicFunctions(unittest.TestCase):
     def test_average(self):
         subject = [1, 2, 3, 4, 5]
         self.assertEqual(
-            Query(subject).average(),
+            Query(subject).mean(),
             3
         )
 
         self.assertEqual(
-            Query(subject).select(lambda x: x*x).average(),
+            Query(subject).select(lambda x: x*x).mean(),
             11
         )
 
@@ -68,7 +68,7 @@ class TestBasicFunctions(unittest.TestCase):
             { "value": 3 }
         ]
         self.assertEqual(
-            Query(subject).select(lambda x: x["value"]).average(),
+            Query(subject).select(lambda x: x["value"]).mean(),
             2
         )
 
@@ -130,7 +130,7 @@ class TestBasicFunctions(unittest.TestCase):
     def test_distinct(self):
         subject = [1, 1, 2, 3, 3, 3]
         self.assertListEqual(
-            Query(subject).distinct().toList(),
+            Query(subject).distinct().to_list(),
             [1, 2, 3]
         )
 
@@ -150,14 +150,14 @@ class TestBasicFunctions(unittest.TestCase):
             }
         ]
         self.assertListEqual(
-            Query(subject).distinct(lambda x: x["id"]).select(lambda x: x["value"]).toList(),
+            Query(subject).distinct(lambda x: x["id"]).select(lambda x: x["value"]).to_list(),
             [3, 4]
         )
 
         expected = [1,2,3,4]
         subject = [1,1,1,1,1,1,1,1,2,3,3,3,3,3,4]
 
-        result = Query(subject).distinct().toList()
+        result = Query(subject).distinct().to_list()
 
         self.assertListEqual(expected, result)
 
@@ -183,26 +183,26 @@ class TestBasicFunctions(unittest.TestCase):
         ]
         expected = [1, 2, 3]
 
-        result = Query(subject).distinct(lambda x: x["value"]).select(lambda x: x["value"]).toList()
+        result = Query(subject).distinct(lambda x: x["value"]).select(lambda x: x["value"]).to_list()
 
         self.assertListEqual(expected,result)
 
     def test_elementat(self):
         subject = [1, 2, 3, 4]
         self.assertEqual(
-            Query(subject).elementAt(2),
+            Query(subject).element_at(2),
             3
         )
 
         with self.assertRaises(IndexError):
-            Query(subject).elementAt(4)
+            Query(subject).element_at(4)
 
         subject = [
             { "value": 1 },
             { "value": 2 }
         ]
         self.assertDictEqual(
-            Query(subject).elementAt(0),
+            Query(subject).element_at(0),
             { "value": 1 }
         )
 
@@ -210,18 +210,18 @@ class TestBasicFunctions(unittest.TestCase):
         
         subject = [1, 2, 3, 4]
         self.assertEqual(
-            Query(subject).elementAtOrNone(2),
+            Query(subject).element_at_or_none(2),
             3
         )
 
-        self.assertIsNone(Query(subject).elementAtOrNone(4))
+        self.assertIsNone(Query(subject).element_at_or_none(4))
 
         subject = [
             { "value": 1 },
             { "value": 2 }
         ]
         self.assertDictEqual(
-            Query(subject).elementAtOrNone(0),
+            Query(subject).element_at_or_none(0),
             { "value": 1 }
         )
 
@@ -263,11 +263,11 @@ class TestBasicFunctions(unittest.TestCase):
     def test_firstornone(self):
         subject = [1, 2, 3, 4]
         self.assertEqual(
-            Query(subject).firstOrNone(lambda x: x % 2 == 0),
+            Query(subject).first_or_none(lambda x: x % 2 == 0),
             2
         )
 
-        self.assertIsNone(Query(subject).firstOrNone(lambda x: x > 4))
+        self.assertIsNone(Query(subject).first_or_none(lambda x: x > 4))
 
         subject = [ 
             { "value": 1 },
@@ -310,7 +310,7 @@ class TestBasicFunctions(unittest.TestCase):
             Query(subject)
             .groupBy(lambda x: x["id"], lambda x: x["data"])
             .select(lambda x: x.values)
-            .toList()
+            .to_list()
         )
         expected = [[1, 2], [3, 4], [5], [6]]
         self.assertListEqual(result, expected)
@@ -321,7 +321,7 @@ class TestBasicFunctions(unittest.TestCase):
             .select(
                 lambda x: Query(x.values).max()
             )
-            .toList()
+            .to_list()
         )
         expected = [2, 4, 5, 6]
         self.assertListEqual(result, expected)
@@ -345,7 +345,7 @@ class TestBasicFunctions(unittest.TestCase):
             Query(subject).groupBy(
                 lambda x: x["age"], 
                 transform = lambda x: x["name"]
-            ).select(lambda x: x.key).toList(),
+            ).select(lambda x: x.key).to_list(),
 
             [10, 11]
         )
@@ -356,7 +356,7 @@ class TestBasicFunctions(unittest.TestCase):
             Query(subject).groupBy(
                 lambda x: x["age"],
                 transform=lambda x: x["name"]
-            ).select(lambda x: x.values).toList(),
+            ).select(lambda x: x.values).to_list(),
 
             [ ["Steven", "Johan" ], [ "Lars" ] ]
         )
@@ -365,7 +365,7 @@ class TestBasicFunctions(unittest.TestCase):
         subject1 = [1,2,3,4]
         subject2 = [3,4,5,6]
 
-        result = Query(subject1).intersect(subject2).toList()
+        result = Query(subject1).intersect(subject2).to_list()
         expected = [3,4]
         self.assertListEqual(result,expected)
 
@@ -387,14 +387,14 @@ class TestBasicFunctions(unittest.TestCase):
                 "value": 5
             }
         ]
-        result = Query(subjectA).intersect(subjectB, key=lambda x: x["id"]).select(lambda x: x["value"]).toList()
+        result = Query(subjectA).intersect(subjectB, key=lambda x: x["id"]).select(lambda x: x["value"]).to_list()
         expected = [4]
         self.assertListEqual(expected, result)
 
         subjectA = [1, 2, 3, 4]
         subjectB = [3, 4, 5, 6]
         self.assertListEqual(
-            Query(subjectA).intersect(subjectB).toList(),
+            Query(subjectA).intersect(subjectB).to_list(),
             [3, 4]
         )
 
@@ -417,7 +417,7 @@ class TestBasicFunctions(unittest.TestCase):
             }
         ]
         self.assertListEqual(
-            Query(subjectA).intersect(subjectB, key=lambda x: x["id"]).select(lambda x: x["value"]).toList(),
+            Query(subjectA).intersect(subjectB, key=lambda x: x["id"]).select(lambda x: x["value"]).to_list(),
             [4]
         )
 
@@ -448,12 +448,12 @@ class TestBasicFunctions(unittest.TestCase):
     def test_lastornone(self):
         subject = [1, 2, 3, 4]
         self.assertEqual(
-            Query(subject).lastOrNone(lambda x: x % 2 == 0),
+            Query(subject).last_or_none(lambda x: x % 2 == 0),
             4
         )
 
         self.assertIsNone(
-            Query(subject).lastOrNone(lambda x: x > 4)
+            Query(subject).last_or_none(lambda x: x > 4)
         )
 
         subject = [ 
@@ -540,7 +540,7 @@ class TestBasicFunctions(unittest.TestCase):
             }
         ]
         self.assertListEqual(
-            Query(subject).select(lambda x: x["value"]).toList(),
+            Query(subject).select(lambda x: x["value"]).to_list(),
             [2, 3]
         )
 
@@ -551,15 +551,15 @@ class TestBasicFunctions(unittest.TestCase):
             }
         
         self.assertListEqual(
-            Query(subject).select(shape).toList(),
+            Query(subject).select(shape).to_list(),
             [ {"value": 1}, {"value": 2} ]
         )
 
-    def test_selectmany(self):
+    def test_flatten(self):
         expected = [1, 2, 3, 4]
         obj = Query([[1, 2], [3, 4]])
 
-        result = obj.selectMany().toList()
+        result = obj.flatten().to_list()
 
         self.assertListEqual(expected, result)
 
@@ -568,7 +568,7 @@ class TestBasicFunctions(unittest.TestCase):
             [5, 6, 7, 8]
         ]
         self.assertListEqual(
-            Query(subject).selectMany().toList(),
+            Query(subject).flatten().to_list(),
             [1, 2, 3, 4, 5, 6, 7, 8]
         )
 
@@ -577,7 +577,7 @@ class TestBasicFunctions(unittest.TestCase):
             [{"value": 3}, {"value": 4}]
         ]
         self.assertListEqual(
-            Query(subject).selectMany(lambda x: x["value"]).toList(),
+            Query(subject).flatten().select(lambda x: x["value"]).to_list(),
             [1, 2, 3, 4]
         )
 
@@ -605,12 +605,12 @@ class TestBasicFunctions(unittest.TestCase):
 
     def test_tolist(self):
         self.assertListEqual(
-            Query([1, 2, 3, 4]).select(lambda x: x*x).toList(),
+            Query([1, 2, 3, 4]).select(lambda x: x*x).to_list(),
             [1, 4, 9, 16]
         )
 
         self.assertListEqual(
-            Query([1, 2, 3, 4]).toList(),
+            Query([1, 2, 3, 4]).to_list(),
             [1, 2, 3, 4]
         )
 
@@ -628,13 +628,13 @@ class TestBasicFunctions(unittest.TestCase):
         expected = [2, 4]
         obj = Query(self.simple)
 
-        result = obj.where(lambda x: x % 2 == 0).toList()
+        result = obj.where(lambda x: x % 2 == 0).to_list()
 
         self.assertListEqual(expected, result)
 
         subject = [1, 2, 3, 4, 5, 6]
         self.assertListEqual(
-            Query(subject).where(lambda x: x > 3).toList(),
+            Query(subject).where(lambda x: x > 3).to_list(),
             [4, 5, 6]
         )
 
@@ -643,7 +643,7 @@ class TestBasicFunctions(unittest.TestCase):
             { "value": 3 }
         ]
         self.assertListEqual(
-            Query(subject).where(lambda x: x["value"] == 3).select(lambda x: x["value"]).toList(),
+            Query(subject).where(lambda x: x["value"] == 3).select(lambda x: x["value"]).to_list(),
             [3]
         )
 
@@ -682,7 +682,7 @@ class TestBasicFunctions(unittest.TestCase):
                 innerTransform = lambda x: x["name"],
                 outerTransform = lambda x: x["grade"]
             )
-            .select(lambda x: x.inner).toList(),
+            .select(lambda x: x.inner).to_list(),
             
             ['Jakob', 'Johan']
         )
@@ -695,7 +695,7 @@ class TestBasicFunctions(unittest.TestCase):
                 outerKey = lambda x: x["userid"],
                 innerTransform = lambda x: x["name"],
                 outerTransform = lambda x: x["grade"]
-            ).select(lambda x: x.outer).toList(),
+            ).select(lambda x: x.outer).to_list(),
 
             [ ['A', 'B'], ['B', 'B'] ]
         )
@@ -709,7 +709,7 @@ class TestBasicFunctions(unittest.TestCase):
             lambda x: x,
             lambda x: x,
             lambda x: x
-        ).select(lambda x: x.outer).toList()
+        ).select(lambda x: x.outer).to_list()
         expected = [[], [2, 2], [3]]
         self.assertListEqual(expected, result)
 
@@ -743,7 +743,7 @@ class TestBasicFunctions(unittest.TestCase):
             outerKey = lambda x: x["userid"],
             innerTransform = lambda x: x["name"],
             outerTransform = lambda x: x["grade"]
-        ).select(lambda x: x.inner).toList()
+        ).select(lambda x: x.inner).to_list()
 
         expected = ["Jakob", "Johan"]
         self.assertListEqual(
@@ -757,7 +757,7 @@ class TestBasicFunctions(unittest.TestCase):
             outerKey = lambda x: x["userid"],
             innerTransform = lambda x: x["name"],
             outerTransform = lambda x: x["grade"]
-        ).select(lambda x: x.outer).toList()
+        ).select(lambda x: x.outer).to_list()
 
         expected = [["A","B"], ["B","B"]]
         self.assertListEqual(
@@ -775,7 +775,7 @@ class TestBasicFunctions(unittest.TestCase):
                 lambda x: x,
                 lambda x: x+1,
                 lambda x, y: {"inner": x, "outer": y}
-            ).toList(),
+            ).to_list(),
 
             [
                 { "inner": 3, "outer": 2},
@@ -833,7 +833,7 @@ class TestBasicFunctions(unittest.TestCase):
                 lambda x: x["id"],
                 lambda inner, outer: { "A": inner["A"], "B": outer["B"] }
             )
-            .toList()
+            .to_list()
         )
         expected = [
             {
@@ -857,45 +857,45 @@ class TestBasicFunctions(unittest.TestCase):
 
     def test_take(self):
         self.assertListEqual(
-            Query([1, 2, 3]).take(2).toList(),
+            Query([1, 2, 3]).take(2).to_list(),
             [1, 2]
         )
 
     def test_takewhile(self):
         self.assertListEqual(
-            Query([1, 2, 3, 4, 5, 6]).takeWhile(lambda x: x % 3 != 0).toList(),
+            Query([1, 2, 3, 4, 5, 6]).take_while(lambda x: x % 3 != 0).to_list(),
             [1, 2]
         )
 
     def test_order(self):
         self.assertListEqual(
-            Query([1, 2, 4, 3, 7, 6, 5]).order(descending=True).toList(),
+            Query([1, 2, 4, 3, 7, 6, 5]).order(descending=True).to_list(),
             [7, 6, 5, 4, 3, 2, 1]
         )
 
         self.assertListEqual(
-            Query([1, 2, 4, 3, 7, 6, 5]).order().toList(),
+            Query([1, 2, 4, 3, 7, 6, 5]).order().to_list(),
             [1, 2, 3, 4, 5, 6, 7]
         )
 
         self.assertListEqual(
-            Query([1, 2, 4, 3, 7, 6, 5]).order(key=lambda x: x % 3).toList(),
+            Query([1, 2, 4, 3, 7, 6, 5]).order(value=lambda x: x % 3).to_list(),
             [3, 6, 1, 4, 7, 2, 5]
         )
 
     def test_union(self):
         self.assertListEqual(
-            Query([1, 2, 3]).union([3, 4, 5]).toList(),
+            Query([1, 2, 3]).union([3, 4, 5]).to_list(),
             [1, 2, 3, 4, 5]
         )
 
         self.assertListEqual(
-            Query([1, 2, 3]).union([3, 4, 5], key = lambda x: x % 4).toList(),
+            Query([1, 2, 3]).union([3, 4, 5], value = lambda x: x % 4).to_list(),
             [1, 2, 3, 4] # Note 5 == 2 in modulo 4
         )
 
         self.assertListEqual(
-            Query([1, 2, 3]).union([3, 4, 5]).select(lambda x: x+1).toList(),
+            Query([1, 2, 3]).union([3, 4, 5]).select(lambda x: x+1).to_list(),
             [2, 3, 4, 5, 6]
         )
 
@@ -910,24 +910,24 @@ class TestBasicFunctions(unittest.TestCase):
 
     def test_skip(self):
         self.assertListEqual(
-            Query([1,2,3,4,5,6,7]).skip(3).toList(),
+            Query([1,2,3,4,5,6,7]).skip(3).to_list(),
             [4,5,6,7]
         )
 
     def test_skipWhile(self):
         self.assertListEqual(
-            Query([1,2,3,4,5,6,7]).skipWhile(lambda x: x < 3).toList(),
+            Query([1,2,3,4,5,6,7]).skip_while(lambda x: x < 3).to_list(),
             [3,4,5,6,7]
         )
 
         self.assertListEqual(
-            Query([1,2,3,4,5,6,7]).skipWhile(lambda x: x % 3 != 0).toList(),
+            Query([1,2,3,4,5,6,7]).skip_while(lambda x: x % 3 != 0).to_list(),
             [3,4,5,6,7]
         )
 
     def test_toDict(self):
         self.assertDictEqual(
-            Query([1,2,3,4]).toDict(lambda x: str(x*x)),
+            Query([1,2,3,4]).to_dict(lambda x: str(x*x)),
             {
                 '1': 1,
                 '4': 2,
@@ -937,7 +937,7 @@ class TestBasicFunctions(unittest.TestCase):
         )
 
         self.assertDictEqual(
-            Query([1,2,3,4]).toDict(lambda x: str(x), transform = lambda x: x*x),
+            Query([1,2,3,4]).to_dict(lambda x: str(x), value = lambda x: x*x),
             {
                 '1': 1,
                 '2': 4,
@@ -947,4 +947,4 @@ class TestBasicFunctions(unittest.TestCase):
         )
 
         with self.assertRaises(KeyError):
-            Query([1,2,3,4]).toDict(lambda x: str(x % 3))
+            Query([1,2,3,4]).to_dict(lambda x: str(x % 3))
