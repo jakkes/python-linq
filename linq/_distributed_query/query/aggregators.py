@@ -107,3 +107,12 @@ class SumAndCount(Base):
             s += x
             c += 1
         return (s, c)
+
+class Dict(Base):
+    def __init__(self, key, value):
+        super().__init__()
+        self.key = key
+        self.value = value
+
+    def aggregate(self, data: Iterable[_Any]) -> _Any:
+        return {self.key(x): self.value(x) for x in data}

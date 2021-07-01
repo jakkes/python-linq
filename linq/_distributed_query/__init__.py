@@ -1,5 +1,6 @@
 from typing import (
     Any,
+    Dict,
     Generic,
     Iterator,
     List,
@@ -23,6 +24,8 @@ from .task_tracker import TaskTracker
 
 T = TypeVar("T")
 S = TypeVar("S")
+KT = TypeVar("KT")
+VT = TypeVar("VT")
 
 
 def identity(x: T) -> T:
@@ -40,7 +43,40 @@ class DistributedQuery(Generic[T]):
     Data and arguments are distributed across processes using queues from Python's
     `multiprocessing` package. This means that everything needs to be pickled, including
     functions passed to, e.g., `select`. Therefore, lambdas and local functions are not
-    supported arguments to the query."""
+    supported arguments to the query.
+    
+    Notes to be aware of:
+    1. Data and arguments are distributed across processes using queues from Python's
+        `multiprocessing` package. This means that everything needs to be pickled,
+        including functions passed to, e.g., `select` or `where`. Therefore, lambdas and
+        local functions are not supported arguments to the query.
+    2. The query may be consumed either through its execution methods, i.e. those not
+        returning another `DistributedQuery` instance, or through an iterator. If
+        consuming through an iterator and the iterator is not fully consumed, i.e. not
+        fully looped through, then the query must be closed using its `close` method.
+        Alternativly, the iteration may occur within a context manager (`with`
+        statement), in which case the query is closed automatically. If unsure,
+        `close` can be executed just in case. If not neceassry, it is a no-op.
+        
+    Example usage
+    ```python
+    >>> import time
+    >>> 
+    >>> def heavy_transformation(x: int):
+    >>>     time.sleep(10)
+    >>>     return x*2
+    >>> 
+    >>> def less_than_5(x: int):
+    >>>     return x < 5
+    >>> 
+    >>> x = (
+    >>>     DistributedQuery(range(100))
+    >>>     .where(less_than_5)
+    >>>     .select(heavy_transformation)
+    >>>     .to_list()
+    >>> )
+    >>> assert x == [0, 1, 4, 9, 16]
+    ```"""
 
     def __init__(
         self, sequence: Iterable[T], processes: int = None, chunk_size: int = 1
@@ -139,7 +175,8 @@ class DistributedQuery(Generic[T]):
         self.close()
 
     def close(self):
-        """Closes the query and all background threads and processes."""
+        """Closes the query and all background threads and processes. If these have
+        already been closed, this operation is a no-op."""
         if not self._executed or self._closed:
             return
 
@@ -443,3 +480,24 @@ class DistributedQuery(Generic[T]):
             sum_ += s
             count += c
         return sum_ / count
+
+    def to_dict(self, key: Callable[[T], KT], value: Callable[[T], VT]) -> Dict[KT, VT]:
+        """Aggregates the elements found in the query into a dictionary. Keys are
+        determined by the key function, and values for the value function. Note, if
+        the key function does not return unique values, query elements will silently
+        be lost.
+
+        Args:
+            key (Callable[[T], KT]): Callable accepting one argument, returning the
+                dictionary key to be used for the particular element.
+            value (Callable[[T], VT]): Callable accepting one argument, returning the
+                value to be used for the given element.
+
+        Returns:
+            Dict[KT, VT]: Dictionary of `{key(x): value(x) for x in self}`.
+        """
+        self._query.set_aggregator(query.aggregators.Dict(key, value))
+        re = {}
+        for x in self:
+            re.update(x)
+        return re

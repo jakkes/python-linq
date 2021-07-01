@@ -173,3 +173,9 @@ def test_sum():
 
 def test_mean():
     assert DistributedQuery(range(100), processes=2).select(square).mean() == 3283.5
+
+
+def test_to_dict():
+    dict_ = DistributedQuery(range(100), processes=2).to_dict(str, square)
+    assert set(dict_.keys()) == {str(x) for x in range(100)}
+    assert set(dict_.values()) == {x**2 for x in range(100)}
