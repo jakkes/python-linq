@@ -57,7 +57,7 @@ pip install -r requirements.txt
 &gt;&gt;&gt;     return x &lt; 5
 &gt;&gt;&gt; 
 &gt;&gt;&gt; x = (
-&gt;&gt;&gt;     DistributedQuery(range(100))
+&gt;&gt;&gt;     DistributedQuery(range(100), processes=8)
 &gt;&gt;&gt;     .where(less_than_5)
 &gt;&gt;&gt;     .select(heavy_transformation)
 &gt;&gt;&gt;     .to_list()
