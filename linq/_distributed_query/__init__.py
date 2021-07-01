@@ -5,11 +5,11 @@ from typing import (
     Iterator,
     List,
     Optional,
-    Sequence,
     TypeVar,
     Iterable,
     Callable,
 )
+import collections.abc
 import multiprocessing as mp
 import threading as th
 
@@ -90,6 +90,9 @@ class DistributedQuery(Generic[T]):
                 Defaults to 1. By increasing the chunk size, aggregating queries may
                 become more efficient, compared to a chunk size of one.
         """
+        if not isinstance(sequence, collections.abc.Iterable):
+            raise ValueError("Object is not iterable")
+
         self._sequence = sequence
         self._processes = processes if processes is not None else mp.cpu_count()
         self._chunk_size = chunk_size
