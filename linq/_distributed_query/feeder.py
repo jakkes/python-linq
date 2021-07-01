@@ -1,6 +1,6 @@
 import multiprocessing as mp
 import threading as th
-from typing import Any, Sequence
+from typing import Any, Iterable
 
 
 class Feeder(th.Thread):
@@ -8,7 +8,7 @@ class Feeder(th.Thread):
         self,
         feed_queue: mp.Queue,
         task_queue: mp.Queue,
-        data: Sequence[Any],
+        data: Iterable[Any],
         chunk_size: int,
         all_data_fed_event: th.Event,
     ):

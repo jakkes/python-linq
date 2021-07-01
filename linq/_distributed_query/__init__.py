@@ -1,4 +1,14 @@
-from typing import Any, Generic, Iterator, List, Optional, Sequence, TypeVar, Iterable, Callable
+from typing import (
+    Any,
+    Generic,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    TypeVar,
+    Iterable,
+    Callable,
+)
 import multiprocessing as mp
 import threading as th
 
@@ -41,7 +51,8 @@ class DistributedQuery(Generic[T]):
             processes (int, optional): Number of processes to distribute the query
                 across. If None, one process is spawned per CPU core. Defaults to None.
             chunk_size (int, optional): Data are distributed using this chunk size.
-                Defaults to 1.
+                Defaults to 1. By increasing the chunk size, aggregating queries may
+                become more efficient, compared to a chunk size of one.
         """
         self._sequence = sequence
         self._processes = processes if processes is not None else mp.cpu_count()
@@ -84,18 +95,29 @@ class DistributedQuery(Generic[T]):
         self._feeder.start()
 
         self._task_tracker = TaskTracker(
-            self._task_queue, self._task_complete_queue, self._feed_complete_event, self._tasks_complete_event
+            self._task_queue,
+            self._task_complete_queue,
+            self._feed_complete_event,
+            self._tasks_complete_event,
         )
         self._task_tracker.start()
 
         self._workers = [
-            Worker(self._feed_queue, self._result_queue, self._feed_complete_event, self._tasks_complete_event, self._query)
+            Worker(
+                self._feed_queue,
+                self._result_queue,
+                self._feed_complete_event,
+                self._tasks_complete_event,
+                self._query,
+            )
             for _ in range(self._processes)
         ]
         for worker in self._workers:
             worker.start()
 
-        yield from Yielder(self._result_queue, self._task_complete_queue, self._tasks_complete_event)
+        yield from Yielder(
+            self._result_queue, self._task_complete_queue, self._tasks_complete_event
+        )
 
         self._feeder.join()
         self._task_tracker.join()
@@ -276,7 +298,7 @@ class DistributedQuery(Generic[T]):
         aggregator = query.aggregators.ArgMax(value_fn)
         self._query.set_aggregator(aggregator)
         return aggregator.aggregate(self)
-    
+
     def argmin(self, value_fn: Callable[[T], Any]) -> T:
         """Returns the query element for which the given value function returns the
         smallest value.
@@ -295,6 +317,9 @@ class DistributedQuery(Generic[T]):
     def first_or_none(self, condition: Callable[[T], bool] = true) -> Optional[T]:
         """Returns the first element found to satisfy the given condition. If no element
         is found, `None` is returned.
+
+        Note: when distributing the workload on more than one process, this function
+        cannot be considered deterministic.
 
         Args:
             condition (Callable[[T], bool], optional): Callable accepting one argument.
@@ -322,6 +347,9 @@ class DistributedQuery(Generic[T]):
         """Returns the first element found to satisfy the given condition. If no element
         is found, an exception is raised.
 
+        Note: when distributing the workload on more than one process, this function
+        cannot be considered deterministic.
+
         Args:
             condition (Callable[[T], bool], optional): Callable accepting one argument.
                 The first element for which condition returns True is returned. Defaults
@@ -339,3 +367,79 @@ class DistributedQuery(Generic[T]):
         if re is None:
             raise errors.NoSuchElementError()
         return re
+
+    def last_or_none(self, condition: Callable[[T], bool] = true) -> T:
+        """Returns the last element found to satisfy the given condition. If no element
+        is found, `None` is returned.
+
+        Note: when distributing the workload on more than one process, this function
+        cannot be considered deterministic.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument.
+                The last element for which condition returns True is returned. Defaults
+                to returning `True` for any input, i.e. the result will be the last
+                element encountered in the query.
+
+        Returns:
+            Optional[T]: Last element encountered for which `condition` returns `True`.
+                If no element is found, returns `None`.
+        """
+        self._query.set_aggregator(query.aggregators.LastOrNone(condition))
+        re = None
+        for x in self:
+            if x is None:
+                continue
+            if condition(x):
+                re = x
+        return re
+
+    def last(self, condition: Callable[[T], bool] = true) -> T:
+        """Returns the last element found to satisfy the given condition. If no element
+        is found, an exception is raised.
+
+        Note: when distributing the workload on more than one process, this function
+        cannot be considered deterministic.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument.
+                The last element for which condition returns True is returned. Defaults
+                to returning `True` for any input, i.e. the result will be the last
+                element encountered in the query.
+
+        Raises:
+            errors.NoSuchElementError: In case no element is found to satisfy the
+                condition.
+
+        Returns:
+            T: Last element encountered for which `condition` returns `True`.
+        """
+        re = self.last_or_none(condition)
+        if re is None:
+            raise errors.NoSuchElementError()
+        return re
+
+    def sum(self) -> T:
+        """Computes the sum over all elements. Assumes associative and commutative
+        addition.
+
+        Returns:
+            T: Sum of all elements in the query.
+        """
+        aggregator = query.aggregators.Sum()
+        self._query.set_aggregator(aggregator)
+        return aggregator.aggregate(self)
+
+    def mean(self) -> T:
+        """Computes the mean of all elements. Assumes associative and commutative
+        addition.
+
+        Returns:
+            T: Mean value.
+        """
+        self._query.set_aggregator(query.aggregators.SumAndCount())
+        sum_, count = 0, 0
+        for s, c in self:
+            sum_ += s
+            count += c
+        return sum_ / count
