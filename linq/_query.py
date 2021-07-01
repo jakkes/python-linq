@@ -448,7 +448,7 @@ class Query(Iterable[T]):
 
         def sequence():
             for n, x in enumerate(self):
-                if n + 1 >= count:
+                if n >= count:
                     break
                 yield x
 

@@ -1,4 +1,4 @@
-from linq import Query, Grouping, errors
+from linq import Query, errors
 import unittest
 
 class TestBasicFunctions(unittest.TestCase):
@@ -72,30 +72,6 @@ class TestBasicFunctions(unittest.TestCase):
             2
         )
 
-    def test_concat(self):
-        
-        subjectA = [1, 2, 3]
-        subjectB = [4, 5, 6]
-        
-        self.assertListEqual(
-            Query(subjectA).concat(subjectB).toList(),
-            [1, 2, 3, 4, 5, 6]
-        )
-
-        subjectA = [
-            { "value": 1},
-            { "value": 2}
-        ]
-        subjectB = [
-            { "value": 3 },
-            { "value": 4 }
-        ]
-        self.assertListEqual(
-            Query(subjectA).select(lambda x: x["value"]).concat(
-                Query(subjectB).select(lambda x: x["value"])
-            ).toList(),
-            [1, 2, 3, 4]
-        )
 
     def test_contains(self):
         self.assertTrue(Query([1, 2, 3, 4]).contains(2))
@@ -278,88 +254,6 @@ class TestBasicFunctions(unittest.TestCase):
             { "value": 2 }
         )
 
-    def test_groupby(self):
-        subject = [
-            {
-                "id": 1,
-                "data": 1
-            },
-            {
-                "id": 1,
-                "data": 2
-            },
-            {
-                "id": 2,
-                "data": 3
-            },
-            {
-                "id": 2,
-                "data": 4
-            },
-            {
-                "id": 3,
-                "data": 5
-            },
-            {
-                "id": 4,
-                "data": 6
-            }
-        ]
-
-        result = (
-            Query(subject)
-            .groupBy(lambda x: x["id"], lambda x: x["data"])
-            .select(lambda x: x.values)
-            .to_list()
-        )
-        expected = [[1, 2], [3, 4], [5], [6]]
-        self.assertListEqual(result, expected)
-
-        result = (
-            Query(subject)
-            .groupBy(lambda x: x["id"], lambda x: x["data"])
-            .select(
-                lambda x: Query(x.values).max()
-            )
-            .to_list()
-        )
-        expected = [2, 4, 5, 6]
-        self.assertListEqual(result, expected)
-
-        subject = [
-            {
-                "age": 10,
-                "name": "Steven"
-            }, {
-                "age": 10,
-                "name": "Johan"
-            }, {
-                "age": 11,
-                "name": "Lars"
-            }
-        ]
-        
-        # Keys
-        self.assertListEqual(
-
-            Query(subject).groupBy(
-                lambda x: x["age"], 
-                transform = lambda x: x["name"]
-            ).select(lambda x: x.key).to_list(),
-
-            [10, 11]
-        )
-
-        # Names
-        self.assertListEqual(
-            
-            Query(subject).groupBy(
-                lambda x: x["age"],
-                transform=lambda x: x["name"]
-            ).select(lambda x: x.values).to_list(),
-
-            [ ["Steven", "Johan" ], [ "Lars" ] ]
-        )
 
     def test_intersect(self):
         subject1 = [1,2,3,4]
@@ -614,15 +508,6 @@ class TestBasicFunctions(unittest.TestCase):
             [1, 2, 3, 4]
         )
 
-    def test_foreach(self):
-        res = []
-
-        subject = [1, 2, 3]
-        Query(subject).forEach(lambda x: res.append(x))
-        self.assertListEqual(
-            res,
-            subject
-        )
 
     def test_where(self):
         expected = [2, 4]
@@ -645,124 +530,6 @@ class TestBasicFunctions(unittest.TestCase):
         self.assertListEqual(
             Query(subject).where(lambda x: x["value"] == 3).select(lambda x: x["value"]).to_list(),
             [3]
-        )
-
-    def test_groupjoin(self):
-        grades = [
-            {
-                "userid": 1,
-                "grade": "A"
-            }, {
-                "userid": 1,
-                "grade": "B"
-            }, {
-                "userid": 2,
-                "grade": "B"
-            }, {
-                "userid": 2,
-                "grade": "B"
-            }
-        ]
-        students = [
-            {
-                "id": 1,
-                "name": "Jakob"
-            }, {
-                "id": 2,
-                "name": "Johan"
-            }
-        ]
-        
-        self.assertListEqual(
-            
-            Query(students).groupJoin(
-                grades,
-                innerKey = lambda x: x["id"],
-                outerKey = lambda x: x["userid"],
-                innerTransform = lambda x: x["name"],
-                outerTransform = lambda x: x["grade"]
-            )
-            .select(lambda x: x.inner).to_list(),
-            
-            ['Jakob', 'Johan']
-        )
-
-        self.assertListEqual(
-
-            Query(students).groupJoin(
-                grades,
-                innerKey = lambda x: x["id"],
-                outerKey = lambda x: x["userid"],
-                innerTransform = lambda x: x["name"],
-                outerTransform = lambda x: x["grade"]
-            ).select(lambda x: x.outer).to_list(),
-
-            [ ['A', 'B'], ['B', 'B'] ]
-        )
-
-        subjA = [1, 2, 3]
-        subjB = [2, 2, 3, 4]
-
-        result = Query(subjA).groupJoin(
-            subjB,
-            lambda x: x,
-            lambda x: x,
-            lambda x: x,
-            lambda x: x
-        ).select(lambda x: x.outer).to_list()
-        expected = [[], [2, 2], [3]]
-        self.assertListEqual(expected, result)
-
-        grades = [
-            {
-                "userid": 1,
-                "grade": "A"
-            }, {
-                "userid": 1,
-                "grade": "B"
-            }, {
-                "userid": 2,
-                "grade": "B"
-            }, {
-                "userid": 2,
-                "grade": "B"
-            }
-        ]
-        students = [
-            {
-                "id": 1,
-                "name": "Jakob"
-            }, {
-                "id": 2,
-                "name": "Johan"
-            }
-        ]
-        names = Query(students).groupJoin(
-            grades,
-            innerKey = lambda x: x["id"],
-            outerKey = lambda x: x["userid"],
-            innerTransform = lambda x: x["name"],
-            outerTransform = lambda x: x["grade"]
-        ).select(lambda x: x.inner).to_list()
-
-        expected = ["Jakob", "Johan"]
-        self.assertListEqual(
-            names,
-            expected
-        )
-
-        grades = Query(students).groupJoin(
-            grades,
-            innerKey = lambda x: x["id"],
-            outerKey = lambda x: x["userid"],
-            innerTransform = lambda x: x["name"],
-            outerTransform = lambda x: x["grade"]
-        ).select(lambda x: x.outer).to_list()
-
-        expected = [["A","B"], ["B","B"]]
-        self.assertListEqual(
-            grades,
-            expected
         )
 
     def test_join(self):
