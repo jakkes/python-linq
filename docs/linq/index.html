@@ -1,0 +1,3344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>linq API documentation</title>
+<meta name="description" content="LINQ
+Provides simple to use LINQ features to Python 3.x …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Package <code>linq</code></h1>
+</header>
+<section id="section-intro">
+<h1 id="linq">LINQ</h1>
+<p>Provides simple to use LINQ features to Python 3.x.</p>
+<h2 id="installing">Installing</h2>
+<h3 id="from-pip">From pip</h3>
+<pre><code class="language-bash">pip install python-linq
+</code></pre>
+<h3 id="from-source">From source</h3>
+<pre><code class="language-bash">git clone https://github.com/jakkes/python-linq.git
+cd python-linq
+pip install -r requirements.txt
+</code></pre>
+<h2 id="usage">Usage</h2>
+<ol>
+<li>Import the <code><a title="linq.Query" href="#linq.Query">Query</a></code> class</li>
+<li>Write beautiful queries!</li>
+</ol>
+<pre><code class="language-python">&gt;&gt;&gt; from linq import Query
+&gt;&gt;&gt; x = Query([1, 2, 3]).select(lambda x: x * x + 3).to_list()
+&gt;&gt;&gt; assert x == [4, 7, 12]
+</code></pre>
+<p>Distribute heavy queries across multiple processes.</p>
+<pre><code class="language-python">&gt;&gt;&gt; import time
+&gt;&gt;&gt; from linq import DistributedQuery
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def heavy_transformation(x: int):
+&gt;&gt;&gt;     time.sleep(10)
+&gt;&gt;&gt;     return x*2
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def less_than_5(x: int):
+&gt;&gt;&gt;     return x &lt; 5
+&gt;&gt;&gt; 
+&gt;&gt;&gt; x = (
+&gt;&gt;&gt;     DistributedQuery(range(100))
+&gt;&gt;&gt;     .where(less_than_5)
+&gt;&gt;&gt;     .select(heavy_transformation)
+&gt;&gt;&gt;     .to_list()
+&gt;&gt;&gt; )
+&gt;&gt;&gt; assert x == [0, 1, 4, 9, 16]
+</code></pre>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+.. include:: ../README.md
+&#34;&#34;&#34;
+
+from . import errors
+from ._query import Query
+from ._distributed_query import DistributedQuery
+
+
+__all__ = [&#34;Query&#34;, &#34;DistributedQuery&#34;, &#34;errors&#34;]
+__version__ = &#34;2.0.0&#34;
+
+
+def _fix_pdoc():
+    import os
+    import queue
+    from types import ModuleType
+    root = os.path.dirname(__file__)
+    modules = queue.Queue()
+    for module in __all__:
+        modules.put_nowait((module, ))
+
+    while not modules.empty():
+        module_name = modules.get_nowait()
+        module = eval(&#34;.&#34;.join(module_name))
+        if not isinstance(module, ModuleType):
+            continue
+        if &#34;__pdoc__&#34; not in dir(module):
+            module.__pdoc__ = {}
+        if &#34;__all__&#34; not in dir(module):
+            module.__all__ = []
+
+        for obj in module.__all__:
+            obj = eval(&#34;.&#34;.join(module_name) + f&#34;.{obj}&#34;)
+            if not isinstance(obj, ModuleType):
+                obj.__module__ = &#34;ai.&#34; + &#34;.&#34;.join(module_name)
+
+        for submodule in os.listdir(os.path.join(root, *module_name)):
+            submodule_path = os.path.join(root, *module_name, submodule)
+            if submodule.startswith(&#34;_&#34;):
+                continue
+            if os.path.isdir(submodule_path) and &#34;__init__.py&#34; in os.listdir(submodule_path):
+                module.__pdoc__[submodule] = submodule in module.__all__
+                if submodule in module.__all__:
+                    modules.put_nowait(module_name + (submodule, ))
+            elif submodule.endswith(&#34;.py&#34;):
+                submodule = submodule[:-3]
+                module.__pdoc__[submodule] = submodule in module.__all__
+
+_fix_pdoc()</code></pre>
+</details>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="linq.errors" href="errors/index.html">linq.errors</a></code></dt>
+<dd>
+<div class="desc"><p>Errors raised by queries.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="linq.DistributedQuery"><code class="flex name class">
+<span>class <span class="ident">DistributedQuery</span></span>
+<span>(</span><span>sequence: Iterable[T], processes: int = None, chunk_size: int = 1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A query that distributes execution across multiple processes, allowing for
+utilization of multiple cores.</p>
+<p>Data and arguments are distributed across processes using queues from Python's
+<code>multiprocessing</code> package. This means that everything needs to be pickled, including
+functions passed to, e.g., <code>select</code>. Therefore, lambdas and local functions are not
+supported arguments to the query.</p>
+<h2 id="notes">Notes:</h2>
+<ol>
+<li>Data and arguments are distributed across processes using queues from Python's
+<code>multiprocessing</code> package. This means that everything needs to be pickled,
+including functions passed to, e.g., <code>select</code> or <code>where</code>. Therefore, lambdas and
+local functions are not supported arguments to the query.</li>
+<li>The query may be consumed either through its execution methods, i.e. those not
+returning another <code><a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a></code> instance, or through an iterator. If
+consuming through an iterator and the iterator is not fully consumed, i.e. not
+fully looped through, then the query must be closed using its <code>close</code> method.
+Alternativly, the iteration may occur within a context manager (<code>with</code>
+statement), in which case the query is closed automatically. If unsure,
+<code>close</code> can be executed just in case. If not neceassry, it is a no-op.</li>
+</ol>
+<h2 id="example-usage">Example usage</h2>
+<pre><code class="language-python">&gt;&gt;&gt; import time
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def heavy_transformation(x: int):
+&gt;&gt;&gt;     time.sleep(10)
+&gt;&gt;&gt;     return x*2
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def less_than_5(x: int):
+&gt;&gt;&gt;     return x &lt; 5
+&gt;&gt;&gt; 
+&gt;&gt;&gt; x = (
+&gt;&gt;&gt;     DistributedQuery(range(100))
+&gt;&gt;&gt;     .where(less_than_5)
+&gt;&gt;&gt;     .select(heavy_transformation)
+&gt;&gt;&gt;     .to_list()
+&gt;&gt;&gt; )
+&gt;&gt;&gt; assert x == [0, 1, 4, 9, 16]
+</code></pre>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>sequence</code></strong> :&ensp;<code>Iterable[T]</code></dt>
+<dd>Sequence to query.</dd>
+<dt><strong><code>processes</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Number of processes to distribute the query
+across. If None, one process is spawned per CPU core. Defaults to None.</dd>
+<dt><strong><code>chunk_size</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>Data are distributed using this chunk size.
+Defaults to 1. By increasing the chunk size, aggregating queries may
+become more efficient, compared to a chunk size of one.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DistributedQuery(Generic[T]):
+    &#34;&#34;&#34;A query that distributes execution across multiple processes, allowing for
+    utilization of multiple cores.
+
+    Data and arguments are distributed across processes using queues from Python&#39;s
+    `multiprocessing` package. This means that everything needs to be pickled, including
+    functions passed to, e.g., `select`. Therefore, lambdas and local functions are not
+    supported arguments to the query.
+    
+    ## Notes:
+    1. Data and arguments are distributed across processes using queues from Python&#39;s
+    `multiprocessing` package. This means that everything needs to be pickled,
+    including functions passed to, e.g., `select` or `where`. Therefore, lambdas and
+    local functions are not supported arguments to the query.
+    2. The query may be consumed either through its execution methods, i.e. those not
+    returning another `DistributedQuery` instance, or through an iterator. If
+    consuming through an iterator and the iterator is not fully consumed, i.e. not
+    fully looped through, then the query must be closed using its `close` method.
+    Alternativly, the iteration may occur within a context manager (`with`
+    statement), in which case the query is closed automatically. If unsure,
+    `close` can be executed just in case. If not neceassry, it is a no-op.
+        
+    ## Example usage
+    ```python
+    &gt;&gt;&gt; import time
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; def heavy_transformation(x: int):
+    &gt;&gt;&gt;     time.sleep(10)
+    &gt;&gt;&gt;     return x*2
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; def less_than_5(x: int):
+    &gt;&gt;&gt;     return x &lt; 5
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; x = (
+    &gt;&gt;&gt;     DistributedQuery(range(100))
+    &gt;&gt;&gt;     .where(less_than_5)
+    &gt;&gt;&gt;     .select(heavy_transformation)
+    &gt;&gt;&gt;     .to_list()
+    &gt;&gt;&gt; )
+    &gt;&gt;&gt; assert x == [0, 1, 4, 9, 16]
+    ```&#34;&#34;&#34;
+
+    def __init__(
+        self, sequence: Iterable[T], processes: int = None, chunk_size: int = 1
+    ):
+        &#34;&#34;&#34;
+        Args:
+            sequence (Iterable[T]): Sequence to query.
+            processes (int, optional): Number of processes to distribute the query
+                across. If None, one process is spawned per CPU core. Defaults to None.
+            chunk_size (int, optional): Data are distributed using this chunk size.
+                Defaults to 1. By increasing the chunk size, aggregating queries may
+                become more efficient, compared to a chunk size of one.
+        &#34;&#34;&#34;
+        if not isinstance(sequence, collections.abc.Iterable):
+            raise ValueError(&#34;Object is not iterable&#34;)
+
+        self._sequence = sequence
+        self._processes = processes if processes is not None else mp.cpu_count()
+        self._chunk_size = chunk_size
+        self._query = query.Executor()
+        self._lock = th.Lock()
+
+        self._feed_queue: mp.Queue = None
+        self._task_queue: mp.Queue = None
+        self._task_complete_queue: mp.Queue = None
+        self._result_queue: mp.Queue = None
+        self._feed_complete_event: th.Event = None
+        self._tasks_complete_event: th.Event = None
+        self._feeder: Feeder = None
+        self._task_tracker: TaskTracker = None
+        self._workers: List[Worker] = None
+
+        self._executed = False
+        self._closed = False
+
+    def __iter__(self) -&gt; Iterator[T]:
+        with self._lock:
+            if self._executed:
+                raise AttributeError(&#34;Query has already been executed.&#34;)
+            self._executed = True
+
+        self._feed_queue = mp.Queue(maxsize=self._processes * 2)
+        self._task_queue = mp.Queue()
+        self._task_complete_queue = mp.Queue()
+        self._result_queue = mp.Queue(maxsize=self._processes * 2)
+        self._feed_complete_event = mp.Event()
+        self._tasks_complete_event = mp.Event()
+        self._feeder = Feeder(
+            self._feed_queue,
+            self._task_queue,
+            self._sequence,
+            self._chunk_size,
+            self._feed_complete_event,
+        )
+        self._feeder.start()
+
+        self._task_tracker = TaskTracker(
+            self._task_queue,
+            self._task_complete_queue,
+            self._feed_complete_event,
+            self._tasks_complete_event,
+        )
+        self._task_tracker.start()
+
+        self._workers = [
+            Worker(
+                self._feed_queue,
+                self._result_queue,
+                self._feed_complete_event,
+                self._tasks_complete_event,
+                self._query,
+            )
+            for _ in range(self._processes)
+        ]
+        for worker in self._workers:
+            worker.start()
+
+        yield from Yielder(
+            self._result_queue, self._task_complete_queue, self._tasks_complete_event
+        )
+
+        self._feeder.join()
+        self._task_tracker.join()
+        for worker in self._workers:
+            worker.join()
+
+    def __contains__(self, obj: T) -&gt; bool:
+        self._query.set_aggregator(query.aggregators.Contains(obj))
+        return_value = False
+        for x in self:
+            if x:
+                return_value = True
+        return return_value
+
+    def __enter__(self) -&gt; DistributedQuery[T]:
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
+    def close(self):
+        &#34;&#34;&#34;Closes the query and all background threads and processes. If these have
+        already been closed, this operation is a no-op.&#34;&#34;&#34;
+        if not self._executed or self._closed:
+            return
+
+        self._feed_complete_event.set()
+        self._tasks_complete_event.set()
+
+        while not self._feed_queue.empty():
+            try:
+                self._feed_queue.get_nowait()
+            except queue.Empty:
+                pass
+
+        while not self._result_queue.empty():
+            try:
+                self._result_queue.get_nowait()
+            except queue.Empty:
+                pass
+
+        self._feeder.join()
+        self._task_tracker.join()
+        for worker in self._workers:
+            worker.join()
+
+    def all(self, condition: Callable[[T], bool] = identity) -&gt; bool:
+        &#34;&#34;&#34;Determines whether all elements in the query fulfill a given condition.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument
+                and returning a boolean. If condition returns True for all elements in
+                the query, then the function evaluates to True, otherwise False.
+                Defaults to the identity function.
+
+        Returns:
+            bool: True if condition returns True for all query elements, otherwise
+                False.
+        &#34;&#34;&#34;
+        aggregator = query.aggregators.All()
+        self._query.add_block(query.blocks.Select(condition))
+        self._query.set_aggregator(aggregator)
+        with self as self:
+            return aggregator.aggregate(self)
+
+    def any(self, condition: Callable[[T], bool] = identity) -&gt; bool:
+        &#34;&#34;&#34;Determines whether any element in the query fulfills a given condition.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument
+                and returning a boolean. If condition returns True for any element
+                the query, then the function evaluates to True, otherwise False.
+                Defaults to the identity function.
+
+        Returns:
+            bool: True if condition evaluates to True for any query element, otherwise
+                False.
+        &#34;&#34;&#34;
+        aggregator = query.aggregators.Any()
+        self._query.add_block(query.blocks.Select(condition))
+        self._query.set_aggregator(aggregator)
+        with self as self:
+            return aggregator.aggregate(self)
+
+    def select(self, transform: Callable[[T], S]) -&gt; DistributedQuery[S]:
+        &#34;&#34;&#34;Applies a transformation on each sequence element.
+
+        Args:
+            transform (Callable[[T], S]): Transform to apply.
+
+        Returns:
+            S: Return type of the transform.
+        &#34;&#34;&#34;
+        self._query.add_block(query.blocks.Select(transform))
+        return self
+
+    def flatten(self) -&gt; &#34;DistributedQuery&#34;:
+        &#34;&#34;&#34;Flattens the query elements one step, i.e. given a list of lists,
+        concatenates them into one long list.
+
+        Returns:
+            DistributedQuery: Query over flattened elements.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; data = [[1,2,3], [4,5,6], [7, 8, 9]]
+        &gt;&gt;&gt; DistributedQuery(data).flatten().toList()
+        [1, 2, 3, 4, 5, 6, 7, 8, 9]  # not necessarily ordered
+        ```
+        &#34;&#34;&#34;
+        self._query.add_block(query.blocks.Flatten())
+        return self
+
+    def to_list(self) -&gt; List[T]:
+        &#34;&#34;&#34;Executes the query and stores the result into a list.
+
+        Returns:
+            List[T]: List of output.
+        &#34;&#34;&#34;
+        return sum(self, [])
+
+    def max(self) -&gt; T:
+        &#34;&#34;&#34;Computes the maximum value.
+
+        Returns:
+            T: The maximum value encountered.
+        &#34;&#34;&#34;
+        self._query.set_aggregator(query.aggregators.Max())
+        return max(self)
+
+    def min(self) -&gt; T:
+        &#34;&#34;&#34;Computes the minimum value.
+
+        Returns:
+            T: Minimum value encountered.
+        &#34;&#34;&#34;
+        self._query.set_aggregator(query.aggregators.Min())
+        return min(self)
+
+    def count(self) -&gt; int:
+        &#34;&#34;&#34;Counts the number of elements in the query.
+
+        Returns:
+            int: Number of elements matching the query.
+        &#34;&#34;&#34;
+        self._query.set_aggregator(query.aggregators.Count())
+        return sum(self)
+
+    def where(self, condition: Callable[[T], bool]) -&gt; DistributedQuery[T]:
+        &#34;&#34;&#34;Filters the query on a given condition.
+
+        Args:
+            condition (Callable[[T], bool]): Condition accepting one argument and
+                returning a boolean. Elements for which the condition evaluates to True
+                are kept.
+
+        Returns:
+            DistributedQuery[T]: Query where elements pass the condition.
+        &#34;&#34;&#34;
+        self._query.add_block(query.blocks.Where(condition))
+        return self
+
+    def contains(self, obj: T) -&gt; bool:
+        &#34;&#34;&#34;Determines whether the given object is found in the query.
+
+        Args:
+            obj (T): Object to search for.
+
+        Returns:
+            bool: True if the object was found, otherwise False.
+        &#34;&#34;&#34;
+        return obj in self
+
+    def argmax(self, value_fn: Callable[[T], Any]) -&gt; T:
+        &#34;&#34;&#34;Returns the query element for which the given value function returns the
+        largest value.
+
+        Args:
+            value_fn (Callable[[T], Any]): Function accepting one argument and returning
+                a comparable object.
+
+        Returns:
+            T: Query element for which `value_fn` returned the largest value.
+        &#34;&#34;&#34;
+        aggregator = query.aggregators.ArgMax(value_fn)
+        self._query.set_aggregator(aggregator)
+        return aggregator.aggregate(self)
+
+    def argmin(self, value_fn: Callable[[T], Any]) -&gt; T:
+        &#34;&#34;&#34;Returns the query element for which the given value function returns the
+        smallest value.
+
+        Args:
+            value_fn (Callable[[T], Any]): Function accepting one argument and returning
+                a comparable object.
+
+        Returns:
+            T: Query element for which `value_fn` returned the smallest value.
+        &#34;&#34;&#34;
+        aggregator = query.aggregators.ArgMax(value_fn, invert_value=True)
+        self._query.set_aggregator(aggregator)
+        return aggregator.aggregate(self)
+
+    def first_or_none(self, condition: Callable[[T], bool] = true) -&gt; Optional[T]:
+        &#34;&#34;&#34;Returns the first element found to satisfy the given condition. If no element
+        is found, `None` is returned.
+
+        Note: when distributing the workload on more than one process, this function
+        cannot be considered deterministic.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument.
+                The first element for which condition returns True is returned. Defaults
+                to returning `True` for any input, i.e. the result will be the first
+                element encountered in the query.
+
+        Returns:
+            Optional[T]: First element encountered for which `condition` returns `True`.
+                If no element is found, returns `None`.
+        &#34;&#34;&#34;
+        aggregator = query.aggregators.FirstOrNone(condition)
+        self._query.set_aggregator(aggregator)
+        re = None
+        for x in self:
+            if x is None:
+                continue
+            if condition(x):
+                re = x
+                break
+        self.close()
+        return re
+
+    def first(self, condition: Callable[[T], bool] = true) -&gt; T:
+        &#34;&#34;&#34;Returns the first element found to satisfy the given condition. If no element
+        is found, an exception is raised.
+
+        Note: when distributing the workload on more than one process, this function
+        cannot be considered deterministic.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument.
+                The first element for which condition returns True is returned. Defaults
+                to returning `True` for any input, i.e. the result will be the first
+                element encountered in the query.
+
+        Raises:
+            errors.NoSuchElementError: In case no element is found to satisfy the
+                condition.
+
+        Returns:
+            T: First element encountered for which `condition` returns `True`.
+        &#34;&#34;&#34;
+        re = self.first_or_none(condition)
+        if re is None:
+            raise errors.NoSuchElementError()
+        return re
+
+    def last_or_none(self, condition: Callable[[T], bool] = true) -&gt; T:
+        &#34;&#34;&#34;Returns the last element found to satisfy the given condition. If no element
+        is found, `None` is returned.
+
+        Note: when distributing the workload on more than one process, this function
+        cannot be considered deterministic.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument.
+                The last element for which condition returns True is returned. Defaults
+                to returning `True` for any input, i.e. the result will be the last
+                element encountered in the query.
+
+        Returns:
+            Optional[T]: Last element encountered for which `condition` returns `True`.
+                If no element is found, returns `None`.
+        &#34;&#34;&#34;
+        self._query.set_aggregator(query.aggregators.LastOrNone(condition))
+        re = None
+        for x in self:
+            if x is None:
+                continue
+            if condition(x):
+                re = x
+        return re
+
+    def last(self, condition: Callable[[T], bool] = true) -&gt; T:
+        &#34;&#34;&#34;Returns the last element found to satisfy the given condition. If no element
+        is found, an exception is raised.
+
+        Note: when distributing the workload on more than one process, this function
+        cannot be considered deterministic.
+
+        Args:
+            condition (Callable[[T], bool], optional): Callable accepting one argument.
+                The last element for which condition returns True is returned. Defaults
+                to returning `True` for any input, i.e. the result will be the last
+                element encountered in the query.
+
+        Raises:
+            errors.NoSuchElementError: In case no element is found to satisfy the
+                condition.
+
+        Returns:
+            T: Last element encountered for which `condition` returns `True`.
+        &#34;&#34;&#34;
+        re = self.last_or_none(condition)
+        if re is None:
+            raise errors.NoSuchElementError()
+        return re
+
+    def sum(self) -&gt; T:
+        &#34;&#34;&#34;Computes the sum over all elements. Assumes associative and commutative
+        addition.
+
+        Returns:
+            T: Sum of all elements in the query.
+        &#34;&#34;&#34;
+        aggregator = query.aggregators.Sum()
+        self._query.set_aggregator(aggregator)
+        return aggregator.aggregate(self)
+
+    def mean(self) -&gt; T:
+        &#34;&#34;&#34;Computes the mean of all elements. Assumes associative and commutative
+        addition.
+
+        Returns:
+            T: Mean value.
+        &#34;&#34;&#34;
+        self._query.set_aggregator(query.aggregators.SumAndCount())
+        sum_, count = 0, 0
+        for s, c in self:
+            sum_ += s
+            count += c
+        return sum_ / count
+
+    def to_dict(self, key: Callable[[T], KT], value: Callable[[T], VT]) -&gt; Dict[KT, VT]:
+        &#34;&#34;&#34;Aggregates the elements found in the query into a dictionary. Keys are
+        determined by the key function, and values for the value function. Note, if
+        the key function does not return unique values, query elements will silently
+        be lost.
+
+        Args:
+            key (Callable[[T], KT]): Callable accepting one argument, returning the
+                dictionary key to be used for the particular element.
+            value (Callable[[T], VT]): Callable accepting one argument, returning the
+                value to be used for the given element.
+
+        Returns:
+            Dict[KT, VT]: Dictionary of `{key(x): value(x) for x in self}`.
+        &#34;&#34;&#34;
+        self._query.set_aggregator(query.aggregators.Dict(key, value))
+        re = {}
+        for x in self:
+            re.update(x)
+        return re</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>typing.Generic</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="linq.DistributedQuery.all"><code class="name flex">
+<span>def <span class="ident">all</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function identity&gt;) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Determines whether all elements in the query fulfill a given condition.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Callable accepting one argument
+and returning a boolean. If condition returns True for all elements in
+the query, then the function evaluates to True, otherwise False.
+Defaults to the identity function.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if condition returns True for all query elements, otherwise
+False.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def all(self, condition: Callable[[T], bool] = identity) -&gt; bool:
+    &#34;&#34;&#34;Determines whether all elements in the query fulfill a given condition.
+
+    Args:
+        condition (Callable[[T], bool], optional): Callable accepting one argument
+            and returning a boolean. If condition returns True for all elements in
+            the query, then the function evaluates to True, otherwise False.
+            Defaults to the identity function.
+
+    Returns:
+        bool: True if condition returns True for all query elements, otherwise
+            False.
+    &#34;&#34;&#34;
+    aggregator = query.aggregators.All()
+    self._query.add_block(query.blocks.Select(condition))
+    self._query.set_aggregator(aggregator)
+    with self as self:
+        return aggregator.aggregate(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.any"><code class="name flex">
+<span>def <span class="ident">any</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function identity&gt;) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Determines whether any element in the query fulfills a given condition.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Callable accepting one argument
+and returning a boolean. If condition returns True for any element
+the query, then the function evaluates to True, otherwise False.
+Defaults to the identity function.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if condition evaluates to True for any query element, otherwise
+False.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def any(self, condition: Callable[[T], bool] = identity) -&gt; bool:
+    &#34;&#34;&#34;Determines whether any element in the query fulfills a given condition.
+
+    Args:
+        condition (Callable[[T], bool], optional): Callable accepting one argument
+            and returning a boolean. If condition returns True for any element
+            the query, then the function evaluates to True, otherwise False.
+            Defaults to the identity function.
+
+    Returns:
+        bool: True if condition evaluates to True for any query element, otherwise
+            False.
+    &#34;&#34;&#34;
+    aggregator = query.aggregators.Any()
+    self._query.add_block(query.blocks.Select(condition))
+    self._query.set_aggregator(aggregator)
+    with self as self:
+        return aggregator.aggregate(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.argmax"><code class="name flex">
+<span>def <span class="ident">argmax</span></span>(<span>self, value_fn: Callable[[T], Any]) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the query element for which the given value function returns the
+largest value.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value_fn</code></strong> :&ensp;<code>Callable[[T], Any]</code></dt>
+<dd>Function accepting one argument and returning
+a comparable object.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Query element for which <code>value_fn</code> returned the largest value.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def argmax(self, value_fn: Callable[[T], Any]) -&gt; T:
+    &#34;&#34;&#34;Returns the query element for which the given value function returns the
+    largest value.
+
+    Args:
+        value_fn (Callable[[T], Any]): Function accepting one argument and returning
+            a comparable object.
+
+    Returns:
+        T: Query element for which `value_fn` returned the largest value.
+    &#34;&#34;&#34;
+    aggregator = query.aggregators.ArgMax(value_fn)
+    self._query.set_aggregator(aggregator)
+    return aggregator.aggregate(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.argmin"><code class="name flex">
+<span>def <span class="ident">argmin</span></span>(<span>self, value_fn: Callable[[T], Any]) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the query element for which the given value function returns the
+smallest value.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value_fn</code></strong> :&ensp;<code>Callable[[T], Any]</code></dt>
+<dd>Function accepting one argument and returning
+a comparable object.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Query element for which <code>value_fn</code> returned the smallest value.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def argmin(self, value_fn: Callable[[T], Any]) -&gt; T:
+    &#34;&#34;&#34;Returns the query element for which the given value function returns the
+    smallest value.
+
+    Args:
+        value_fn (Callable[[T], Any]): Function accepting one argument and returning
+            a comparable object.
+
+    Returns:
+        T: Query element for which `value_fn` returned the smallest value.
+    &#34;&#34;&#34;
+    aggregator = query.aggregators.ArgMax(value_fn, invert_value=True)
+    self._query.set_aggregator(aggregator)
+    return aggregator.aggregate(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Closes the query and all background threads and processes. If these have
+already been closed, this operation is a no-op.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def close(self):
+    &#34;&#34;&#34;Closes the query and all background threads and processes. If these have
+    already been closed, this operation is a no-op.&#34;&#34;&#34;
+    if not self._executed or self._closed:
+        return
+
+    self._feed_complete_event.set()
+    self._tasks_complete_event.set()
+
+    while not self._feed_queue.empty():
+        try:
+            self._feed_queue.get_nowait()
+        except queue.Empty:
+            pass
+
+    while not self._result_queue.empty():
+        try:
+            self._result_queue.get_nowait()
+        except queue.Empty:
+            pass
+
+    self._feeder.join()
+    self._task_tracker.join()
+    for worker in self._workers:
+        worker.join()</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.contains"><code class="name flex">
+<span>def <span class="ident">contains</span></span>(<span>self, obj: T) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Determines whether the given object is found in the query.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>obj</code></strong> :&ensp;<code>T</code></dt>
+<dd>Object to search for.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the object was found, otherwise False.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def contains(self, obj: T) -&gt; bool:
+    &#34;&#34;&#34;Determines whether the given object is found in the query.
+
+    Args:
+        obj (T): Object to search for.
+
+    Returns:
+        bool: True if the object was found, otherwise False.
+    &#34;&#34;&#34;
+    return obj in self</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.count"><code class="name flex">
+<span>def <span class="ident">count</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Counts the number of elements in the query.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>Number of elements matching the query.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def count(self) -&gt; int:
+    &#34;&#34;&#34;Counts the number of elements in the query.
+
+    Returns:
+        int: Number of elements matching the query.
+    &#34;&#34;&#34;
+    self._query.set_aggregator(query.aggregators.Count())
+    return sum(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.first"><code class="name flex">
+<span>def <span class="ident">first</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function true&gt;) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the first element found to satisfy the given condition. If no element
+is found, an exception is raised.</p>
+<p>Note: when distributing the workload on more than one process, this function
+cannot be considered deterministic.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Callable accepting one argument.
+The first element for which condition returns True is returned. Defaults
+to returning <code>True</code> for any input, i.e. the result will be the first
+element encountered in the query.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="linq.errors.NoSuchElementError" href="errors/index.html#linq.errors.NoSuchElementError">NoSuchElementError</a></code></dt>
+<dd>In case no element is found to satisfy the
+condition.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>First element encountered for which <code>condition</code> returns <code>True</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def first(self, condition: Callable[[T], bool] = true) -&gt; T:
+    &#34;&#34;&#34;Returns the first element found to satisfy the given condition. If no element
+    is found, an exception is raised.
+
+    Note: when distributing the workload on more than one process, this function
+    cannot be considered deterministic.
+
+    Args:
+        condition (Callable[[T], bool], optional): Callable accepting one argument.
+            The first element for which condition returns True is returned. Defaults
+            to returning `True` for any input, i.e. the result will be the first
+            element encountered in the query.
+
+    Raises:
+        errors.NoSuchElementError: In case no element is found to satisfy the
+            condition.
+
+    Returns:
+        T: First element encountered for which `condition` returns `True`.
+    &#34;&#34;&#34;
+    re = self.first_or_none(condition)
+    if re is None:
+        raise errors.NoSuchElementError()
+    return re</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.first_or_none"><code class="name flex">
+<span>def <span class="ident">first_or_none</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function true&gt;) ‑> Union[~T, NoneType]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the first element found to satisfy the given condition. If no element
+is found, <code>None</code> is returned.</p>
+<p>Note: when distributing the workload on more than one process, this function
+cannot be considered deterministic.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Callable accepting one argument.
+The first element for which condition returns True is returned. Defaults
+to returning <code>True</code> for any input, i.e. the result will be the first
+element encountered in the query.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Optional[T]</code></dt>
+<dd>First element encountered for which <code>condition</code> returns <code>True</code>.
+If no element is found, returns <code>None</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def first_or_none(self, condition: Callable[[T], bool] = true) -&gt; Optional[T]:
+    &#34;&#34;&#34;Returns the first element found to satisfy the given condition. If no element
+    is found, `None` is returned.
+
+    Note: when distributing the workload on more than one process, this function
+    cannot be considered deterministic.
+
+    Args:
+        condition (Callable[[T], bool], optional): Callable accepting one argument.
+            The first element for which condition returns True is returned. Defaults
+            to returning `True` for any input, i.e. the result will be the first
+            element encountered in the query.
+
+    Returns:
+        Optional[T]: First element encountered for which `condition` returns `True`.
+            If no element is found, returns `None`.
+    &#34;&#34;&#34;
+    aggregator = query.aggregators.FirstOrNone(condition)
+    self._query.set_aggregator(aggregator)
+    re = None
+    for x in self:
+        if x is None:
+            continue
+        if condition(x):
+            re = x
+            break
+    self.close()
+    return re</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.flatten"><code class="name flex">
+<span>def <span class="ident">flatten</span></span>(<span>self) ‑> <a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Flattens the query elements one step, i.e. given a list of lists,
+concatenates them into one long list.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a></code></dt>
+<dd>Query over flattened elements.</dd>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; data = [[1,2,3], [4,5,6], [7, 8, 9]]
+&gt;&gt;&gt; DistributedQuery(data).flatten().toList()
+[1, 2, 3, 4, 5, 6, 7, 8, 9]  # not necessarily ordered
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def flatten(self) -&gt; &#34;DistributedQuery&#34;:
+    &#34;&#34;&#34;Flattens the query elements one step, i.e. given a list of lists,
+    concatenates them into one long list.
+
+    Returns:
+        DistributedQuery: Query over flattened elements.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; data = [[1,2,3], [4,5,6], [7, 8, 9]]
+    &gt;&gt;&gt; DistributedQuery(data).flatten().toList()
+    [1, 2, 3, 4, 5, 6, 7, 8, 9]  # not necessarily ordered
+    ```
+    &#34;&#34;&#34;
+    self._query.add_block(query.blocks.Flatten())
+    return self</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.last"><code class="name flex">
+<span>def <span class="ident">last</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function true&gt;) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the last element found to satisfy the given condition. If no element
+is found, an exception is raised.</p>
+<p>Note: when distributing the workload on more than one process, this function
+cannot be considered deterministic.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Callable accepting one argument.
+The last element for which condition returns True is returned. Defaults
+to returning <code>True</code> for any input, i.e. the result will be the last
+element encountered in the query.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="linq.errors.NoSuchElementError" href="errors/index.html#linq.errors.NoSuchElementError">NoSuchElementError</a></code></dt>
+<dd>In case no element is found to satisfy the
+condition.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Last element encountered for which <code>condition</code> returns <code>True</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def last(self, condition: Callable[[T], bool] = true) -&gt; T:
+    &#34;&#34;&#34;Returns the last element found to satisfy the given condition. If no element
+    is found, an exception is raised.
+
+    Note: when distributing the workload on more than one process, this function
+    cannot be considered deterministic.
+
+    Args:
+        condition (Callable[[T], bool], optional): Callable accepting one argument.
+            The last element for which condition returns True is returned. Defaults
+            to returning `True` for any input, i.e. the result will be the last
+            element encountered in the query.
+
+    Raises:
+        errors.NoSuchElementError: In case no element is found to satisfy the
+            condition.
+
+    Returns:
+        T: Last element encountered for which `condition` returns `True`.
+    &#34;&#34;&#34;
+    re = self.last_or_none(condition)
+    if re is None:
+        raise errors.NoSuchElementError()
+    return re</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.last_or_none"><code class="name flex">
+<span>def <span class="ident">last_or_none</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function true&gt;) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the last element found to satisfy the given condition. If no element
+is found, <code>None</code> is returned.</p>
+<p>Note: when distributing the workload on more than one process, this function
+cannot be considered deterministic.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Callable accepting one argument.
+The last element for which condition returns True is returned. Defaults
+to returning <code>True</code> for any input, i.e. the result will be the last
+element encountered in the query.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Optional[T]</code></dt>
+<dd>Last element encountered for which <code>condition</code> returns <code>True</code>.
+If no element is found, returns <code>None</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def last_or_none(self, condition: Callable[[T], bool] = true) -&gt; T:
+    &#34;&#34;&#34;Returns the last element found to satisfy the given condition. If no element
+    is found, `None` is returned.
+
+    Note: when distributing the workload on more than one process, this function
+    cannot be considered deterministic.
+
+    Args:
+        condition (Callable[[T], bool], optional): Callable accepting one argument.
+            The last element for which condition returns True is returned. Defaults
+            to returning `True` for any input, i.e. the result will be the last
+            element encountered in the query.
+
+    Returns:
+        Optional[T]: Last element encountered for which `condition` returns `True`.
+            If no element is found, returns `None`.
+    &#34;&#34;&#34;
+    self._query.set_aggregator(query.aggregators.LastOrNone(condition))
+    re = None
+    for x in self:
+        if x is None:
+            continue
+        if condition(x):
+            re = x
+    return re</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.max"><code class="name flex">
+<span>def <span class="ident">max</span></span>(<span>self) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the maximum value.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>The maximum value encountered.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def max(self) -&gt; T:
+    &#34;&#34;&#34;Computes the maximum value.
+
+    Returns:
+        T: The maximum value encountered.
+    &#34;&#34;&#34;
+    self._query.set_aggregator(query.aggregators.Max())
+    return max(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.mean"><code class="name flex">
+<span>def <span class="ident">mean</span></span>(<span>self) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the mean of all elements. Assumes associative and commutative
+addition.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Mean value.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mean(self) -&gt; T:
+    &#34;&#34;&#34;Computes the mean of all elements. Assumes associative and commutative
+    addition.
+
+    Returns:
+        T: Mean value.
+    &#34;&#34;&#34;
+    self._query.set_aggregator(query.aggregators.SumAndCount())
+    sum_, count = 0, 0
+    for s, c in self:
+        sum_ += s
+        count += c
+    return sum_ / count</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.min"><code class="name flex">
+<span>def <span class="ident">min</span></span>(<span>self) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the minimum value.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Minimum value encountered.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def min(self) -&gt; T:
+    &#34;&#34;&#34;Computes the minimum value.
+
+    Returns:
+        T: Minimum value encountered.
+    &#34;&#34;&#34;
+    self._query.set_aggregator(query.aggregators.Min())
+    return min(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.select"><code class="name flex">
+<span>def <span class="ident">select</span></span>(<span>self, transform: Callable[[T], S]) ‑> linq._distributed_query.DistributedQuery[~S]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Applies a transformation on each sequence element.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>transform</code></strong> :&ensp;<code>Callable[[T], S]</code></dt>
+<dd>Transform to apply.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>S</code></dt>
+<dd>Return type of the transform.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def select(self, transform: Callable[[T], S]) -&gt; DistributedQuery[S]:
+    &#34;&#34;&#34;Applies a transformation on each sequence element.
+
+    Args:
+        transform (Callable[[T], S]): Transform to apply.
+
+    Returns:
+        S: Return type of the transform.
+    &#34;&#34;&#34;
+    self._query.add_block(query.blocks.Select(transform))
+    return self</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.sum"><code class="name flex">
+<span>def <span class="ident">sum</span></span>(<span>self) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Computes the sum over all elements. Assumes associative and commutative
+addition.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Sum of all elements in the query.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sum(self) -&gt; T:
+    &#34;&#34;&#34;Computes the sum over all elements. Assumes associative and commutative
+    addition.
+
+    Returns:
+        T: Sum of all elements in the query.
+    &#34;&#34;&#34;
+    aggregator = query.aggregators.Sum()
+    self._query.set_aggregator(aggregator)
+    return aggregator.aggregate(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, key: Callable[[T], KT], value: Callable[[T], VT]) ‑> Dict[~KT, ~VT]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Aggregates the elements found in the query into a dictionary. Keys are
+determined by the key function, and values for the value function. Note, if
+the key function does not return unique values, query elements will silently
+be lost.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>key</code></strong> :&ensp;<code>Callable[[T], KT]</code></dt>
+<dd>Callable accepting one argument, returning the
+dictionary key to be used for the particular element.</dd>
+<dt><strong><code>value</code></strong> :&ensp;<code>Callable[[T], VT]</code></dt>
+<dd>Callable accepting one argument, returning the
+value to be used for the given element.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Dict[KT, VT]</code></dt>
+<dd>Dictionary of <code>{key(x): value(x) for x in self}</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(self, key: Callable[[T], KT], value: Callable[[T], VT]) -&gt; Dict[KT, VT]:
+    &#34;&#34;&#34;Aggregates the elements found in the query into a dictionary. Keys are
+    determined by the key function, and values for the value function. Note, if
+    the key function does not return unique values, query elements will silently
+    be lost.
+
+    Args:
+        key (Callable[[T], KT]): Callable accepting one argument, returning the
+            dictionary key to be used for the particular element.
+        value (Callable[[T], VT]): Callable accepting one argument, returning the
+            value to be used for the given element.
+
+    Returns:
+        Dict[KT, VT]: Dictionary of `{key(x): value(x) for x in self}`.
+    &#34;&#34;&#34;
+    self._query.set_aggregator(query.aggregators.Dict(key, value))
+    re = {}
+    for x in self:
+        re.update(x)
+    return re</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.to_list"><code class="name flex">
+<span>def <span class="ident">to_list</span></span>(<span>self) ‑> List[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Executes the query and stores the result into a list.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[T]</code></dt>
+<dd>List of output.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_list(self) -&gt; List[T]:
+    &#34;&#34;&#34;Executes the query and stores the result into a list.
+
+    Returns:
+        List[T]: List of output.
+    &#34;&#34;&#34;
+    return sum(self, [])</code></pre>
+</details>
+</dd>
+<dt id="linq.DistributedQuery.where"><code class="name flex">
+<span>def <span class="ident">where</span></span>(<span>self, condition: Callable[[T], bool]) ‑> linq._distributed_query.DistributedQuery[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Filters the query on a given condition.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code></dt>
+<dd>Condition accepting one argument and
+returning a boolean. Elements for which the condition evaluates to True
+are kept.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a>[T]</code></dt>
+<dd>Query where elements pass the condition.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def where(self, condition: Callable[[T], bool]) -&gt; DistributedQuery[T]:
+    &#34;&#34;&#34;Filters the query on a given condition.
+
+    Args:
+        condition (Callable[[T], bool]): Condition accepting one argument and
+            returning a boolean. Elements for which the condition evaluates to True
+            are kept.
+
+    Returns:
+        DistributedQuery[T]: Query where elements pass the condition.
+    &#34;&#34;&#34;
+    self._query.add_block(query.blocks.Where(condition))
+    return self</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="linq.Query"><code class="flex name class">
+<span>class <span class="ident">Query</span></span>
+<span>(</span><span>iterable: Iterable[T])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The most basic query.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>iterable</code></strong> :&ensp;<code>Iterable[T]</code></dt>
+<dd>An iterable collection of objects of type <code>T</code></dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If <code>iterable</code> is not an iterable collection</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Query(Iterable[T]):
+    &#34;&#34;&#34;The most basic query.&#34;&#34;&#34;
+
+    def __init__(self, iterable: Iterable[T]):
+        &#34;&#34;&#34;
+        Args:
+            iterable (Iterable[T]): An iterable collection of objects of type `T`
+
+        Raises:
+            ValueError: If `iterable` is not an iterable collection
+        &#34;&#34;&#34;
+        if not isinstance(iterable, collections.abc.Iterable):
+            raise ValueError(&#34;Object is not iterable&#34;)
+
+        self._iterable: Iterable[T] = iterable
+        self._extensions: List[Iterable[T]] = []
+
+    def __contains__(self, obj: T) -&gt; bool:
+        for o in self:
+            if o == obj:
+                return True
+        return False
+
+    def contains(self, obj: T) -&gt; bool:
+        &#34;&#34;&#34;Determines if the sequence contains the given object.
+
+        Args:
+            obj (T): Object to look for
+
+        Returns:
+            bool: `True` if the object is found, otherwise `False`.
+        &#34;&#34;&#34;
+        return obj in self
+
+    def __iter__(self) -&gt; Iterator[T]:
+        for obj in self._iterable:
+            yield obj
+
+        for extension in self._extensions:
+            for obj in extension:
+                yield obj
+
+    def count(self, condition: Callable[[T], bool] = lambda x: True) -&gt; int:
+        &#34;&#34;&#34;Counts the objects satisfying the condition
+
+        Args:
+            condition (Callable[[T], bool], optional): Expression returning `True` or
+                `False`. Defaults to counting all objects.
+
+        Returns:
+            int: The number of objects found satisfying the condition
+        &#34;&#34;&#34;
+
+        return sum(1 for x in self if condition(x))
+
+    def any(self, condition: Callable[[T], bool]) -&gt; bool:
+        &#34;&#34;&#34;Checks whether the sequence contains any object fulfilling the condition
+
+        Args:
+            condition (Callable[[T], bool]): Expression returning `True` or `False`.
+
+        Returns:
+            bool: `True` if any satisfactory object is found, otherwise `False`
+        &#34;&#34;&#34;
+
+        return any(condition(x) for x in self)
+
+    def all(self, condition: Callable[[T], bool]) -&gt; bool:
+        &#34;&#34;&#34;Checks whether all objects satisfy a given condition
+
+        Args:
+            condition (Callable[[T], bool]): Expression returning `True` or `False`.
+
+        Returns:
+            bool: `True` if all objects are found to satisfy the condition, otherwise
+                `False`
+        &#34;&#34;&#34;
+
+        return all(condition(x) for x in self)
+
+    def select(self, transform: Callable[[T], S]) -&gt; Query[S]:
+        &#34;&#34;&#34;Transforms each object in the sequence.
+
+        Args:
+            transform (Callable[[T], S]): Function describing the transformation
+
+        Returns:
+            Query: Returns a new query builder based on the transformed objects.
+        &#34;&#34;&#34;
+        return Query(transform(x) for x in self)
+
+    def flatten(self) -&gt; Query[T]:
+        &#34;&#34;&#34;Selects objects from all underlying lists into one sequence, i.e. a
+        flattening operation. Useful when the collection is composed of multiple
+        subcollections.
+
+        Returns:
+            Query: Returns a new query builder based on the flattened query.
+        &#34;&#34;&#34;
+
+        return Query(x for y in self for x in y)
+
+    def where(self, condition: Callable[[T], bool]) -&gt; Query[T]:
+        &#34;&#34;&#34;Filters the sequence for the given condition
+
+        Args:
+            condition (Callable[[T], bool]): Expression returning `True` or `False`
+                with a single input.
+
+        Returns:
+            Query: Returns a new query builder based on the filtered objects.
+        &#34;&#34;&#34;
+
+        return Query(x for x in self if condition(x))
+
+    def max(self) -&gt; T:
+        &#34;&#34;&#34;Returns the maximum value found
+
+        Returns:
+            T: Returns the maximum value
+        &#34;&#34;&#34;
+        return max(self)
+
+    def argmax(self, value: Callable[[T], Any]) -&gt; T:
+        &#34;&#34;&#34;Return the object that maximizes the given value function. NOTE: does not
+        return the index of the object.
+
+        Args:
+            value (Callable[[T], Any]): Expression determining which value to use
+
+        Returns:
+            T: Returns the object which maximizes the value function
+        &#34;&#34;&#34;
+        m = None
+        vm = None
+        for x in self:
+            vx = value(x)
+            if m is None or vx &gt; vm:
+                m = x
+                vm = vx
+        if m is None:
+            raise ValueError(&#34;Cannot find the maximum of an empty sequence&#34;)
+        return m
+
+    def min(self) -&gt; T:
+        &#34;&#34;&#34;Returns the minimum value found
+
+        Returns:
+            T: Returns the maximum value
+        &#34;&#34;&#34;
+
+        return min(self)
+
+    def argmin(self, value: Callable[[T], Any]) -&gt; T:
+        &#34;&#34;&#34;Return the object that minimizes the value given by value.
+
+        Args:
+            value (Callable[[T], Any]): Expression determining which value to use
+
+        Returns:
+            T: Returns the object which minimizes the value
+        &#34;&#34;&#34;
+        m = None
+        for x in self:
+            if m is None or value(x) &lt; value(m):
+                m = x
+        if m is None:
+            raise ValueError(&#34;Cannot find a minimum in an empty sequence&#34;)
+        return m
+
+    def first(self, condition: Callable[[T], bool] = lambda x: True) -&gt; T:
+        &#34;&#34;&#34;Returns the first element found to satisfy the given condition
+
+        Args:
+            condition (Callable[[T], bool], optional): Expression returning `True` or
+            `False`. By default, returns the first element in the sequence.
+
+        Raises:
+            linq.errors.NoSuchElementError: If no element is found to satisfy the
+                condition
+
+        Returns:
+            T: The first element found to satisfy the given condition
+        &#34;&#34;&#34;
+
+        for x in self:
+            if condition(x):
+                return x
+
+        raise linq.errors.NoSuchElementError()
+
+    def first_or_none(
+        self, condition: Callable[[T], bool] = lambda x: True
+    ) -&gt; Optional[T]:
+        &#34;&#34;&#34;Returns the first element found to satisfy the given condition, or `None` if
+        no such element was found.
+
+        Args:
+            condition (Callable[[T], bool], optional): Expression returning `True` or
+            `False`. Defaults to returning `True` for any input.
+
+        Returns:
+            Optional[T]: The first element found to satisfy the given condition. If no
+                element is found, then `None` is returned.
+        &#34;&#34;&#34;
+
+        for x in self:
+            if condition(x):
+                return x
+        return None
+
+    def last_or_none(
+        self, condition: Callable[[T], bool] = lambda x: True
+    ) -&gt; Optional[T]:
+        &#34;&#34;&#34;Returns the last element found to satisfy the given condition, or `None` if
+        no such element was found.
+
+        Args:
+            condition (Callable[[T], bool], optional): Expression returning `True` or
+                `False`. Defaults to returning `True` for any input.
+
+        Returns:
+            Optional[T]: The last element found to satisfy the given condition. If no
+                element is found, then `None` is returned.
+        &#34;&#34;&#34;
+        last = None
+        for x in self:
+            if condition(x):
+                last = x
+        return last
+
+    def last(self, condition: Callable[[T], bool] = lambda x: True) -&gt; T:
+        &#34;&#34;&#34;Returns the last element found to satisfy the given condition
+
+        Args:
+            condition (Callable[[T], bool], bool): Expression returning `True` or
+                `False`. Defaults to returning `True` for any input.
+
+        Raises:
+            linq.errors.NoSuchElementError: If no element is found to satisfy the
+                condition
+
+        Returns:
+            T: The last element found to satisfy the given condition
+        &#34;&#34;&#34;
+
+        last = self.last_or_none(condition)
+
+        if last is None:
+            raise linq.errors.NoSuchElementError()
+        else:
+            return last
+
+    def sum(self) -&gt; T:
+        &#34;&#34;&#34;Returns the sum over all elements
+
+        Returns:
+            T: The sum over all elements
+        &#34;&#34;&#34;
+        return sum(self)
+
+    def mean(self) -&gt; T:
+        &#34;&#34;&#34;Returns the average of all elements
+
+        Returns:
+            T: The average of all elements
+        &#34;&#34;&#34;
+        s = 0
+        n = 0
+        for x in self:
+            s += x
+            n += 1
+        return s / n
+
+    def distinct(self, key: Callable[[T], Any] = lambda x: x) -&gt; Query[T]:
+        &#34;&#34;&#34;Filters all objects that are unique in the given key function, i.e. having
+        unique return values.
+
+        Args:
+            key (Callable[[T], Any], optional): Expression determining the value to use
+                for comparisons, must be hashable. By default, elements are compared as
+                is, i.e. `lambda x: x`.
+
+        Returns:
+            Query: Query builder with only distinct elements, as defined by the `key`
+                callable.
+        &#34;&#34;&#34;
+
+        cache = set()
+
+        def sequence():
+            for x in self:
+                if key(x) in cache:
+                    continue
+                else:
+                    cache.add(key(x))
+                    yield x
+
+        return Query(sequence())
+
+    def element_at_or_none(self, i: int) -&gt; Optional[T]:
+        &#34;&#34;&#34;Returns the element at the given position. If there is no element at the
+        given position, then `None` is returned.
+
+        Args:
+            i (int): The position at which to retrieve the element from
+
+        Returns:
+            Optional[T]: The object at the given position. `None` if there is no such
+                element.
+        &#34;&#34;&#34;
+
+        n = 0
+        for o in self:
+            if n == i:
+                return o
+            n += 1
+        return None
+
+    def element_at(self, i: int) -&gt; T:
+        &#34;&#34;&#34;Returns the element at the given position.
+
+        Args:
+            i (int): The position at which to retrieve the element from
+
+        Raises:
+            IndexError: If there is no object at the given position
+
+        Returns:
+            T: The element at the given position
+        &#34;&#34;&#34;
+
+        result = self.element_at_or_none(i)
+        if result is None:
+            raise IndexError()
+        else:
+            return result
+
+    def intersect(
+        self, iterable: Iterable[T], key: Callable[[T], Any] = lambda x: x
+    ) -&gt; Query[T]:
+        &#34;&#34;&#34;Returns all elements found in both sequences.
+
+        Args:
+            iterable (Iterable): The other iterable to compare to.
+            key (Callable[[T], Any], optional): Expression determining value to use for
+                comparison, must be hashable. Defaults to `lambda x: x`.
+
+        Raises:
+            ValueError: If the given iterable is not Iterable
+
+        Returns:
+            Query: Query builder on the intersection of self and the given iterable.
+        &#34;&#34;&#34;
+
+        if not isinstance(iterable, collections.abc.Iterable):
+            raise ValueError(&#34;Object is not iterable&#34;)
+
+        def sequence():
+            for x in self:
+                kx = key(x)
+                if Query(iterable).any(lambda y: kx == key(y)):
+                    yield x
+
+        return Query(sequence())
+
+    def to_list(self) -&gt; List[T]:
+        &#34;&#34;&#34;Returns the sequence as a list.
+
+        Returns:
+            List: A list containing all elements in the sequence.
+        &#34;&#34;&#34;
+        return list(self)
+
+    def join(
+        self,
+        extension: Iterable[S],
+        innerKey: Callable[[T], Any],
+        outerKey: Callable[[S], Any],
+        transform: Callable[[T, S], U],
+    ) -&gt; Query[U]:
+        &#34;&#34;&#34;Joins the sequence of objects with another sequence of objects on the given
+        keys and yields a new sequence of objects according to the transform specified.
+        Equivalent to INNER JOIN in SQL.
+
+        Args:
+            extension (Iterable): The sequence to join into the query.
+            innerKey (Callable[[T], Any]): Expression determining which key to join on
+                in the query.
+            outerKey (Callable[[S], Any]): Expression determining which key to join on
+                in the extension.
+            transform (Callable[[T, S], U]): Transform, taking two arguments, the inner
+                and outer elements to join respectively, returning the joined object.
+
+        Raises:
+            ValueError: If the extension is not Iterable
+
+        Returns:
+            Query: Query build object wrapping the new sequence of objects.
+        &#34;&#34;&#34;
+
+        if not isinstance(extension, collections.abc.Iterable):
+            raise ValueError(&#34;Object is not iterable&#34;)
+
+        def sequence():
+            for x in self:
+                outerObjs = Query(extension).where(lambda y: innerKey(x) == outerKey(y))
+                for outerObj in outerObjs:
+                    yield transform(x, outerObj)
+
+        return Query(sequence())
+
+    def take(self, count: int) -&gt; Query[T]:
+        &#34;&#34;&#34;Selects the first `n` elements from the query.
+
+        Args:
+            count: The number of elements to select.
+
+        Returns:
+            Query: Query builder object wrapping the selected elements.
+        &#34;&#34;&#34;
+
+        def sequence():
+            for n, x in enumerate(self):
+                if n &gt;= count:
+                    break
+                yield x
+
+        return Query(sequence())
+
+    def take_while(self, condition: Callable[[T], bool]) -&gt; Query[T]:
+        &#34;&#34;&#34;Selects elements as long as the condition is fulfilled.
+
+        Args:
+            condition (Callable[[T], bool]): Expression returning `True` or `False`.
+
+        Returns:
+            Query: Query builder object wrapping the selected elements.
+        &#34;&#34;&#34;
+
+        def sequence():
+            for x in self:
+                if condition(x):
+                    yield x
+                else:
+                    break
+
+        return Query(sequence())
+
+    def order(
+        self, value: Callable[[T], Any] = lambda x: x, descending=False
+    ) -&gt; Query[T]:
+        &#34;&#34;&#34;Orders the sequence with respect to the given key
+
+        Args:
+            value (Callable[[T], Any], optional): Expression determining which value to
+                sort on. Defaults to `lambda x: x`.
+            descending (bool, optional): Whether or not to sort in descending order.
+                Defaults to `False`.
+
+        Returns:
+            Query: Query builder object wrapping the sorted sequence
+        &#34;&#34;&#34;
+
+        def sequence():
+            yield from sorted(self, key=value, reverse=descending)
+
+        return Query(sequence())
+
+    def skip(self, count: int) -&gt; Query[T]:
+        &#34;&#34;&#34;Skips the first elements in the sequence.
+
+        Args:
+            count (int): The number of elements to skip.
+
+        Returns:
+            Query: Query builder wrapping the remaining elements.
+        &#34;&#34;&#34;
+
+        def sequence():
+            i = 0
+            for obj in self:
+                if i &lt; count:
+                    i += 1
+                    continue
+
+                yield obj
+
+        return Query(sequence())
+
+    def skip_while(self, condition: Callable[[T], bool]) -&gt; Query[T]:
+        &#34;&#34;&#34;Skips the first elements in the sequence while the condition is fulfilled.
+
+        Args:
+            condition (Callable[[T], bool]): Callable, elements are skipped as long as
+                `True` is returned.
+
+        Returns:
+            Query: The remaining elements wrapped in a query builder object.
+        &#34;&#34;&#34;
+
+        def sequence():
+            skipping = True
+            for obj in self:
+                if skipping:
+                    if condition(obj):
+                        continue
+                    else:
+                        skipping = False
+                yield obj
+
+        return Query(sequence())
+
+    def to_dict(
+        self, key: Callable[[T], KT], value: Callable[[T], VT] = lambda x: x
+    ) -&gt; Dict[KT, VT]:
+        &#34;&#34;&#34;Returns the sequence as a dictionary where the key is given by `key`.
+
+        Args:
+            key (Callable[[T], KT]): Expression determining the key for each element.
+                Must evaluate to a unique value for each element.
+            value (Callable[[T], VT], optional): Expression describing the value of the
+                elements before added to the dictionary. Defaults to `lambda x: x`.
+
+        Returns:
+            Dict[KT, VT]: A dictionary where the keys are giving by `key` and elements
+                by `value`.
+
+        &#34;&#34;&#34;
+
+        re = {}
+        keys = set()
+        for el in self:
+            k_ey = key(el)
+            if k_ey in keys:
+                raise KeyError(&#34;Key already exists.&#34;)
+            keys.add(k_ey)
+            re[k_ey] = value(el)
+
+        return re
+
+    def union(
+        self, outer: Iterable[T], value: Callable[[T], Any] = lambda x: x
+    ) -&gt; Query[T]:
+        &#34;&#34;&#34;Finds the union with another sequence, i.e. all objects that are within
+        either one the two sequences. Only unique objects (with respect to the `value`)
+        are returned.
+
+        Args:
+            outer (Iterable): The other sequence
+            value (Callable[[T], Any]): Expression determining which value to use for
+                comparison, must be hashable. Defaults to `lambda x: x`.
+
+        Raises:
+            ValueError: If `outer` is not of instance Iterable
+
+        Returns:
+            Query: Query builder object wrapping the new elements
+        &#34;&#34;&#34;
+
+        if not isinstance(outer, collections.abc.Iterable):
+            raise ValueError(&#34;Object is not iterable&#34;)
+
+        cache = set()
+
+        def sequence():
+            for x in self:
+                if value(x) in cache:
+                    continue
+                else:
+                    cache.add(value(x))
+                    yield x
+
+            for x in outer:
+                if value(x) in cache:
+                    continue
+                else:
+                    cache.add(value(x))
+                    yield x
+
+        return Query(sequence())</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>collections.abc.Iterable</li>
+<li>typing.Generic</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="linq.Query.all"><code class="name flex">
+<span>def <span class="ident">all</span></span>(<span>self, condition: Callable[[T], bool]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether all objects satisfy a given condition</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code></dt>
+<dd>Expression returning <code>True</code> or <code>False</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd><code>True</code> if all objects are found to satisfy the condition, otherwise
+<code>False</code></dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def all(self, condition: Callable[[T], bool]) -&gt; bool:
+    &#34;&#34;&#34;Checks whether all objects satisfy a given condition
+
+    Args:
+        condition (Callable[[T], bool]): Expression returning `True` or `False`.
+
+    Returns:
+        bool: `True` if all objects are found to satisfy the condition, otherwise
+            `False`
+    &#34;&#34;&#34;
+
+    return all(condition(x) for x in self)</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.any"><code class="name flex">
+<span>def <span class="ident">any</span></span>(<span>self, condition: Callable[[T], bool]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks whether the sequence contains any object fulfilling the condition</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code></dt>
+<dd>Expression returning <code>True</code> or <code>False</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd><code>True</code> if any satisfactory object is found, otherwise <code>False</code></dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def any(self, condition: Callable[[T], bool]) -&gt; bool:
+    &#34;&#34;&#34;Checks whether the sequence contains any object fulfilling the condition
+
+    Args:
+        condition (Callable[[T], bool]): Expression returning `True` or `False`.
+
+    Returns:
+        bool: `True` if any satisfactory object is found, otherwise `False`
+    &#34;&#34;&#34;
+
+    return any(condition(x) for x in self)</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.argmax"><code class="name flex">
+<span>def <span class="ident">argmax</span></span>(<span>self, value: Callable[[T], Any]) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the object that maximizes the given value function. NOTE: does not
+return the index of the object.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Callable[[T], Any]</code></dt>
+<dd>Expression determining which value to use</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Returns the object which maximizes the value function</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def argmax(self, value: Callable[[T], Any]) -&gt; T:
+    &#34;&#34;&#34;Return the object that maximizes the given value function. NOTE: does not
+    return the index of the object.
+
+    Args:
+        value (Callable[[T], Any]): Expression determining which value to use
+
+    Returns:
+        T: Returns the object which maximizes the value function
+    &#34;&#34;&#34;
+    m = None
+    vm = None
+    for x in self:
+        vx = value(x)
+        if m is None or vx &gt; vm:
+            m = x
+            vm = vx
+    if m is None:
+        raise ValueError(&#34;Cannot find the maximum of an empty sequence&#34;)
+    return m</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.argmin"><code class="name flex">
+<span>def <span class="ident">argmin</span></span>(<span>self, value: Callable[[T], Any]) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the object that minimizes the value given by value.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Callable[[T], Any]</code></dt>
+<dd>Expression determining which value to use</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Returns the object which minimizes the value</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def argmin(self, value: Callable[[T], Any]) -&gt; T:
+    &#34;&#34;&#34;Return the object that minimizes the value given by value.
+
+    Args:
+        value (Callable[[T], Any]): Expression determining which value to use
+
+    Returns:
+        T: Returns the object which minimizes the value
+    &#34;&#34;&#34;
+    m = None
+    for x in self:
+        if m is None or value(x) &lt; value(m):
+            m = x
+    if m is None:
+        raise ValueError(&#34;Cannot find a minimum in an empty sequence&#34;)
+    return m</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.contains"><code class="name flex">
+<span>def <span class="ident">contains</span></span>(<span>self, obj: T) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Determines if the sequence contains the given object.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>obj</code></strong> :&ensp;<code>T</code></dt>
+<dd>Object to look for</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd><code>True</code> if the object is found, otherwise <code>False</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def contains(self, obj: T) -&gt; bool:
+    &#34;&#34;&#34;Determines if the sequence contains the given object.
+
+    Args:
+        obj (T): Object to look for
+
+    Returns:
+        bool: `True` if the object is found, otherwise `False`.
+    &#34;&#34;&#34;
+    return obj in self</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.count"><code class="name flex">
+<span>def <span class="ident">count</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Counts the objects satisfying the condition</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Expression returning <code>True</code> or
+<code>False</code>. Defaults to counting all objects.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>The number of objects found satisfying the condition</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def count(self, condition: Callable[[T], bool] = lambda x: True) -&gt; int:
+    &#34;&#34;&#34;Counts the objects satisfying the condition
+
+    Args:
+        condition (Callable[[T], bool], optional): Expression returning `True` or
+            `False`. Defaults to counting all objects.
+
+    Returns:
+        int: The number of objects found satisfying the condition
+    &#34;&#34;&#34;
+
+    return sum(1 for x in self if condition(x))</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.distinct"><code class="name flex">
+<span>def <span class="ident">distinct</span></span>(<span>self, key: Callable[[T], Any] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Filters all objects that are unique in the given key function, i.e. having
+unique return values.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>key</code></strong> :&ensp;<code>Callable[[T], Any]</code>, optional</dt>
+<dd>Expression determining the value to use
+for comparisons, must be hashable. By default, elements are compared as
+is, i.e. <code>lambda x: x</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Query builder with only distinct elements, as defined by the <code>key</code>
+callable.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def distinct(self, key: Callable[[T], Any] = lambda x: x) -&gt; Query[T]:
+    &#34;&#34;&#34;Filters all objects that are unique in the given key function, i.e. having
+    unique return values.
+
+    Args:
+        key (Callable[[T], Any], optional): Expression determining the value to use
+            for comparisons, must be hashable. By default, elements are compared as
+            is, i.e. `lambda x: x`.
+
+    Returns:
+        Query: Query builder with only distinct elements, as defined by the `key`
+            callable.
+    &#34;&#34;&#34;
+
+    cache = set()
+
+    def sequence():
+        for x in self:
+            if key(x) in cache:
+                continue
+            else:
+                cache.add(key(x))
+                yield x
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.element_at"><code class="name flex">
+<span>def <span class="ident">element_at</span></span>(<span>self, i: int) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the element at the given position.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>i</code></strong> :&ensp;<code>int</code></dt>
+<dd>The position at which to retrieve the element from</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>IndexError</code></dt>
+<dd>If there is no object at the given position</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>The element at the given position</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def element_at(self, i: int) -&gt; T:
+    &#34;&#34;&#34;Returns the element at the given position.
+
+    Args:
+        i (int): The position at which to retrieve the element from
+
+    Raises:
+        IndexError: If there is no object at the given position
+
+    Returns:
+        T: The element at the given position
+    &#34;&#34;&#34;
+
+    result = self.element_at_or_none(i)
+    if result is None:
+        raise IndexError()
+    else:
+        return result</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.element_at_or_none"><code class="name flex">
+<span>def <span class="ident">element_at_or_none</span></span>(<span>self, i: int) ‑> Union[~T, NoneType]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the element at the given position. If there is no element at the
+given position, then <code>None</code> is returned.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>i</code></strong> :&ensp;<code>int</code></dt>
+<dd>The position at which to retrieve the element from</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Optional[T]</code></dt>
+<dd>The object at the given position. <code>None</code> if there is no such
+element.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def element_at_or_none(self, i: int) -&gt; Optional[T]:
+    &#34;&#34;&#34;Returns the element at the given position. If there is no element at the
+    given position, then `None` is returned.
+
+    Args:
+        i (int): The position at which to retrieve the element from
+
+    Returns:
+        Optional[T]: The object at the given position. `None` if there is no such
+            element.
+    &#34;&#34;&#34;
+
+    n = 0
+    for o in self:
+        if n == i:
+            return o
+        n += 1
+    return None</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.first"><code class="name flex">
+<span>def <span class="ident">first</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the first element found to satisfy the given condition</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Expression returning <code>True</code> or</dd>
+</dl>
+<p><code>False</code>. By default, returns the first element in the sequence.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="linq.errors.NoSuchElementError" href="errors/index.html#linq.errors.NoSuchElementError">NoSuchElementError</a></code></dt>
+<dd>If no element is found to satisfy the
+condition</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>The first element found to satisfy the given condition</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def first(self, condition: Callable[[T], bool] = lambda x: True) -&gt; T:
+    &#34;&#34;&#34;Returns the first element found to satisfy the given condition
+
+    Args:
+        condition (Callable[[T], bool], optional): Expression returning `True` or
+        `False`. By default, returns the first element in the sequence.
+
+    Raises:
+        linq.errors.NoSuchElementError: If no element is found to satisfy the
+            condition
+
+    Returns:
+        T: The first element found to satisfy the given condition
+    &#34;&#34;&#34;
+
+    for x in self:
+        if condition(x):
+            return x
+
+    raise linq.errors.NoSuchElementError()</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.first_or_none"><code class="name flex">
+<span>def <span class="ident">first_or_none</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> Union[~T, NoneType]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the first element found to satisfy the given condition, or <code>None</code> if
+no such element was found.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Expression returning <code>True</code> or</dd>
+</dl>
+<p><code>False</code>. Defaults to returning <code>True</code> for any input.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Optional[T]</code></dt>
+<dd>The first element found to satisfy the given condition. If no
+element is found, then <code>None</code> is returned.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def first_or_none(
+    self, condition: Callable[[T], bool] = lambda x: True
+) -&gt; Optional[T]:
+    &#34;&#34;&#34;Returns the first element found to satisfy the given condition, or `None` if
+    no such element was found.
+
+    Args:
+        condition (Callable[[T], bool], optional): Expression returning `True` or
+        `False`. Defaults to returning `True` for any input.
+
+    Returns:
+        Optional[T]: The first element found to satisfy the given condition. If no
+            element is found, then `None` is returned.
+    &#34;&#34;&#34;
+
+    for x in self:
+        if condition(x):
+            return x
+    return None</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.flatten"><code class="name flex">
+<span>def <span class="ident">flatten</span></span>(<span>self) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Selects objects from all underlying lists into one sequence, i.e. a
+flattening operation. Useful when the collection is composed of multiple
+subcollections.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Returns a new query builder based on the flattened query.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def flatten(self) -&gt; Query[T]:
+    &#34;&#34;&#34;Selects objects from all underlying lists into one sequence, i.e. a
+    flattening operation. Useful when the collection is composed of multiple
+    subcollections.
+
+    Returns:
+        Query: Returns a new query builder based on the flattened query.
+    &#34;&#34;&#34;
+
+    return Query(x for y in self for x in y)</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.intersect"><code class="name flex">
+<span>def <span class="ident">intersect</span></span>(<span>self, iterable: Iterable[T], key: Callable[[T], Any] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns all elements found in both sequences.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>iterable</code></strong> :&ensp;<code>Iterable</code></dt>
+<dd>The other iterable to compare to.</dd>
+<dt><strong><code>key</code></strong> :&ensp;<code>Callable[[T], Any]</code>, optional</dt>
+<dd>Expression determining value to use for
+comparison, must be hashable. Defaults to <code>lambda x: x</code>.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the given iterable is not Iterable</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Query builder on the intersection of self and the given iterable.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def intersect(
+    self, iterable: Iterable[T], key: Callable[[T], Any] = lambda x: x
+) -&gt; Query[T]:
+    &#34;&#34;&#34;Returns all elements found in both sequences.
+
+    Args:
+        iterable (Iterable): The other iterable to compare to.
+        key (Callable[[T], Any], optional): Expression determining value to use for
+            comparison, must be hashable. Defaults to `lambda x: x`.
+
+    Raises:
+        ValueError: If the given iterable is not Iterable
+
+    Returns:
+        Query: Query builder on the intersection of self and the given iterable.
+    &#34;&#34;&#34;
+
+    if not isinstance(iterable, collections.abc.Iterable):
+        raise ValueError(&#34;Object is not iterable&#34;)
+
+    def sequence():
+        for x in self:
+            kx = key(x)
+            if Query(iterable).any(lambda y: kx == key(y)):
+                yield x
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.join"><code class="name flex">
+<span>def <span class="ident">join</span></span>(<span>self, extension: Iterable[S], innerKey: Callable[[T], Any], outerKey: Callable[[S], Any], transform: Callable[[T, S], U]) ‑> linq._query.Query[~U]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Joins the sequence of objects with another sequence of objects on the given
+keys and yields a new sequence of objects according to the transform specified.
+Equivalent to INNER JOIN in SQL.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>extension</code></strong> :&ensp;<code>Iterable</code></dt>
+<dd>The sequence to join into the query.</dd>
+<dt><strong><code>innerKey</code></strong> :&ensp;<code>Callable[[T], Any]</code></dt>
+<dd>Expression determining which key to join on
+in the query.</dd>
+<dt><strong><code>outerKey</code></strong> :&ensp;<code>Callable[[S], Any]</code></dt>
+<dd>Expression determining which key to join on
+in the extension.</dd>
+<dt><strong><code>transform</code></strong> :&ensp;<code>Callable[[T, S], U]</code></dt>
+<dd>Transform, taking two arguments, the inner
+and outer elements to join respectively, returning the joined object.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If the extension is not Iterable</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Query build object wrapping the new sequence of objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def join(
+    self,
+    extension: Iterable[S],
+    innerKey: Callable[[T], Any],
+    outerKey: Callable[[S], Any],
+    transform: Callable[[T, S], U],
+) -&gt; Query[U]:
+    &#34;&#34;&#34;Joins the sequence of objects with another sequence of objects on the given
+    keys and yields a new sequence of objects according to the transform specified.
+    Equivalent to INNER JOIN in SQL.
+
+    Args:
+        extension (Iterable): The sequence to join into the query.
+        innerKey (Callable[[T], Any]): Expression determining which key to join on
+            in the query.
+        outerKey (Callable[[S], Any]): Expression determining which key to join on
+            in the extension.
+        transform (Callable[[T, S], U]): Transform, taking two arguments, the inner
+            and outer elements to join respectively, returning the joined object.
+
+    Raises:
+        ValueError: If the extension is not Iterable
+
+    Returns:
+        Query: Query build object wrapping the new sequence of objects.
+    &#34;&#34;&#34;
+
+    if not isinstance(extension, collections.abc.Iterable):
+        raise ValueError(&#34;Object is not iterable&#34;)
+
+    def sequence():
+        for x in self:
+            outerObjs = Query(extension).where(lambda y: innerKey(x) == outerKey(y))
+            for outerObj in outerObjs:
+                yield transform(x, outerObj)
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.last"><code class="name flex">
+<span>def <span class="ident">last</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the last element found to satisfy the given condition</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool], bool</code></dt>
+<dd>Expression returning <code>True</code> or
+<code>False</code>. Defaults to returning <code>True</code> for any input.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="linq.errors.NoSuchElementError" href="errors/index.html#linq.errors.NoSuchElementError">NoSuchElementError</a></code></dt>
+<dd>If no element is found to satisfy the
+condition</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>The last element found to satisfy the given condition</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def last(self, condition: Callable[[T], bool] = lambda x: True) -&gt; T:
+    &#34;&#34;&#34;Returns the last element found to satisfy the given condition
+
+    Args:
+        condition (Callable[[T], bool], bool): Expression returning `True` or
+            `False`. Defaults to returning `True` for any input.
+
+    Raises:
+        linq.errors.NoSuchElementError: If no element is found to satisfy the
+            condition
+
+    Returns:
+        T: The last element found to satisfy the given condition
+    &#34;&#34;&#34;
+
+    last = self.last_or_none(condition)
+
+    if last is None:
+        raise linq.errors.NoSuchElementError()
+    else:
+        return last</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.last_or_none"><code class="name flex">
+<span>def <span class="ident">last_or_none</span></span>(<span>self, condition: Callable[[T], bool] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> Union[~T, NoneType]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the last element found to satisfy the given condition, or <code>None</code> if
+no such element was found.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code>, optional</dt>
+<dd>Expression returning <code>True</code> or
+<code>False</code>. Defaults to returning <code>True</code> for any input.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Optional[T]</code></dt>
+<dd>The last element found to satisfy the given condition. If no
+element is found, then <code>None</code> is returned.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def last_or_none(
+    self, condition: Callable[[T], bool] = lambda x: True
+) -&gt; Optional[T]:
+    &#34;&#34;&#34;Returns the last element found to satisfy the given condition, or `None` if
+    no such element was found.
+
+    Args:
+        condition (Callable[[T], bool], optional): Expression returning `True` or
+            `False`. Defaults to returning `True` for any input.
+
+    Returns:
+        Optional[T]: The last element found to satisfy the given condition. If no
+            element is found, then `None` is returned.
+    &#34;&#34;&#34;
+    last = None
+    for x in self:
+        if condition(x):
+            last = x
+    return last</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.max"><code class="name flex">
+<span>def <span class="ident">max</span></span>(<span>self) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the maximum value found</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Returns the maximum value</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def max(self) -&gt; T:
+    &#34;&#34;&#34;Returns the maximum value found
+
+    Returns:
+        T: Returns the maximum value
+    &#34;&#34;&#34;
+    return max(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.mean"><code class="name flex">
+<span>def <span class="ident">mean</span></span>(<span>self) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the average of all elements</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>The average of all elements</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def mean(self) -&gt; T:
+    &#34;&#34;&#34;Returns the average of all elements
+
+    Returns:
+        T: The average of all elements
+    &#34;&#34;&#34;
+    s = 0
+    n = 0
+    for x in self:
+        s += x
+        n += 1
+    return s / n</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.min"><code class="name flex">
+<span>def <span class="ident">min</span></span>(<span>self) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the minimum value found</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>Returns the maximum value</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def min(self) -&gt; T:
+    &#34;&#34;&#34;Returns the minimum value found
+
+    Returns:
+        T: Returns the maximum value
+    &#34;&#34;&#34;
+
+    return min(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.order"><code class="name flex">
+<span>def <span class="ident">order</span></span>(<span>self, value: Callable[[T], Any] = &lt;function Query.&lt;lambda&gt;&gt;, descending=False) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Orders the sequence with respect to the given key</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>value</code></strong> :&ensp;<code>Callable[[T], Any]</code>, optional</dt>
+<dd>Expression determining which value to
+sort on. Defaults to <code>lambda x: x</code>.</dd>
+<dt><strong><code>descending</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Whether or not to sort in descending order.
+Defaults to <code>False</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Query builder object wrapping the sorted sequence</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def order(
+    self, value: Callable[[T], Any] = lambda x: x, descending=False
+) -&gt; Query[T]:
+    &#34;&#34;&#34;Orders the sequence with respect to the given key
+
+    Args:
+        value (Callable[[T], Any], optional): Expression determining which value to
+            sort on. Defaults to `lambda x: x`.
+        descending (bool, optional): Whether or not to sort in descending order.
+            Defaults to `False`.
+
+    Returns:
+        Query: Query builder object wrapping the sorted sequence
+    &#34;&#34;&#34;
+
+    def sequence():
+        yield from sorted(self, key=value, reverse=descending)
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.select"><code class="name flex">
+<span>def <span class="ident">select</span></span>(<span>self, transform: Callable[[T], S]) ‑> linq._query.Query[~S]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Transforms each object in the sequence.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>transform</code></strong> :&ensp;<code>Callable[[T], S]</code></dt>
+<dd>Function describing the transformation</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Returns a new query builder based on the transformed objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def select(self, transform: Callable[[T], S]) -&gt; Query[S]:
+    &#34;&#34;&#34;Transforms each object in the sequence.
+
+    Args:
+        transform (Callable[[T], S]): Function describing the transformation
+
+    Returns:
+        Query: Returns a new query builder based on the transformed objects.
+    &#34;&#34;&#34;
+    return Query(transform(x) for x in self)</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.skip"><code class="name flex">
+<span>def <span class="ident">skip</span></span>(<span>self, count: int) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Skips the first elements in the sequence.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>count</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of elements to skip.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Query builder wrapping the remaining elements.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def skip(self, count: int) -&gt; Query[T]:
+    &#34;&#34;&#34;Skips the first elements in the sequence.
+
+    Args:
+        count (int): The number of elements to skip.
+
+    Returns:
+        Query: Query builder wrapping the remaining elements.
+    &#34;&#34;&#34;
+
+    def sequence():
+        i = 0
+        for obj in self:
+            if i &lt; count:
+                i += 1
+                continue
+
+            yield obj
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.skip_while"><code class="name flex">
+<span>def <span class="ident">skip_while</span></span>(<span>self, condition: Callable[[T], bool]) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Skips the first elements in the sequence while the condition is fulfilled.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code></dt>
+<dd>Callable, elements are skipped as long as
+<code>True</code> is returned.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>The remaining elements wrapped in a query builder object.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def skip_while(self, condition: Callable[[T], bool]) -&gt; Query[T]:
+    &#34;&#34;&#34;Skips the first elements in the sequence while the condition is fulfilled.
+
+    Args:
+        condition (Callable[[T], bool]): Callable, elements are skipped as long as
+            `True` is returned.
+
+    Returns:
+        Query: The remaining elements wrapped in a query builder object.
+    &#34;&#34;&#34;
+
+    def sequence():
+        skipping = True
+        for obj in self:
+            if skipping:
+                if condition(obj):
+                    continue
+                else:
+                    skipping = False
+            yield obj
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.sum"><code class="name flex">
+<span>def <span class="ident">sum</span></span>(<span>self) ‑> ~T</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the sum over all elements</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>T</code></dt>
+<dd>The sum over all elements</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sum(self) -&gt; T:
+    &#34;&#34;&#34;Returns the sum over all elements
+
+    Returns:
+        T: The sum over all elements
+    &#34;&#34;&#34;
+    return sum(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.take"><code class="name flex">
+<span>def <span class="ident">take</span></span>(<span>self, count: int) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Selects the first <code>n</code> elements from the query.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>count</code></strong></dt>
+<dd>The number of elements to select.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Query builder object wrapping the selected elements.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def take(self, count: int) -&gt; Query[T]:
+    &#34;&#34;&#34;Selects the first `n` elements from the query.
+
+    Args:
+        count: The number of elements to select.
+
+    Returns:
+        Query: Query builder object wrapping the selected elements.
+    &#34;&#34;&#34;
+
+    def sequence():
+        for n, x in enumerate(self):
+            if n &gt;= count:
+                break
+            yield x
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.take_while"><code class="name flex">
+<span>def <span class="ident">take_while</span></span>(<span>self, condition: Callable[[T], bool]) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Selects elements as long as the condition is fulfilled.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code></dt>
+<dd>Expression returning <code>True</code> or <code>False</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Query builder object wrapping the selected elements.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def take_while(self, condition: Callable[[T], bool]) -&gt; Query[T]:
+    &#34;&#34;&#34;Selects elements as long as the condition is fulfilled.
+
+    Args:
+        condition (Callable[[T], bool]): Expression returning `True` or `False`.
+
+    Returns:
+        Query: Query builder object wrapping the selected elements.
+    &#34;&#34;&#34;
+
+    def sequence():
+        for x in self:
+            if condition(x):
+                yield x
+            else:
+                break
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.to_dict"><code class="name flex">
+<span>def <span class="ident">to_dict</span></span>(<span>self, key: Callable[[T], KT], value: Callable[[T], VT] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> Dict[~KT, ~VT]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the sequence as a dictionary where the key is given by <code>key</code>.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>key</code></strong> :&ensp;<code>Callable[[T], KT]</code></dt>
+<dd>Expression determining the key for each element.
+Must evaluate to a unique value for each element.</dd>
+<dt><strong><code>value</code></strong> :&ensp;<code>Callable[[T], VT]</code>, optional</dt>
+<dd>Expression describing the value of the
+elements before added to the dictionary. Defaults to <code>lambda x: x</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Dict[KT, VT]</code></dt>
+<dd>A dictionary where the keys are giving by <code>key</code> and elements
+by <code>value</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_dict(
+    self, key: Callable[[T], KT], value: Callable[[T], VT] = lambda x: x
+) -&gt; Dict[KT, VT]:
+    &#34;&#34;&#34;Returns the sequence as a dictionary where the key is given by `key`.
+
+    Args:
+        key (Callable[[T], KT]): Expression determining the key for each element.
+            Must evaluate to a unique value for each element.
+        value (Callable[[T], VT], optional): Expression describing the value of the
+            elements before added to the dictionary. Defaults to `lambda x: x`.
+
+    Returns:
+        Dict[KT, VT]: A dictionary where the keys are giving by `key` and elements
+            by `value`.
+
+    &#34;&#34;&#34;
+
+    re = {}
+    keys = set()
+    for el in self:
+        k_ey = key(el)
+        if k_ey in keys:
+            raise KeyError(&#34;Key already exists.&#34;)
+        keys.add(k_ey)
+        re[k_ey] = value(el)
+
+    return re</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.to_list"><code class="name flex">
+<span>def <span class="ident">to_list</span></span>(<span>self) ‑> List[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the sequence as a list.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List</code></dt>
+<dd>A list containing all elements in the sequence.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_list(self) -&gt; List[T]:
+    &#34;&#34;&#34;Returns the sequence as a list.
+
+    Returns:
+        List: A list containing all elements in the sequence.
+    &#34;&#34;&#34;
+    return list(self)</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.union"><code class="name flex">
+<span>def <span class="ident">union</span></span>(<span>self, outer: Iterable[T], value: Callable[[T], Any] = &lt;function Query.&lt;lambda&gt;&gt;) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the union with another sequence, i.e. all objects that are within
+either one the two sequences. Only unique objects (with respect to the <code>value</code>)
+are returned.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>outer</code></strong> :&ensp;<code>Iterable</code></dt>
+<dd>The other sequence</dd>
+<dt><strong><code>value</code></strong> :&ensp;<code>Callable[[T], Any]</code></dt>
+<dd>Expression determining which value to use for
+comparison, must be hashable. Defaults to <code>lambda x: x</code>.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>If <code>outer</code> is not of instance Iterable</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Query builder object wrapping the new elements</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def union(
+    self, outer: Iterable[T], value: Callable[[T], Any] = lambda x: x
+) -&gt; Query[T]:
+    &#34;&#34;&#34;Finds the union with another sequence, i.e. all objects that are within
+    either one the two sequences. Only unique objects (with respect to the `value`)
+    are returned.
+
+    Args:
+        outer (Iterable): The other sequence
+        value (Callable[[T], Any]): Expression determining which value to use for
+            comparison, must be hashable. Defaults to `lambda x: x`.
+
+    Raises:
+        ValueError: If `outer` is not of instance Iterable
+
+    Returns:
+        Query: Query builder object wrapping the new elements
+    &#34;&#34;&#34;
+
+    if not isinstance(outer, collections.abc.Iterable):
+        raise ValueError(&#34;Object is not iterable&#34;)
+
+    cache = set()
+
+    def sequence():
+        for x in self:
+            if value(x) in cache:
+                continue
+            else:
+                cache.add(value(x))
+                yield x
+
+        for x in outer:
+            if value(x) in cache:
+                continue
+            else:
+                cache.add(value(x))
+                yield x
+
+    return Query(sequence())</code></pre>
+</details>
+</dd>
+<dt id="linq.Query.where"><code class="name flex">
+<span>def <span class="ident">where</span></span>(<span>self, condition: Callable[[T], bool]) ‑> linq._query.Query[~T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Filters the sequence for the given condition</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>condition</code></strong> :&ensp;<code>Callable[[T], bool]</code></dt>
+<dd>Expression returning <code>True</code> or <code>False</code>
+with a single input.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="linq.Query" href="#linq.Query">Query</a></code></dt>
+<dd>Returns a new query builder based on the filtered objects.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def where(self, condition: Callable[[T], bool]) -&gt; Query[T]:
+    &#34;&#34;&#34;Filters the sequence for the given condition
+
+    Args:
+        condition (Callable[[T], bool]): Expression returning `True` or `False`
+            with a single input.
+
+    Returns:
+        Query: Returns a new query builder based on the filtered objects.
+    &#34;&#34;&#34;
+
+    return Query(x for x in self if condition(x))</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul>
+<li><a href="#linq">LINQ</a><ul>
+<li><a href="#installing">Installing</a><ul>
+<li><a href="#from-pip">From pip</a></li>
+<li><a href="#from-source">From source</a></li>
+</ul>
+</li>
+<li><a href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="linq.errors" href="errors/index.html">linq.errors</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a></code></h4>
+<ul class="two-column">
+<li><code><a title="linq.DistributedQuery.all" href="#linq.DistributedQuery.all">all</a></code></li>
+<li><code><a title="linq.DistributedQuery.any" href="#linq.DistributedQuery.any">any</a></code></li>
+<li><code><a title="linq.DistributedQuery.argmax" href="#linq.DistributedQuery.argmax">argmax</a></code></li>
+<li><code><a title="linq.DistributedQuery.argmin" href="#linq.DistributedQuery.argmin">argmin</a></code></li>
+<li><code><a title="linq.DistributedQuery.close" href="#linq.DistributedQuery.close">close</a></code></li>
+<li><code><a title="linq.DistributedQuery.contains" href="#linq.DistributedQuery.contains">contains</a></code></li>
+<li><code><a title="linq.DistributedQuery.count" href="#linq.DistributedQuery.count">count</a></code></li>
+<li><code><a title="linq.DistributedQuery.first" href="#linq.DistributedQuery.first">first</a></code></li>
+<li><code><a title="linq.DistributedQuery.first_or_none" href="#linq.DistributedQuery.first_or_none">first_or_none</a></code></li>
+<li><code><a title="linq.DistributedQuery.flatten" href="#linq.DistributedQuery.flatten">flatten</a></code></li>
+<li><code><a title="linq.DistributedQuery.last" href="#linq.DistributedQuery.last">last</a></code></li>
+<li><code><a title="linq.DistributedQuery.last_or_none" href="#linq.DistributedQuery.last_or_none">last_or_none</a></code></li>
+<li><code><a title="linq.DistributedQuery.max" href="#linq.DistributedQuery.max">max</a></code></li>
+<li><code><a title="linq.DistributedQuery.mean" href="#linq.DistributedQuery.mean">mean</a></code></li>
+<li><code><a title="linq.DistributedQuery.min" href="#linq.DistributedQuery.min">min</a></code></li>
+<li><code><a title="linq.DistributedQuery.select" href="#linq.DistributedQuery.select">select</a></code></li>
+<li><code><a title="linq.DistributedQuery.sum" href="#linq.DistributedQuery.sum">sum</a></code></li>
+<li><code><a title="linq.DistributedQuery.to_dict" href="#linq.DistributedQuery.to_dict">to_dict</a></code></li>
+<li><code><a title="linq.DistributedQuery.to_list" href="#linq.DistributedQuery.to_list">to_list</a></code></li>
+<li><code><a title="linq.DistributedQuery.where" href="#linq.DistributedQuery.where">where</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="linq.Query" href="#linq.Query">Query</a></code></h4>
+<ul class="two-column">
+<li><code><a title="linq.Query.all" href="#linq.Query.all">all</a></code></li>
+<li><code><a title="linq.Query.any" href="#linq.Query.any">any</a></code></li>
+<li><code><a title="linq.Query.argmax" href="#linq.Query.argmax">argmax</a></code></li>
+<li><code><a title="linq.Query.argmin" href="#linq.Query.argmin">argmin</a></code></li>
+<li><code><a title="linq.Query.contains" href="#linq.Query.contains">contains</a></code></li>
+<li><code><a title="linq.Query.count" href="#linq.Query.count">count</a></code></li>
+<li><code><a title="linq.Query.distinct" href="#linq.Query.distinct">distinct</a></code></li>
+<li><code><a title="linq.Query.element_at" href="#linq.Query.element_at">element_at</a></code></li>
+<li><code><a title="linq.Query.element_at_or_none" href="#linq.Query.element_at_or_none">element_at_or_none</a></code></li>
+<li><code><a title="linq.Query.first" href="#linq.Query.first">first</a></code></li>
+<li><code><a title="linq.Query.first_or_none" href="#linq.Query.first_or_none">first_or_none</a></code></li>
+<li><code><a title="linq.Query.flatten" href="#linq.Query.flatten">flatten</a></code></li>
+<li><code><a title="linq.Query.intersect" href="#linq.Query.intersect">intersect</a></code></li>
+<li><code><a title="linq.Query.join" href="#linq.Query.join">join</a></code></li>
+<li><code><a title="linq.Query.last" href="#linq.Query.last">last</a></code></li>
+<li><code><a title="linq.Query.last_or_none" href="#linq.Query.last_or_none">last_or_none</a></code></li>
+<li><code><a title="linq.Query.max" href="#linq.Query.max">max</a></code></li>
+<li><code><a title="linq.Query.mean" href="#linq.Query.mean">mean</a></code></li>
+<li><code><a title="linq.Query.min" href="#linq.Query.min">min</a></code></li>
+<li><code><a title="linq.Query.order" href="#linq.Query.order">order</a></code></li>
+<li><code><a title="linq.Query.select" href="#linq.Query.select">select</a></code></li>
+<li><code><a title="linq.Query.skip" href="#linq.Query.skip">skip</a></code></li>
+<li><code><a title="linq.Query.skip_while" href="#linq.Query.skip_while">skip_while</a></code></li>
+<li><code><a title="linq.Query.sum" href="#linq.Query.sum">sum</a></code></li>
+<li><code><a title="linq.Query.take" href="#linq.Query.take">take</a></code></li>
+<li><code><a title="linq.Query.take_while" href="#linq.Query.take_while">take_while</a></code></li>
+<li><code><a title="linq.Query.to_dict" href="#linq.Query.to_dict">to_dict</a></code></li>
+<li><code><a title="linq.Query.to_list" href="#linq.Query.to_list">to_list</a></code></li>
+<li><code><a title="linq.Query.union" href="#linq.Query.union">union</a></code></li>
+<li><code><a title="linq.Query.where" href="#linq.Query.where">where</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>
