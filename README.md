@@ -32,7 +32,7 @@ Distribute heavy queries across multiple processes.
 >>> 
 >>> def heavy_transformation(x: int):
 >>>     time.sleep(10)
->>>     return x*2
+>>>     return x**2
 >>> 
 >>> def less_than_5(x: int):
 >>>     return x < 5
