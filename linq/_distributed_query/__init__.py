@@ -13,6 +13,7 @@ from typing import (
 import collections.abc
 import multiprocessing as mp
 import threading as th
+import queue
 
 from linq import errors
 
@@ -188,10 +189,16 @@ class DistributedQuery(Generic[T]):
         self._tasks_complete_event.set()
 
         while not self._feed_queue.empty():
-            self._feed_queue.get_nowait()
+            try:
+                self._feed_queue.get_nowait()
+            except queue.Empty:
+                pass
 
         while not self._result_queue.empty():
-            self._result_queue.get_nowait()
+            try:
+                self._result_queue.get_nowait()
+            except queue.Empty:
+                pass
 
         self._feeder.join()
         self._task_tracker.join()
