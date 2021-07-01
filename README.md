@@ -1,6 +1,9 @@
 # LINQ
 Provides simple to use LINQ features to Python 3.x.
 
+## Documentation
+See this link: https://jakkes.github.io/python-linq/
+
 ## Installing
 ### From pip
 ```bash
