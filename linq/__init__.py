@@ -8,7 +8,7 @@ from ._distributed_query import DistributedQuery
 
 
 __all__ = ["Query", "DistributedQuery", "errors"]
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 
 
 def _fix_pdoc():
