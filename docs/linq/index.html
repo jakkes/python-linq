@@ -78,7 +78,7 @@ from ._distributed_query import DistributedQuery
 
 
 __all__ = [&#34;Query&#34;, &#34;DistributedQuery&#34;, &#34;errors&#34;]
-__version__ = &#34;2.0.0&#34;
+__version__ = &#34;2.0.1&#34;
 
 
 def _fix_pdoc():
@@ -344,6 +344,7 @@ become more efficient, compared to a chunk size of one.</dd>
 
         self._feed_complete_event.set()
         self._tasks_complete_event.set()
+        self._task_queue.put(StopIteration)
 
         while not self._feed_queue.empty():
             try:
@@ -854,6 +855,7 @@ already been closed, this operation is a no-op.</p></div>
 
     self._feed_complete_event.set()
     self._tasks_complete_event.set()
+    self._task_queue.put(StopIteration)
 
     while not self._feed_queue.empty():
         try:
