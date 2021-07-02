@@ -1,5 +1,7 @@
 # LINQ
-[![Build Status](http://drone.jakke.se/api/badges/jakkes/python-linq/status.svg)](http://drone.jakke.se/jakkes/python-linq)  
+[![Build Status](http://drone.jakke.se/api/badges/jakkes/python-linq/status.svg)](http://drone.jakke.se/jakkes/python-linq)
+[![Coverage Status](https://coveralls.io/repos/github/jakkes/python-linq/badge.svg?branch=master)](https://coveralls.io/github/jakkes/python-linq?branch=master)
+
 Provides simple to use LINQ features to Python 3.x.
 
 ## Documentation
