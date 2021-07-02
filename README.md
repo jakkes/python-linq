@@ -1,4 +1,5 @@
 # LINQ
+[![Build Status](http://drone.jakke.se/api/badges/jakkes/python-linq/status.svg)](http://drone.jakke.se/jakkes/python-linq)
 Provides simple to use LINQ features to Python 3.x.
 
 ## Documentation
