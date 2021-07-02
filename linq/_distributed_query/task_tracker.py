@@ -19,10 +19,12 @@ class TaskTracker(th.Thread):
 
     def run(self) -> None:
         tasks = 0
-        while not (self._task_event.is_set() and self._task_queue.empty()):
+        while True:
             try:
-                self._task_queue.get(timeout=0.1)
-                tasks += 1
+                data = self._task_queue.get(timeout=0.1)
+                if data is StopIteration:
+                    break
+                tasks += data
             except queue.Empty:
                 continue
 

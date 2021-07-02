@@ -187,6 +187,7 @@ class DistributedQuery(Generic[T]):
 
         self._feed_complete_event.set()
         self._tasks_complete_event.set()
+        self._task_queue.put(StopIteration)
 
         while not self._feed_queue.empty():
             try:

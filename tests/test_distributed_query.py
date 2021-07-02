@@ -1,9 +1,15 @@
+import time
 from typing import TypeVar
 import pytest
 from linq import DistributedQuery, errors
 
 
 T = TypeVar("T")
+
+
+def wait(x):
+    time.sleep(1.0)
+    return x
 
 
 def square(x: T) -> T:
@@ -26,8 +32,12 @@ def greater_than_0(x):
     return x > 0
 
 
+def test_sleep():
+    assert DistributedQuery(range(9), processes=3).select(wait).count() == 9
+
+
 def test_distributed_query_single_process():
-    assert DistributedQuery(range(100), processes=2).select(square).max() == 99 ** 2
+    assert DistributedQuery(range(100), processes=1).select(square).max() == 99 ** 2
 
 
 def test_distributed_query_multiple_processes():
@@ -37,6 +47,16 @@ def test_distributed_query_multiple_processes():
 def test_chunk_size():
     assert (
         DistributedQuery(range(100), processes=2, chunk_size=23).select(square).count()
+        == 100
+    )
+    assert (
+        DistributedQuery(range(10000), processes=2, chunk_size=70)
+        .select(square)
+        .count()
+        == 10000
+    )
+    assert (
+        DistributedQuery(range(100), processes=2, chunk_size=1000).select(square).count()
         == 100
     )
 

@@ -35,4 +35,5 @@ class Feeder(th.Thread):
         if len(chunk) > 0:
             self._feed_queue.put(chunk)
             self._task_queue.put(1)
+        self._task_queue.put(StopIteration)
         self._data_fed_event.set()
