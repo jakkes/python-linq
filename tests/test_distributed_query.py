@@ -33,7 +33,7 @@ def greater_than_0(x):
 
 
 def test_sleep():
-    assert DistributedQuery(range(100), processes=101).select(wait).count() == 100
+    assert DistributedQuery(range(9), processes=3).select(wait).count() == 100
 
 
 def test_distributed_query_single_process():
