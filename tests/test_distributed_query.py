@@ -197,7 +197,3 @@ def test_to_dict():
     dict_ = DistributedQuery(range(100), processes=2).to_dict(str, square)
     assert set(dict_.keys()) == {str(x) for x in range(100)}
     assert set(dict_.values()) == {x ** 2 for x in range(100)}
-
-
-if __name__ == "__main__":
-    test_sleep()
