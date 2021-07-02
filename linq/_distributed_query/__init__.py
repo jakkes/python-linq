@@ -160,6 +160,9 @@ class DistributedQuery(Generic[T]):
             self._result_queue, self._task_complete_queue, self._tasks_complete_event
         )
 
+        print(self._feed_queue.empty())
+        print(self._result_queue.empty())
+
         self._feeder.join()
         self._task_tracker.join()
         for worker in self._workers:
@@ -187,6 +190,7 @@ class DistributedQuery(Generic[T]):
 
         self._feed_complete_event.set()
         self._tasks_complete_event.set()
+        self._task_queue.put(StopIteration)
 
         while not self._feed_queue.empty():
             try:
