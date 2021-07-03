@@ -27,7 +27,7 @@ pip install -r requirements.txt
 >>> assert x == [4, 7, 12]
 ```
 
-Distribute heavy queries across multiple processes.
+Distribute heavy queries across multiple processes using `DistributedQuery`.
 ```python
 >>> import time
 >>> from linq import DistributedQuery
