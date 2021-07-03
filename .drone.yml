@@ -4,7 +4,6 @@ type: docker
 name: default
 
 steps:
-
 - name: test and docs
   image: python:3.8-slim
   commands:
@@ -13,7 +12,15 @@ steps:
   - pytest
   - rm -rf ./docs/linq/
   - pdoc3 ./linq --html -o docs
-
+- name: publish
+  image: python:3.8-slim
+  environment:
+    PYPI_USERNAME:
+      from_secret: PYPI_USERNAME
+    PYPI_PASSWORD:
+      from secret: PYPI_PASSWORD
+  commands:
+    - python scripts/publish_if_new_version.py
 - name: push
   image: alpine/git
   commands:
