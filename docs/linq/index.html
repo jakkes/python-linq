@@ -46,7 +46,7 @@ pip install -r requirements.txt
 &gt;&gt;&gt; x = Query([1, 2, 3]).select(lambda x: x * x + 3).to_list()
 &gt;&gt;&gt; assert x == [4, 7, 12]
 </code></pre>
-<p>Distribute heavy queries across multiple processes.</p>
+<p>Distribute heavy queries across multiple processes using <code><a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a></code>.</p>
 <pre><code class="language-python">&gt;&gt;&gt; import time
 &gt;&gt;&gt; from linq import DistributedQuery
 &gt;&gt;&gt; 
@@ -79,7 +79,7 @@ from ._distributed_query import DistributedQuery
 
 
 __all__ = [&#34;Query&#34;, &#34;DistributedQuery&#34;, &#34;errors&#34;]
-__version__ = &#34;2.0.2&#34;
+__version__ = &#34;2.0.3&#34;
 
 
 def _fix_pdoc():
@@ -151,17 +151,40 @@ supported arguments to the query.</p>
 <h2 id="notes">Notes:</h2>
 <ol>
 <li>Data and arguments are distributed across processes using queues from Python's
-<code>multiprocessing</code> package. This means that everything needs to be pickled,
-including functions passed to, e.g., <code>select</code> or <code>where</code>. Therefore, lambdas and
-local functions are not supported arguments to the query.</li>
+<code>multiprocessing</code> package. This means that everything needs to be pickled, including
+functions passed to, e.g., <code>select</code> or <code>where</code>. Therefore, lambdas and local
+functions are not supported arguments to the query.</li>
 <li>The query may be consumed either through its execution methods, i.e. those not
-returning another <code><a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a></code> instance, or through an iterator. If
-consuming through an iterator and the iterator is not fully consumed, i.e. not
-fully looped through, then the query must be closed using its <code>close</code> method.
-Alternativly, the iteration may occur within a context manager (<code>with</code>
-statement), in which case the query is closed automatically. If unsure,
-<code>close</code> can be executed just in case. If not neceassry, it is a no-op.</li>
+returning another <code><a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a></code> instance, or through the iterator. If consuming
+through the iterator and the iterator is not fully consumed, i.e. not fully looped
+through, then the query must be closed using its <code>close</code> method. Alternativly, the
+iteration may occur within a context manager (<code>with</code> statement), in which case the
+query is closed automatically. Examples of correct usages:</li>
 </ol>
+<pre><code class="language-python">&gt;&gt;&gt; def even(x):
+&gt;&gt;&gt;     return x % 2 == 0
+&gt;&gt;&gt; 
+&gt;&gt;&gt; # Iterator is fully consumed, thus closes automatically.
+&gt;&gt;&gt; q = DistributedQuery(range(1000)).where(even)
+&gt;&gt;&gt; for x in q:
+&gt;&gt;&gt;     print(f&quot;{x} is an even number&quot;)
+&gt;&gt;&gt; 
+&gt;&gt;&gt; # Iterator is not fully consumed, needs to be closed manually.
+&gt;&gt;&gt; q = DistributedQuery(range(1000)).where(even)
+&gt;&gt;&gt; for x in q:
+&gt;&gt;&gt;     if x &gt; 500:
+&gt;&gt;&gt;         break
+&gt;&gt;&gt;     print(f&quot;{x} is an even number&quot;)
+&gt;&gt;&gt; q.close()
+&gt;&gt;&gt; 
+&gt;&gt;&gt; # Iterator is not fully consumed, but closed automatically using the context
+&gt;&gt;&gt; # manager
+&gt;&gt;&gt; with DistributedQuery(range(1000)).where(even) as q:
+&gt;&gt;&gt;     for x in q:
+&gt;&gt;&gt;         if x &gt; 500:
+&gt;&gt;&gt;             break
+&gt;&gt;&gt;         print(f&quot;{x} is an even number&quot;)
+</code></pre>
 <h2 id="example-usage">Example usage</h2>
 <pre><code class="language-python">&gt;&gt;&gt; import time
 &gt;&gt;&gt; 
@@ -178,7 +201,8 @@ statement), in which case the query is closed automatically. If unsure,
 &gt;&gt;&gt;     .select(heavy_transformation)
 &gt;&gt;&gt;     .to_list()
 &gt;&gt;&gt; )
-&gt;&gt;&gt; assert x == [0, 1, 4, 9, 16]
+&gt;&gt;&gt; print(x)
+[0, 1, 4, 9, 16]    # Not necessarily in this order.
 </code></pre>
 <h2 id="args">Args</h2>
 <dl>
@@ -207,16 +231,40 @@ become more efficient, compared to a chunk size of one.</dd>
     
     ## Notes:
     1. Data and arguments are distributed across processes using queues from Python&#39;s
-    `multiprocessing` package. This means that everything needs to be pickled,
-    including functions passed to, e.g., `select` or `where`. Therefore, lambdas and
-    local functions are not supported arguments to the query.
+    `multiprocessing` package. This means that everything needs to be pickled, including
+    functions passed to, e.g., `select` or `where`. Therefore, lambdas and local
+    functions are not supported arguments to the query.
     2. The query may be consumed either through its execution methods, i.e. those not
-    returning another `DistributedQuery` instance, or through an iterator. If
-    consuming through an iterator and the iterator is not fully consumed, i.e. not
-    fully looped through, then the query must be closed using its `close` method.
-    Alternativly, the iteration may occur within a context manager (`with`
-    statement), in which case the query is closed automatically. If unsure,
-    `close` can be executed just in case. If not neceassry, it is a no-op.
+    returning another `DistributedQuery` instance, or through the iterator. If consuming
+    through the iterator and the iterator is not fully consumed, i.e. not fully looped
+    through, then the query must be closed using its `close` method. Alternativly, the
+    iteration may occur within a context manager (`with` statement), in which case the
+    query is closed automatically. Examples of correct usages:
+    ```python
+    &gt;&gt;&gt; def even(x):
+    &gt;&gt;&gt;     return x % 2 == 0
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; # Iterator is fully consumed, thus closes automatically.
+    &gt;&gt;&gt; q = DistributedQuery(range(1000)).where(even)
+    &gt;&gt;&gt; for x in q:
+    &gt;&gt;&gt;     print(f&#34;{x} is an even number&#34;)
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; # Iterator is not fully consumed, needs to be closed manually.
+    &gt;&gt;&gt; q = DistributedQuery(range(1000)).where(even)
+    &gt;&gt;&gt; for x in q:
+    &gt;&gt;&gt;     if x &gt; 500:
+    &gt;&gt;&gt;         break
+    &gt;&gt;&gt;     print(f&#34;{x} is an even number&#34;)
+    &gt;&gt;&gt; q.close()
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; # Iterator is not fully consumed, but closed automatically using the context
+    &gt;&gt;&gt; # manager
+    &gt;&gt;&gt; with DistributedQuery(range(1000)).where(even) as q:
+    &gt;&gt;&gt;     for x in q:
+    &gt;&gt;&gt;         if x &gt; 500:
+    &gt;&gt;&gt;             break
+    &gt;&gt;&gt;         print(f&#34;{x} is an even number&#34;)
+    ```
         
     ## Example usage
     ```python
@@ -235,7 +283,8 @@ become more efficient, compared to a chunk size of one.</dd>
     &gt;&gt;&gt;     .select(heavy_transformation)
     &gt;&gt;&gt;     .to_list()
     &gt;&gt;&gt; )
-    &gt;&gt;&gt; assert x == [0, 1, 4, 9, 16]
+    &gt;&gt;&gt; print(x)
+    [0, 1, 4, 9, 16]    # Not necessarily in this order.
     ```&#34;&#34;&#34;
 
     def __init__(
@@ -323,6 +372,8 @@ become more efficient, compared to a chunk size of one.</dd>
         for worker in self._workers:
             worker.join()
 
+        self._closed = True
+
     def __contains__(self, obj: T) -&gt; bool:
         self._query.set_aggregator(query.aggregators.Contains(obj))
         return_value = False
@@ -376,6 +427,20 @@ become more efficient, compared to a chunk size of one.</dd>
         Returns:
             bool: True if condition returns True for all query elements, otherwise
                 False.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def greater_than_0(x):
+        &gt;&gt;&gt;     return x &gt; 0
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; def smaller_than_10(x):
+        &gt;&gt;&gt;     return x &lt; 10
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; DistributedQuery(range(10)).all(smaller_than_10)
+        True
+        &gt;&gt;&gt; DistributedQuery(range(10)).all(greater_than_0)
+        False
+        ```
         &#34;&#34;&#34;
         aggregator = query.aggregators.All()
         self._query.add_block(query.blocks.Select(condition))
@@ -395,6 +460,20 @@ become more efficient, compared to a chunk size of one.</dd>
         Returns:
             bool: True if condition evaluates to True for any query element, otherwise
                 False.
+        
+        Example:
+        ```python
+        &gt;&gt;&gt; def greater_than_10(x):
+        &gt;&gt;&gt;     return x &gt; 10
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; def smaller_than_5(x):
+        &gt;&gt;&gt;     return x &lt; 5
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; DistributedQuery(range(10)).any(smaller_than_5)
+        True
+        &gt;&gt;&gt; DistributedQuery(range(10)).any(greater_than_10)
+        False
+        ```
         &#34;&#34;&#34;
         aggregator = query.aggregators.Any()
         self._query.add_block(query.blocks.Select(condition))
@@ -410,6 +489,15 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             S: Return type of the transform.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def square(x):
+        &gt;&gt;&gt;     return x * x
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; DistributedQuery(range(3)).select(square).to_list()
+        [0, 1, 4]   # Not necessarily in this order.
+        ```
         &#34;&#34;&#34;
         self._query.add_block(query.blocks.Select(transform))
         return self
@@ -424,8 +512,8 @@ become more efficient, compared to a chunk size of one.</dd>
         Example:
         ```python
         &gt;&gt;&gt; data = [[1,2,3], [4,5,6], [7, 8, 9]]
-        &gt;&gt;&gt; DistributedQuery(data).flatten().toList()
-        [1, 2, 3, 4, 5, 6, 7, 8, 9]  # not necessarily ordered
+        &gt;&gt;&gt; DistributedQuery(data).flatten().to_list()
+        [1, 2, 3, 4, 5, 6, 7, 8, 9]  # Not necessarily in this order.
         ```
         &#34;&#34;&#34;
         self._query.add_block(query.blocks.Flatten())
@@ -436,6 +524,12 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             List[T]: List of output.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; DistributedQuery(range(100)).to_list()
+        [1, 2, 3, ..., 99]  # Not necessarily in this order.
+        ```
         &#34;&#34;&#34;
         return sum(self, [])
 
@@ -444,6 +538,18 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             T: The maximum value encountered.
+
+        Example
+        ```python
+        &gt;&gt;&gt; def negative_square(x):
+        &gt;&gt;&gt;     return - x * x
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; def add_1(x):
+        &gt;&gt;&gt;     return x + 1
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; DistributedQuery(range(-4, 5)).select(negative_square).select(add_1).max()
+        1
+        ```
         &#34;&#34;&#34;
         self._query.set_aggregator(query.aggregators.Max())
         return max(self)
@@ -453,15 +559,34 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             T: Minimum value encountered.
+        
+        Example
+        ```python
+        &gt;&gt;&gt; def square(x):
+        &gt;&gt;&gt;     return x * x
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; def add_1(x):
+        &gt;&gt;&gt;     return x + 1
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; DistributedQuery(range(-4, 5)).select(square).select(add_1).min()
+        1
+        ```
         &#34;&#34;&#34;
         self._query.set_aggregator(query.aggregators.Min())
         return min(self)
 
     def count(self) -&gt; int:
-        &#34;&#34;&#34;Counts the number of elements in the query.
+        &#34;&#34;&#34;Counts the number of elements in the result.
 
         Returns:
-            int: Number of elements matching the query.
+            int: Number of elements in the result.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def less_than_10(x):
+        &gt;&gt;&gt;     return x &lt; 10
+        &gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).count()
+        10
         &#34;&#34;&#34;
         self._query.set_aggregator(query.aggregators.Count())
         return sum(self)
@@ -476,6 +601,13 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             DistributedQuery[T]: Query where elements pass the condition.
+        
+        Example:
+        ```python
+        &gt;&gt;&gt; def less_than_10(x):
+        &gt;&gt;&gt;     return x &lt; 10
+        &gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).count()
+        10
         &#34;&#34;&#34;
         self._query.add_block(query.blocks.Where(condition))
         return self
@@ -488,12 +620,20 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             bool: True if the object was found, otherwise False.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def less_than_10(x):
+        &gt;&gt;&gt;     return x &lt; 10
+        &gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).contains(5)
+        True
         &#34;&#34;&#34;
         return obj in self
 
     def argmax(self, value_fn: Callable[[T], Any]) -&gt; T:
-        &#34;&#34;&#34;Returns the query element for which the given value function returns the
-        largest value.
+        &#34;&#34;&#34;Returns the element for which the given value function returns the largest
+        value. Note, that if transforms are applied to the elements, the transformed
+        objects are considered, see example.
 
         Args:
             value_fn (Callable[[T], Any]): Function accepting one argument and returning
@@ -501,14 +641,29 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             T: Query element for which `value_fn` returned the largest value.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def negative_square(x):
+        &gt;&gt;&gt;     return - x * x
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; def add_100(x):
+        &gt;&gt;&gt;     return x + 100
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; DistributedQuery(range(10)).argmax(negative_square)
+        0
+        &gt;&gt;&gt; DistributedQuery(range(10)).select(add_100).argmax(negative_square)
+        100
+        ```
         &#34;&#34;&#34;
         aggregator = query.aggregators.ArgMax(value_fn)
         self._query.set_aggregator(aggregator)
         return aggregator.aggregate(self)
 
     def argmin(self, value_fn: Callable[[T], Any]) -&gt; T:
-        &#34;&#34;&#34;Returns the query element for which the given value function returns the
-        smallest value.
+        &#34;&#34;&#34;Returns the element for which the given value function returns the smallest
+        value. Note, that if transforms are applied to the elements, the transformed
+        objects are considered, see example.
 
         Args:
             value_fn (Callable[[T], Any]): Function accepting one argument and returning
@@ -516,6 +671,20 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             T: Query element for which `value_fn` returned the smallest value.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def square(x):
+        &gt;&gt;&gt;     return x * x
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; def add_100(x):
+        &gt;&gt;&gt;     return x + 100
+        &gt;&gt;&gt; 
+        &gt;&gt;&gt; DistributedQuery(range(10)).argmin(square)
+        0
+        &gt;&gt;&gt; DistributedQuery(range(10)).select(add_100).argmin(square)
+        100
+        ```
         &#34;&#34;&#34;
         aggregator = query.aggregators.ArgMax(value_fn, invert_value=True)
         self._query.set_aggregator(aggregator)
@@ -537,6 +706,15 @@ become more efficient, compared to a chunk size of one.</dd>
         Returns:
             Optional[T]: First element encountered for which `condition` returns `True`.
                 If no element is found, returns `None`.
+
+        ```python
+        &gt;&gt;&gt; def dividible_by_97(x):
+        &gt;&gt;&gt;     return x % 97 == 0
+        &gt;&gt;&gt; DistributedQuery(range(10)).first_or_none(dividible_by_97)
+        None
+        &gt;&gt;&gt; DistributedQuery(range(1000)).first_or_none(dividible_by_97)
+        # Any of 97, 97 * 2, ..., 970
+        ```
         &#34;&#34;&#34;
         aggregator = query.aggregators.FirstOrNone(condition)
         self._query.set_aggregator(aggregator)
@@ -569,6 +747,16 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             T: First element encountered for which `condition` returns `True`.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def dividible_by_97(x):
+        &gt;&gt;&gt;     return x % 97 == 0
+        &gt;&gt;&gt; DistributedQuery(range(10)).first(dividible_by_97)
+        # Exception raised: linq.errors.NoSuchElementError
+        &gt;&gt;&gt; DistributedQuery(range(1000)).first(dividible_by_97)
+        # Any of 97, 97 * 2, ..., 970
+        ```
         &#34;&#34;&#34;
         re = self.first_or_none(condition)
         if re is None:
@@ -591,6 +779,16 @@ become more efficient, compared to a chunk size of one.</dd>
         Returns:
             Optional[T]: Last element encountered for which `condition` returns `True`.
                 If no element is found, returns `None`.
+    
+        Example:
+        ```python
+        &gt;&gt;&gt; def dividible_by_97(x):
+        &gt;&gt;&gt;     return x % 97 == 0
+        &gt;&gt;&gt; DistributedQuery(range(10)).last_or_none(dividible_by_97)
+        None
+        &gt;&gt;&gt; DistributedQuery(range(1000)).last_or_none(dividible_by_97)
+        # Any of 97, 97 * 2, ..., 970
+        ```
         &#34;&#34;&#34;
         self._query.set_aggregator(query.aggregators.LastOrNone(condition))
         re = None
@@ -620,6 +818,16 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             T: Last element encountered for which `condition` returns `True`.
+        
+        Example:
+        ```python
+        &gt;&gt;&gt; def dividible_by_97(x):
+        &gt;&gt;&gt;     return x % 97 == 0
+        &gt;&gt;&gt; DistributedQuery(range(10)).last(dividible_by_97)
+        # Exception raised: linq.errors.NoSuchElementError
+        &gt;&gt;&gt; DistributedQuery(range(1000)).last(dividible_by_97)
+        # Any of 97, 97 * 2, ..., 970
+        ```
         &#34;&#34;&#34;
         re = self.last_or_none(condition)
         if re is None:
@@ -632,6 +840,14 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             T: Sum of all elements in the query.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def even(x):
+        &gt;&gt;&gt;     return x % 2 == 0
+        &gt;&gt;&gt; DistributedQuery(range(100)).where(even).sum()
+        2352
+        ```
         &#34;&#34;&#34;
         aggregator = query.aggregators.Sum()
         self._query.set_aggregator(aggregator)
@@ -643,6 +859,13 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             T: Mean value.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def even(x):
+        &gt;&gt;&gt;     return x % 2 == 0
+        &gt;&gt;&gt; DistributedQuery(range(100)).where(even).mean()
+        1176
         &#34;&#34;&#34;
         self._query.set_aggregator(query.aggregators.SumAndCount())
         sum_, count = 0, 0
@@ -665,6 +888,16 @@ become more efficient, compared to a chunk size of one.</dd>
 
         Returns:
             Dict[KT, VT]: Dictionary of `{key(x): value(x) for x in self}`.
+
+        Example:
+        ```python
+        &gt;&gt;&gt; def key(x):
+        &gt;&gt;&gt;     return str(x*x)
+        &gt;&gt;&gt; def value(x):
+        &gt;&gt;&gt;     return x*x*x*x
+        &gt;&gt;&gt; DistributedQuery(range(3)).to_dict(key, value)
+        {&#34;0&#34;: 0, &#34;1&#34;: 1, &#34;4&#34;: 16}
+        ```
         &#34;&#34;&#34;
         self._query.set_aggregator(query.aggregators.Dict(key, value))
         re = {}
@@ -696,7 +929,19 @@ Defaults to the identity function.</dd>
 <dt><code>bool</code></dt>
 <dd>True if condition returns True for all query elements, otherwise
 False.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def greater_than_0(x):
+&gt;&gt;&gt;     return x &gt; 0
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def smaller_than_10(x):
+&gt;&gt;&gt;     return x &lt; 10
+&gt;&gt;&gt; 
+&gt;&gt;&gt; DistributedQuery(range(10)).all(smaller_than_10)
+True
+&gt;&gt;&gt; DistributedQuery(range(10)).all(greater_than_0)
+False
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -713,6 +958,20 @@ False.</dd>
     Returns:
         bool: True if condition returns True for all query elements, otherwise
             False.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def greater_than_0(x):
+    &gt;&gt;&gt;     return x &gt; 0
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; def smaller_than_10(x):
+    &gt;&gt;&gt;     return x &lt; 10
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; DistributedQuery(range(10)).all(smaller_than_10)
+    True
+    &gt;&gt;&gt; DistributedQuery(range(10)).all(greater_than_0)
+    False
+    ```
     &#34;&#34;&#34;
     aggregator = query.aggregators.All()
     self._query.add_block(query.blocks.Select(condition))
@@ -739,7 +998,19 @@ Defaults to the identity function.</dd>
 <dt><code>bool</code></dt>
 <dd>True if condition evaluates to True for any query element, otherwise
 False.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def greater_than_10(x):
+&gt;&gt;&gt;     return x &gt; 10
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def smaller_than_5(x):
+&gt;&gt;&gt;     return x &lt; 5
+&gt;&gt;&gt; 
+&gt;&gt;&gt; DistributedQuery(range(10)).any(smaller_than_5)
+True
+&gt;&gt;&gt; DistributedQuery(range(10)).any(greater_than_10)
+False
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -756,6 +1027,20 @@ False.</dd>
     Returns:
         bool: True if condition evaluates to True for any query element, otherwise
             False.
+    
+    Example:
+    ```python
+    &gt;&gt;&gt; def greater_than_10(x):
+    &gt;&gt;&gt;     return x &gt; 10
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; def smaller_than_5(x):
+    &gt;&gt;&gt;     return x &lt; 5
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; DistributedQuery(range(10)).any(smaller_than_5)
+    True
+    &gt;&gt;&gt; DistributedQuery(range(10)).any(greater_than_10)
+    False
+    ```
     &#34;&#34;&#34;
     aggregator = query.aggregators.Any()
     self._query.add_block(query.blocks.Select(condition))
@@ -768,8 +1053,9 @@ False.</dd>
 <span>def <span class="ident">argmax</span></span>(<span>self, value_fn: Callable[[T], Any]) ‑> ~T</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Returns the query element for which the given value function returns the
-largest value.</p>
+<div class="desc"><p>Returns the element for which the given value function returns the largest
+value. Note, that if transforms are applied to the elements, the transformed
+objects are considered, see example.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>value_fn</code></strong> :&ensp;<code>Callable[[T], Any]</code></dt>
@@ -780,14 +1066,27 @@ a comparable object.</dd>
 <dl>
 <dt><code>T</code></dt>
 <dd>Query element for which <code>value_fn</code> returned the largest value.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def negative_square(x):
+&gt;&gt;&gt;     return - x * x
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def add_100(x):
+&gt;&gt;&gt;     return x + 100
+&gt;&gt;&gt; 
+&gt;&gt;&gt; DistributedQuery(range(10)).argmax(negative_square)
+0
+&gt;&gt;&gt; DistributedQuery(range(10)).select(add_100).argmax(negative_square)
+100
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def argmax(self, value_fn: Callable[[T], Any]) -&gt; T:
-    &#34;&#34;&#34;Returns the query element for which the given value function returns the
-    largest value.
+    &#34;&#34;&#34;Returns the element for which the given value function returns the largest
+    value. Note, that if transforms are applied to the elements, the transformed
+    objects are considered, see example.
 
     Args:
         value_fn (Callable[[T], Any]): Function accepting one argument and returning
@@ -795,6 +1094,20 @@ a comparable object.</dd>
 
     Returns:
         T: Query element for which `value_fn` returned the largest value.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def negative_square(x):
+    &gt;&gt;&gt;     return - x * x
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; def add_100(x):
+    &gt;&gt;&gt;     return x + 100
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; DistributedQuery(range(10)).argmax(negative_square)
+    0
+    &gt;&gt;&gt; DistributedQuery(range(10)).select(add_100).argmax(negative_square)
+    100
+    ```
     &#34;&#34;&#34;
     aggregator = query.aggregators.ArgMax(value_fn)
     self._query.set_aggregator(aggregator)
@@ -805,8 +1118,9 @@ a comparable object.</dd>
 <span>def <span class="ident">argmin</span></span>(<span>self, value_fn: Callable[[T], Any]) ‑> ~T</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Returns the query element for which the given value function returns the
-smallest value.</p>
+<div class="desc"><p>Returns the element for which the given value function returns the smallest
+value. Note, that if transforms are applied to the elements, the transformed
+objects are considered, see example.</p>
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>value_fn</code></strong> :&ensp;<code>Callable[[T], Any]</code></dt>
@@ -817,14 +1131,27 @@ a comparable object.</dd>
 <dl>
 <dt><code>T</code></dt>
 <dd>Query element for which <code>value_fn</code> returned the smallest value.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def square(x):
+&gt;&gt;&gt;     return x * x
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def add_100(x):
+&gt;&gt;&gt;     return x + 100
+&gt;&gt;&gt; 
+&gt;&gt;&gt; DistributedQuery(range(10)).argmin(square)
+0
+&gt;&gt;&gt; DistributedQuery(range(10)).select(add_100).argmin(square)
+100
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def argmin(self, value_fn: Callable[[T], Any]) -&gt; T:
-    &#34;&#34;&#34;Returns the query element for which the given value function returns the
-    smallest value.
+    &#34;&#34;&#34;Returns the element for which the given value function returns the smallest
+    value. Note, that if transforms are applied to the elements, the transformed
+    objects are considered, see example.
 
     Args:
         value_fn (Callable[[T], Any]): Function accepting one argument and returning
@@ -832,6 +1159,20 @@ a comparable object.</dd>
 
     Returns:
         T: Query element for which `value_fn` returned the smallest value.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def square(x):
+    &gt;&gt;&gt;     return x * x
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; def add_100(x):
+    &gt;&gt;&gt;     return x + 100
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; DistributedQuery(range(10)).argmin(square)
+    0
+    &gt;&gt;&gt; DistributedQuery(range(10)).select(add_100).argmin(square)
+    100
+    ```
     &#34;&#34;&#34;
     aggregator = query.aggregators.ArgMax(value_fn, invert_value=True)
     self._query.set_aggregator(aggregator)
@@ -890,7 +1231,14 @@ already been closed, this operation is a no-op.</p></div>
 <dl>
 <dt><code>bool</code></dt>
 <dd>True if the object was found, otherwise False.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">```python-repl
+&gt;&gt;&gt; def less_than_10(x):
+&gt;&gt;&gt;     return x &lt; 10
+&gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).contains(5)
+True
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -903,6 +1251,13 @@ already been closed, this operation is a no-op.</p></div>
 
     Returns:
         bool: True if the object was found, otherwise False.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def less_than_10(x):
+    &gt;&gt;&gt;     return x &lt; 10
+    &gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).contains(5)
+    True
     &#34;&#34;&#34;
     return obj in self</code></pre>
 </details>
@@ -911,21 +1266,35 @@ already been closed, this operation is a no-op.</p></div>
 <span>def <span class="ident">count</span></span>(<span>self) ‑> int</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Counts the number of elements in the query.</p>
+<div class="desc"><p>Counts the number of elements in the result.</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>int</code></dt>
-<dd>Number of elements matching the query.</dd>
-</dl></div>
+<dd>Number of elements in the result.</dd>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">```python-repl
+&gt;&gt;&gt; def less_than_10(x):
+&gt;&gt;&gt;     return x &lt; 10
+&gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).count()
+10
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def count(self) -&gt; int:
-    &#34;&#34;&#34;Counts the number of elements in the query.
+    &#34;&#34;&#34;Counts the number of elements in the result.
 
     Returns:
-        int: Number of elements matching the query.
+        int: Number of elements in the result.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def less_than_10(x):
+    &gt;&gt;&gt;     return x &lt; 10
+    &gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).count()
+    10
     &#34;&#34;&#34;
     self._query.set_aggregator(query.aggregators.Count())
     return sum(self)</code></pre>
@@ -957,7 +1326,15 @@ condition.</dd>
 <dl>
 <dt><code>T</code></dt>
 <dd>First element encountered for which <code>condition</code> returns <code>True</code>.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def dividible_by_97(x):
+&gt;&gt;&gt;     return x % 97 == 0
+&gt;&gt;&gt; DistributedQuery(range(10)).first(dividible_by_97)
+# Exception raised: linq.errors.NoSuchElementError
+&gt;&gt;&gt; DistributedQuery(range(1000)).first(dividible_by_97)
+# Any of 97, 97 * 2, ..., 970
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -981,6 +1358,16 @@ condition.</dd>
 
     Returns:
         T: First element encountered for which `condition` returns `True`.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def dividible_by_97(x):
+    &gt;&gt;&gt;     return x % 97 == 0
+    &gt;&gt;&gt; DistributedQuery(range(10)).first(dividible_by_97)
+    # Exception raised: linq.errors.NoSuchElementError
+    &gt;&gt;&gt; DistributedQuery(range(1000)).first(dividible_by_97)
+    # Any of 97, 97 * 2, ..., 970
+    ```
     &#34;&#34;&#34;
     re = self.first_or_none(condition)
     if re is None:
@@ -1009,7 +1396,14 @@ element encountered in the query.</dd>
 <dt><code>Optional[T]</code></dt>
 <dd>First element encountered for which <code>condition</code> returns <code>True</code>.
 If no element is found, returns <code>None</code>.</dd>
-</dl></div>
+</dl>
+<pre><code class="language-python">&gt;&gt;&gt; def dividible_by_97(x):
+&gt;&gt;&gt;     return x % 97 == 0
+&gt;&gt;&gt; DistributedQuery(range(10)).first_or_none(dividible_by_97)
+None
+&gt;&gt;&gt; DistributedQuery(range(1000)).first_or_none(dividible_by_97)
+# Any of 97, 97 * 2, ..., 970
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1030,6 +1424,15 @@ If no element is found, returns <code>None</code>.</dd>
     Returns:
         Optional[T]: First element encountered for which `condition` returns `True`.
             If no element is found, returns `None`.
+
+    ```python
+    &gt;&gt;&gt; def dividible_by_97(x):
+    &gt;&gt;&gt;     return x % 97 == 0
+    &gt;&gt;&gt; DistributedQuery(range(10)).first_or_none(dividible_by_97)
+    None
+    &gt;&gt;&gt; DistributedQuery(range(1000)).first_or_none(dividible_by_97)
+    # Any of 97, 97 * 2, ..., 970
+    ```
     &#34;&#34;&#34;
     aggregator = query.aggregators.FirstOrNone(condition)
     self._query.set_aggregator(aggregator)
@@ -1057,8 +1460,8 @@ concatenates them into one long list.</p>
 </dl>
 <p>Example:</p>
 <pre><code class="language-python">&gt;&gt;&gt; data = [[1,2,3], [4,5,6], [7, 8, 9]]
-&gt;&gt;&gt; DistributedQuery(data).flatten().toList()
-[1, 2, 3, 4, 5, 6, 7, 8, 9]  # not necessarily ordered
+&gt;&gt;&gt; DistributedQuery(data).flatten().to_list()
+[1, 2, 3, 4, 5, 6, 7, 8, 9]  # Not necessarily in this order.
 </code></pre></div>
 <details class="source">
 <summary>
@@ -1074,8 +1477,8 @@ concatenates them into one long list.</p>
     Example:
     ```python
     &gt;&gt;&gt; data = [[1,2,3], [4,5,6], [7, 8, 9]]
-    &gt;&gt;&gt; DistributedQuery(data).flatten().toList()
-    [1, 2, 3, 4, 5, 6, 7, 8, 9]  # not necessarily ordered
+    &gt;&gt;&gt; DistributedQuery(data).flatten().to_list()
+    [1, 2, 3, 4, 5, 6, 7, 8, 9]  # Not necessarily in this order.
     ```
     &#34;&#34;&#34;
     self._query.add_block(query.blocks.Flatten())
@@ -1108,7 +1511,15 @@ condition.</dd>
 <dl>
 <dt><code>T</code></dt>
 <dd>Last element encountered for which <code>condition</code> returns <code>True</code>.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def dividible_by_97(x):
+&gt;&gt;&gt;     return x % 97 == 0
+&gt;&gt;&gt; DistributedQuery(range(10)).last(dividible_by_97)
+# Exception raised: linq.errors.NoSuchElementError
+&gt;&gt;&gt; DistributedQuery(range(1000)).last(dividible_by_97)
+# Any of 97, 97 * 2, ..., 970
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1132,6 +1543,16 @@ condition.</dd>
 
     Returns:
         T: Last element encountered for which `condition` returns `True`.
+    
+    Example:
+    ```python
+    &gt;&gt;&gt; def dividible_by_97(x):
+    &gt;&gt;&gt;     return x % 97 == 0
+    &gt;&gt;&gt; DistributedQuery(range(10)).last(dividible_by_97)
+    # Exception raised: linq.errors.NoSuchElementError
+    &gt;&gt;&gt; DistributedQuery(range(1000)).last(dividible_by_97)
+    # Any of 97, 97 * 2, ..., 970
+    ```
     &#34;&#34;&#34;
     re = self.last_or_none(condition)
     if re is None:
@@ -1160,7 +1581,15 @@ element encountered in the query.</dd>
 <dt><code>Optional[T]</code></dt>
 <dd>Last element encountered for which <code>condition</code> returns <code>True</code>.
 If no element is found, returns <code>None</code>.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def dividible_by_97(x):
+&gt;&gt;&gt;     return x % 97 == 0
+&gt;&gt;&gt; DistributedQuery(range(10)).last_or_none(dividible_by_97)
+None
+&gt;&gt;&gt; DistributedQuery(range(1000)).last_or_none(dividible_by_97)
+# Any of 97, 97 * 2, ..., 970
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1181,6 +1610,16 @@ If no element is found, returns <code>None</code>.</dd>
     Returns:
         Optional[T]: Last element encountered for which `condition` returns `True`.
             If no element is found, returns `None`.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def dividible_by_97(x):
+    &gt;&gt;&gt;     return x % 97 == 0
+    &gt;&gt;&gt; DistributedQuery(range(10)).last_or_none(dividible_by_97)
+    None
+    &gt;&gt;&gt; DistributedQuery(range(1000)).last_or_none(dividible_by_97)
+    # Any of 97, 97 * 2, ..., 970
+    ```
     &#34;&#34;&#34;
     self._query.set_aggregator(query.aggregators.LastOrNone(condition))
     re = None
@@ -1201,7 +1640,17 @@ If no element is found, returns <code>None</code>.</dd>
 <dl>
 <dt><code>T</code></dt>
 <dd>The maximum value encountered.</dd>
-</dl></div>
+</dl>
+<p>Example</p>
+<pre><code class="language-python">&gt;&gt;&gt; def negative_square(x):
+&gt;&gt;&gt;     return - x * x
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def add_1(x):
+&gt;&gt;&gt;     return x + 1
+&gt;&gt;&gt; 
+&gt;&gt;&gt; DistributedQuery(range(-4, 5)).select(negative_square).select(add_1).max()
+1
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1211,6 +1660,18 @@ If no element is found, returns <code>None</code>.</dd>
 
     Returns:
         T: The maximum value encountered.
+
+    Example
+    ```python
+    &gt;&gt;&gt; def negative_square(x):
+    &gt;&gt;&gt;     return - x * x
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; def add_1(x):
+    &gt;&gt;&gt;     return x + 1
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; DistributedQuery(range(-4, 5)).select(negative_square).select(add_1).max()
+    1
+    ```
     &#34;&#34;&#34;
     self._query.set_aggregator(query.aggregators.Max())
     return max(self)</code></pre>
@@ -1226,7 +1687,14 @@ addition.</p>
 <dl>
 <dt><code>T</code></dt>
 <dd>Mean value.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">```python-repl
+&gt;&gt;&gt; def even(x):
+&gt;&gt;&gt;     return x % 2 == 0
+&gt;&gt;&gt; DistributedQuery(range(100)).where(even).mean()
+1176
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1237,6 +1705,13 @@ addition.</p>
 
     Returns:
         T: Mean value.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def even(x):
+    &gt;&gt;&gt;     return x % 2 == 0
+    &gt;&gt;&gt; DistributedQuery(range(100)).where(even).mean()
+    1176
     &#34;&#34;&#34;
     self._query.set_aggregator(query.aggregators.SumAndCount())
     sum_, count = 0, 0
@@ -1255,7 +1730,17 @@ addition.</p>
 <dl>
 <dt><code>T</code></dt>
 <dd>Minimum value encountered.</dd>
-</dl></div>
+</dl>
+<p>Example</p>
+<pre><code class="language-python">&gt;&gt;&gt; def square(x):
+&gt;&gt;&gt;     return x * x
+&gt;&gt;&gt; 
+&gt;&gt;&gt; def add_1(x):
+&gt;&gt;&gt;     return x + 1
+&gt;&gt;&gt; 
+&gt;&gt;&gt; DistributedQuery(range(-4, 5)).select(square).select(add_1).min()
+1
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1265,6 +1750,18 @@ addition.</p>
 
     Returns:
         T: Minimum value encountered.
+    
+    Example
+    ```python
+    &gt;&gt;&gt; def square(x):
+    &gt;&gt;&gt;     return x * x
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; def add_1(x):
+    &gt;&gt;&gt;     return x + 1
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; DistributedQuery(range(-4, 5)).select(square).select(add_1).min()
+    1
+    ```
     &#34;&#34;&#34;
     self._query.set_aggregator(query.aggregators.Min())
     return min(self)</code></pre>
@@ -1284,7 +1781,14 @@ addition.</p>
 <dl>
 <dt><code>S</code></dt>
 <dd>Return type of the transform.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def square(x):
+&gt;&gt;&gt;     return x * x
+&gt;&gt;&gt; 
+&gt;&gt;&gt; DistributedQuery(range(3)).select(square).to_list()
+[0, 1, 4]   # Not necessarily in this order.
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1297,6 +1801,15 @@ addition.</p>
 
     Returns:
         S: Return type of the transform.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def square(x):
+    &gt;&gt;&gt;     return x * x
+    &gt;&gt;&gt; 
+    &gt;&gt;&gt; DistributedQuery(range(3)).select(square).to_list()
+    [0, 1, 4]   # Not necessarily in this order.
+    ```
     &#34;&#34;&#34;
     self._query.add_block(query.blocks.Select(transform))
     return self</code></pre>
@@ -1312,7 +1825,13 @@ addition.</p>
 <dl>
 <dt><code>T</code></dt>
 <dd>Sum of all elements in the query.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def even(x):
+&gt;&gt;&gt;     return x % 2 == 0
+&gt;&gt;&gt; DistributedQuery(range(100)).where(even).sum()
+2352
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1323,6 +1842,14 @@ addition.</p>
 
     Returns:
         T: Sum of all elements in the query.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def even(x):
+    &gt;&gt;&gt;     return x % 2 == 0
+    &gt;&gt;&gt; DistributedQuery(range(100)).where(even).sum()
+    2352
+    ```
     &#34;&#34;&#34;
     aggregator = query.aggregators.Sum()
     self._query.set_aggregator(aggregator)
@@ -1350,7 +1877,15 @@ value to be used for the given element.</dd>
 <dl>
 <dt><code>Dict[KT, VT]</code></dt>
 <dd>Dictionary of <code>{key(x): value(x) for x in self}</code>.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; def key(x):
+&gt;&gt;&gt;     return str(x*x)
+&gt;&gt;&gt; def value(x):
+&gt;&gt;&gt;     return x*x*x*x
+&gt;&gt;&gt; DistributedQuery(range(3)).to_dict(key, value)
+{&quot;0&quot;: 0, &quot;1&quot;: 1, &quot;4&quot;: 16}
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1369,6 +1904,16 @@ value to be used for the given element.</dd>
 
     Returns:
         Dict[KT, VT]: Dictionary of `{key(x): value(x) for x in self}`.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; def key(x):
+    &gt;&gt;&gt;     return str(x*x)
+    &gt;&gt;&gt; def value(x):
+    &gt;&gt;&gt;     return x*x*x*x
+    &gt;&gt;&gt; DistributedQuery(range(3)).to_dict(key, value)
+    {&#34;0&#34;: 0, &#34;1&#34;: 1, &#34;4&#34;: 16}
+    ```
     &#34;&#34;&#34;
     self._query.set_aggregator(query.aggregators.Dict(key, value))
     re = {}
@@ -1386,7 +1931,11 @@ value to be used for the given element.</dd>
 <dl>
 <dt><code>List[T]</code></dt>
 <dd>List of output.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">&gt;&gt;&gt; DistributedQuery(range(100)).to_list()
+[1, 2, 3, ..., 99]  # Not necessarily in this order.
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1396,6 +1945,12 @@ value to be used for the given element.</dd>
 
     Returns:
         List[T]: List of output.
+
+    Example:
+    ```python
+    &gt;&gt;&gt; DistributedQuery(range(100)).to_list()
+    [1, 2, 3, ..., 99]  # Not necessarily in this order.
+    ```
     &#34;&#34;&#34;
     return sum(self, [])</code></pre>
 </details>
@@ -1416,7 +1971,14 @@ are kept.</dd>
 <dl>
 <dt><code><a title="linq.DistributedQuery" href="#linq.DistributedQuery">DistributedQuery</a>[T]</code></dt>
 <dd>Query where elements pass the condition.</dd>
-</dl></div>
+</dl>
+<p>Example:</p>
+<pre><code class="language-python">```python-repl
+&gt;&gt;&gt; def less_than_10(x):
+&gt;&gt;&gt;     return x &lt; 10
+&gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).count()
+10
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1431,6 +1993,13 @@ are kept.</dd>
 
     Returns:
         DistributedQuery[T]: Query where elements pass the condition.
+    
+    Example:
+    ```python
+    &gt;&gt;&gt; def less_than_10(x):
+    &gt;&gt;&gt;     return x &lt; 10
+    &gt;&gt;&gt; DistributedQuery(range(100)).where(less_than_10).count()
+    10
     &#34;&#34;&#34;
     self._query.add_block(query.blocks.Where(condition))
     return self</code></pre>
