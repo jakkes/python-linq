@@ -7,8 +7,7 @@ steps:
 - name: test and docs
   image: python:3.8-slim
   commands:
-  - pip install pdoc3==0.9.2
-  - pip install -r requirements.txt
+  - pip install pdoc3==0.9.2 -r requirements.txt
   - pytest
   - rm -rf ./docs/linq/
   - pdoc3 ./linq --html -o docs
@@ -20,8 +19,7 @@ steps:
     PYPI_PASSWORD:
       from secret: PYPI_PASSWORD
   commands:
-    - pip install twine requests
-    - pip install -r requirements.txt
+    - pip install twine -r requirements.txt
     - python scripts/publish_if_new_version.py
 - name: push
   image: alpine/git
