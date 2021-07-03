@@ -20,6 +20,8 @@ steps:
     PYPI_PASSWORD:
       from secret: PYPI_PASSWORD
   commands:
+    - pip install twine requests
+    - pip install -r requirements.txt
     - python scripts/publish_if_new_version.py
 - name: push
   image: alpine/git
