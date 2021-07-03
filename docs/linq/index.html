@@ -63,7 +63,8 @@ pip install -r requirements.txt
 &gt;&gt;&gt;     .select(heavy_transformation)
 &gt;&gt;&gt;     .to_list()
 &gt;&gt;&gt; )
-&gt;&gt;&gt; assert x == [0, 1, 4, 9, 16]
+&gt;&gt;&gt; print(x)
+[0, 1, 4, 9, 16]    # Not necessarily in this order.
 </code></pre>
 <details class="source">
 <summary>
