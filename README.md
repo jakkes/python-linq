@@ -45,5 +45,6 @@ Distribute heavy queries across multiple processes using `DistributedQuery`.
 >>>     .select(heavy_transformation)
 >>>     .to_list()
 >>> )
->>> assert x == [0, 1, 4, 9, 16]
+>>> print(x)
+[0, 1, 4, 9, 16]    # Not necessarily in this order.
 ```
