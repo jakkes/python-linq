@@ -8,9 +8,9 @@ from linq import __version__
 HOST = "https://pypi.org/pypi/python-linq"
 
 
-def get_latest_version():
+def get_versions():
     response = requests.get(f"{HOST}/json").json()
-    return response["info"]["version"]
+    return response["releases"].keys()
 
 
 def upload():
@@ -28,8 +28,7 @@ def main():
     if os.environ.get("PYPI_PASSWORD") is None:
         raise RuntimeError("PYPI_PASSWORD environment variable was not found.")
 
-    latest_version = get_latest_version()
-    if __version__ != latest_version:
+    if __version__ not in get_versions():
         print(f"New version {__version__} detected. Uploading...")
         upload()
     else:
