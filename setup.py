@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="python-linq",
-    version="2.0.3",
+    version="2.0.4",
     author="Jakob Stigenberg",
     description="Brings LINQ to Python",
     long_description=long_description,
@@ -17,7 +17,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ),
-    python_requires=">=3.8"
+    python_requires=">=3.7"
 )
 
 ### Publish
