@@ -35,3 +35,19 @@ trigger:
   - master
   event:
   - push
+
+---
+kind: pipeline
+type: docker
+name: pull request
+
+steps:
+- name: test
+  image: python:3.8-slim
+  commands:
+  - pip install -r requirements.txt
+  - pytest
+
+trigger:
+  event:
+  - pull_request
