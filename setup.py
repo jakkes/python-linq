@@ -1,12 +1,14 @@
-from linq import __version__
 import setuptools
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("VERSION", "r") as f:
+    version = f.read()
+
 setuptools.setup(
     name="python-linq",
-    version=__version__,
+    version=version,
     author="Jakob Stigenberg",
     description="Brings LINQ to Python",
     long_description=long_description,

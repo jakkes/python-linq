@@ -22,14 +22,26 @@ def upload():
     )
 
 
+def set_version(version):
+    with open("linq/__init__.py", "r") as f:
+        data = f.read()
+    data.replace("<%<%VERSION%>%>", version)
+    with open("linq/__init__.py", "w") as f:
+        f.write(data)
+
+
 def main():
+    with open("VERSION", "r") as f:
+        version = f.read()
+
     if os.environ.get("PYPI_USERNAME") is None:
         raise RuntimeError("PYPI_USERNAME environment variable was not found.")
     if os.environ.get("PYPI_PASSWORD") is None:
         raise RuntimeError("PYPI_PASSWORD environment variable was not found.")
 
-    if __version__ not in get_versions():
-        print(f"New version {__version__} detected. Uploading...")
+    if version not in get_versions():
+        print(f"New version {version} detected. Uploading...")
+        set_version(version)
         upload()
     else:
         print("No new version detected.")
