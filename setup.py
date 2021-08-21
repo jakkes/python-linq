@@ -1,3 +1,4 @@
+from linq import __version__
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -5,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="python-linq",
-    version="2.0.4",
+    version=__version__,
     author="Jakob Stigenberg",
     description="Brings LINQ to Python",
     long_description=long_description,
